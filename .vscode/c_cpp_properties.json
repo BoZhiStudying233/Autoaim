@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "${default}",
+                "limitSymbolsToIncludedHeaders": false
+            },
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/local/include/opencv4/",
+                "/usr/local/include/ceres/",
+                "/opt/intel/openvino_2022.3.0/runtime/include/**",
+                "/opt/intel/openvino_2022.3.0/runtime/include/openvino/**",
+                "/opt/intel/openvino_2022.3.0/runtime/include/ie/**",
+                "/opt/intel/openvino_2022.3.0/runtime/include/ngraph/**",
+                "/opt/ros/foxy/include"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "c++14",
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+        }
+    ],
+    "version": 4
+}
