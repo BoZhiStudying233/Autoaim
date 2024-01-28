@@ -5,6 +5,7 @@
 #include "OVInterpreter.hpp"
 #include "RM-V7-PostProcesser.hpp"
 #include "RM-V5-PostProcesser.hpp"
+#include "RM-V7-C-PostProcesser.hpp"
 
 void ModuleRegiste(void);
 
@@ -24,6 +25,7 @@ public:
         // post processer registe
         REGISTER_POSTPROCESSER(RmV5PostProcesser, "rm-v5-post-processer");
         REGISTER_POSTPROCESSER(RmV7PostProcesser, "rm-v7-post-processer");
+        REGISTER_POSTPROCESSER(RmV7CPostProcesser, "rm-v7-c-post-processer");
     }
 
 };

@@ -168,7 +168,6 @@ namespace rmos_transporter
         while (rclcpp::ok())
         {
 
-
             uint id = 0;
             u_char buf[8] = {0};
             u_char dlc = 0;
@@ -192,7 +191,7 @@ namespace rmos_transporter
                     quaternion_time_msg.quaternion_stamped.quaternion.x = q_temp.y();
                     quaternion_time_msg.quaternion_stamped.quaternion.y = q_temp.z();
                     quaternion_time_msg.quaternion_stamped.quaternion.z = q_temp.w();
-
+                    
                     geometry_msgs::msg::TransformStamped t;
                     t.header.stamp =  quaternion_time_msg.quaternion_stamped.header.stamp;
                     t.header.frame_id = "world";
@@ -219,27 +218,19 @@ namespace rmos_transporter
                     if ((buf[0] & 0x10) == 0x10)
                     {
                         mode_msg.mode = (int) base::Mode::NORMAL_RUNE;
-                        std::cout<<"NORMAL_RUNE"<<std::endl;    
                     }
                     else if ((buf[0] & 0x20) == 0x20)
                     {
                         mode_msg.mode = (int) base::Mode::RUNE;
-                        std::cout<<"RUNE"<<std::endl;
                     }
-                    else if ((buf[0] & 0x01) == 0x01)
-                    
+                    else
                     {
-                        mode_msg.mode = (int) base::Mode::NORMAL;
-                        std::cout<<"NORMAL"<<std::endl;
+                        mode_msg.mode = (int)base::Mode::NORMAL;
                     }
-                    else 
-                    {
-                        mode_msg.mode = (int) base::Mode::WAIT;
-                        std::cout<<"WAIT"<<std::endl;
-                    }
-                    
+                    //ForceSetMode(mode_msg);//比赛模式时记得注释掉！
+                    tellMode(mode_msg);
                     this->mode_pub_->publish(mode_msg);
-
+                    
                     if((buf[6] & 0x02) == 0x02)
                     {
                         autoaim_state_msg.autoaim_state = 1;
@@ -290,13 +281,64 @@ namespace rmos_transporter
         {
             quaternion[i] = (double)q[i] / 32768.0;
         }
-        // double *q_;
-        // q_ = quaternion;
+        double *q_;
+        q_ = quaternion;
         // std::cout<<"yaw"<<atan2f(2.0f*(q_[0]*q_[3]+q_[1]*q_[2]),2.0f*(q_[0]*q_[0]+q_[1]*q_[1]-1.0f))<<
         //             "pitch"<<asinf(-2.0f*(q_[1]*q_[3]-q_[0]*q_[2]))<<
         //             "roll"<<atan2f(2.0f*(q_[0]*q_[1]+q_[2]*q_[3]),2.0f*(q_[0]*q_[0]+q_[3]*q_[3])-1.0f)<<std::endl;
         // std::cout<<"q"<<q_[0]<<" "<<q_[1]<<" "<<q_[2]<<" "<<q_[3]<<std::endl;
 
+    }
+
+    void CanCommNode::ForceSetMode(rmos_interfaces::msg::Mode &mode_msg)
+    {
+        cv::FileStorage fs("./src/Algorithm/configure/Detector/detector/rune_detector/Rune.xml",cv::FileStorage::READ);
+        if(!fs.isOpened())
+        {
+            std::cout<<"Rune.xml is not opened!"<<std::endl;
+        }
+        int force_mode;
+        fs["force_mode"]>>force_mode;
+
+        switch(force_mode)
+        {
+            case 0: break;
+            case 1:
+            {
+                mode_msg.mode = (int)base::Mode::NORMAL;
+                break;
+            }
+            case 2:
+            {
+                mode_msg.mode = (int)base::Mode::NORMAL_RUNE;
+                break;
+            }
+            case 3:
+            {
+                mode_msg.mode = (int) base::Mode::RUNE;
+                break;
+            }
+            default:
+            {
+                std::cout<<"Wrong force_mode param!"<<std::endl;
+            }
+
+        }
+    }
+    void CanCommNode::tellMode(rmos_interfaces::msg::Mode mode_msg)
+    {
+        if(mode_msg.mode == (int) base::Mode::RUNE)
+        {
+            std::cout<<"RUNE"<<std::endl;
+        }
+        if(mode_msg.mode == (int) base::Mode::NORMAL)
+        {
+            std::cout<<"NORMAL"<<std::endl;
+        }
+        if(mode_msg.mode == (int) base::Mode::NORMAL_RUNE)
+        {
+            std::cout<<"NORMAL_RUNE"<<std::endl;
+        }
     }
 
 } // namespace rmos_comm

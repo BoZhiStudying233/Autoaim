@@ -16,14 +16,11 @@ namespace processer
             exit(0);
         }
         fs["lost_time_thres"] >> lost_time_thres_;
-
         fs["s2qxyz"] >> s2qxyz_;
         fs["s2qyaw"] >> s2qyaw_;
         fs["s2qr"] >> s2qr_;
-
         fs["r_xyz_factor"] >> r_xyz_factor;
         fs["r_yaw"] >> r_yaw;
-
         fs["delay"] >> delay_;
         fs["true_x"] >> true_x_;
 
@@ -126,7 +123,6 @@ namespace processer
     {
         double time = timestamp;
         bool is_tracking = false;
-        std::cout<<"tracker_.tracker_state:"<<tracker_.tracker_state<<std::endl;
         if (tracker_.tracker_state == base::LOST)
         {
             is_tracking = false;
@@ -170,7 +166,7 @@ namespace processer
             //predict
             cv::Point3d p_center = cv::Point3d(xc, yc, za + dz/ 2);
             cv::Point3d velocity_linear = cv::Point3d(vx, vy, vz);
-            double all_time = ballistic_solver_.getAngleTime(p_center * 1000).z + delay_;
+            double all_time = ballistic_solver_.getAngleTime(p_center * 1000, false).z + delay_;
 
             cv::Point3d linear_change = cv::Point3d(velocity_linear.x * (all_time+0.05),
                                                     velocity_linear.y * (all_time+0.05),
@@ -240,7 +236,7 @@ namespace processer
             }
 
             //求解最优点
-            double limit_area = 0.6 + abs(v_yaw)*0.08;
+            double limit_area = 0.6 + abs(v_yaw)*0.04;
             if(limit_area>0.99)
             {
                 limit_area = 0.99;
@@ -300,18 +296,21 @@ namespace processer
 
         double x = aim_point_2d.x;
         double delta_x = abs(x-this->true_x_);
+        // std::cout<<"x  is"<<x<<std::endl;
 
     
 
-        double fire_area = abs(150/v_yaw);
-        if(fire_area<20)
-        {
-            fire_area = 20;
+        double fire_area = abs(78.5/v_yaw);
+        //std::cout<<"v_yaw is"<<v_yaw<<std::endl;
+        //std::cout<<"fire_area is"<<fire_area<<std::endl;
+        if(fire_area<12){
+            fire_area=12;
         }
         if(fire_area>200)
         {
             fire_area = 200;
         }
+        // std::cout<<"delta_x is"<<delta_x<<std::endl;
 
         if(delta_x<fire_area)
         {
@@ -340,29 +339,5 @@ namespace processer
 
     }
 
-      bool Controler::judgeRuneFire(int num_id, uint32_t timestamp)
-      {
-        // 开火决策
-        // 1.判断扇叶切换
-        if(num_id != last_id_)
-        {
-            this->vane_change_timestamp_ = timestamp;
-            last_id_ = num_id;
-        }
-        // 2.时间差判断是否给予开火权,注意陀螺仪时间戳单位为ms;2500ms后切换扇叶
-        uint32_t delta_vane_change_timestamp = timestamp - this->vane_change_timestamp_;
-        uint32_t delta_fire_timestamp = timestamp - this->last_fire_timestamp_;
 
-        if(delta_vane_change_timestamp > ready_time_ && 
-            delta_fire_timestamp > bs_fly_time_)
-        {
-            last_fire_timestamp_ = timestamp;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-
-      }
 }

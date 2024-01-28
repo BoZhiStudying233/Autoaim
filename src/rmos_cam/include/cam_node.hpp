@@ -31,7 +31,6 @@
 
 #include "rmos_interfaces/msg/mode.hpp"
 #include "rmos_interfaces/msg/exp.hpp"
-
 namespace rmos_cam
 {
     class CamNode : public rclcpp::Node
@@ -46,9 +45,13 @@ namespace rmos_cam
             image_transport::CameraPublisher img_pub_;                // 信息发布
             sensor_msgs::msg::CameraInfo camera_info_msg_;            // 相机消息
             sensor_msgs::msg::Image::SharedPtr image_msg_;
+
             rmos_interfaces::msg::Exp exp_msg;
+
+
             cv::Mat image_;
             std::unique_ptr<camera_info_manager::CameraInfoManager> cam_info_manager_;
+            rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_pub_;
 
             uint32_t frame_id_ = 0;                                   // 帧计数器
     };
@@ -60,40 +63,41 @@ namespace rmos_cam
         ~DahengCamNode();
     protected:
 
+        
+        /**
+        *  @brief  设置模式
+        */
+        void setMode(int mode);
 
-    /**
-     *  @brief  设置模式
-     */
-    void setMode(int mode);
+        void JudgeReset();
 
-    void JudgeReset();
+        void autoExpChange();
 
-    void autoExpChange();
+        // exp
+        int normal_Exposure = 2500;
+        int normal_Gamma = 9;
+        
+        int rune_Exposure = 1200;
+        int rune_Gamma = 6;
+        
+        int auto_exp_change = 0;
+        int max_exp = 5000;
+        int min_exp = 300; 
+        int change_num = 0;
 
-    // exp
-    int normal_Exposure = 2500;
-    int normal_Gamma = 9;
-    
-    int rune_Exposure = 1200;
-    int rune_Gamma = 6;
-    
-    int auto_exp_change = 0;
-    int max_exp = 5000;
-    int min_exp = 300; 
-    int change_num = 0;
 
-    /*mode*/
-    base::Mode mode_ = base::Mode::NORMAL;
-    base::Mode previous_mode_ = base::Mode::NORMAL;
-    int mode = 0;
+        /*mode*/
+        base::Mode mode_ = base::Mode::NORMAL;
+        base::Mode previous_mode_ = base::Mode::NORMAL;
+        int mode = 0;
 
-    // 模式切换计数器
-    int mode_num = 0;
+        // 模式切换计数器
+        int mode_num = 0;
 
-    rclcpp::Publisher<rmos_interfaces::msg::Exp>:: SharedPtr exp_pub_;
-    rclcpp::Subscription<rmos_interfaces::msg::Mode>::SharedPtr mode_sub_;
-    std::shared_ptr<camera::DahengCam> cam_dev_;
-    std::thread capture_thread_;                    // 采图线程
+        rclcpp::Publisher<rmos_interfaces::msg::Exp>:: SharedPtr exp_pub_;
+        rclcpp::Subscription<rmos_interfaces::msg::Mode>::SharedPtr mode_sub_;
+        std::shared_ptr<camera::DahengCam> cam_dev_;
+        std::thread capture_thread_;                    // 采图线程
 
     };
     class VirtualCamNode : public virtual CamNode

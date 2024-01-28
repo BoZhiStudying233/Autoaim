@@ -15,21 +15,22 @@ namespace detector
         switch (armor.type)
         {
             case base::ArmorType::SMALL:
-                cv::solvePnP(small_armor, point2D, camera_matrix, dist_coeffs, rVec, tVec, false, cv::SOLVEPNP_ITERATIVE);
+                cv::solvePnP(small_armor, point2D, camera_matrix, dist_coeffs, rVec, tVec, false, cv::SOLVEPNP_IPPE);
                 break;
             case base::ArmorType::BIG:
-                cv::solvePnP(big_armor, point2D, camera_matrix, dist_coeffs, rVec, tVec, false, cv::SOLVEPNP_ITERATIVE);
+                cv::solvePnP(big_armor, point2D, camera_matrix, dist_coeffs, rVec, tVec, false, cv::SOLVEPNP_IPPE);
                 break;
             default:
-                cv::solvePnP(big_armor, point2D, camera_matrix, dist_coeffs, rVec, tVec, false, cv::SOLVEPNP_ITERATIVE);
+                cv::solvePnP(big_armor, point2D, camera_matrix, dist_coeffs, rVec, tVec, false, cv::SOLVEPNP_IPPE);
                 break;
         }
 
         return true;
 
+
+
     }
-
-
+    
     bool PnpSolver::solveRuneArmorPose(std::vector<cv::Point2f> rune_next_pos,const cv::Mat& camera_matrix,const cv::Mat& dist_coeffs,cv::Mat &tVec, cv::Mat &rVec)
     {
         
@@ -42,8 +43,5 @@ namespace detector
         return true;
 
     }
-
-
-
 
 }

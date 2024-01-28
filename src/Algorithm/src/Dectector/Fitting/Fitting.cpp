@@ -1,6 +1,6 @@
 #include "Dectector/Fitting/Fitting.h"
 
-namespace detector
+namespace RuneDetector
 {
 
     /*-----------Fitting-----------*/

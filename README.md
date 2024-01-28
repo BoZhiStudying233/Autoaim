@@ -6,21 +6,22 @@
     -opencv4.4.0
     -Eigen
 ## CmakeList.txt
-    -需要手动更改每个CmakeList.txt中的3rdparty路径
-
+    -需要更改每个CmakeList.txt中的3rdparty路径。
+     可以运行replace_3rdparty_path.sh一键替换
+     若运行失败，可能是需要赋权。
+    -3rdparty路径不可包含中文！
 ## 运行节点
 
 - 相机节点： daheng_cam  启动命令：`ros2 run rmos_cam daheng_camera`
-- 传统识别节点：basic_detector 启动命令： `ros2 run rmos_detector basic_detector`
+- 传统识别节点：basic_detector 启动命令： `ros2 run rmos_detector rune_detector`
 - 解算节点：processer              启动命令：`ros2 run rmos_processer processer`
 - 通信节点 ： can_comm            启动命令：`ros2 run rmos_transporter can_comm`
-
+- 
 ## 如何启动程序
 `source install/setup.bash`
 
 `ros2 launch rmos_bringup normal_aim.launch.py`
 
-source install/setup.bash && ros2 run rmos_detector basic_detector
 
 ## 需要调试的地方
 
@@ -62,8 +63,7 @@ source install/setup.bash && ros2 run rmos_detector basic_detector
 
 ## TODO
 
-- 分类数据集中没有5号平衡
-- 和大符代码合并
+暂无
 
 
 

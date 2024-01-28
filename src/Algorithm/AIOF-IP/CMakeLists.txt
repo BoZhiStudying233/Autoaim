@@ -20,8 +20,12 @@ endif()
 
 #查找必要的依赖包
 find_package(OpenCV 4 REQUIRED)
-find_package(InferenceEngine REQUIRED)
+find_package(InferenceEngine)
 find_package(ngraph REQUIRED)
+
+include_directories(
+    include
+)
 
 add_library(aiof SHARED
     src/Module.cc
@@ -39,8 +43,6 @@ target_include_directories(aiof
     PUBLIC ${InferenceEngine_INCLUDE_DIRS}
     PUBLIC include
 )
-
-
 
 # Install libraries
 install(TARGETS aiof

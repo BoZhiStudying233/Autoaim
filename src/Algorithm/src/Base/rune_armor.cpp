@@ -30,6 +30,7 @@ namespace base
         }
     }
 
+    
     void RuneArmor::initRuneArmor(std::vector<cv::Point2f> hull)
     {
         this->candidates_points = hull;

@@ -97,6 +97,9 @@ namespace rmos_transporter
          */
         void recevieCallBack();
 
+        void ForceSetMode(rmos_interfaces::msg::Mode &mode_msg);
+        void tellMode(rmos_interfaces::msg::Mode mode_msg);
+
         transporter::Can can_;   // can通信接口
 
         /* Buffer */

@@ -37,6 +37,12 @@ namespace detector {
             temp = image(cv::Rect2d(armor.rect));
             gamma(temp, temp, 0.6);
             cv::Mat num_image = cv::Mat::zeros(144,240,CV_8UC3);
+            if(temp.cols <= 10 || temp.rows <= 10)
+            {
+                armor.type = base::ArmorType::WRONG;
+                continue;
+            }
+
             cv::resize(temp,num_image,num_image.size());
             //cv::imshow("num",num_image);
             double confidence = 0;

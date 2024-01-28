@@ -31,11 +31,11 @@ rosidl_generate_interfaces(${PROJECT_NAME}
         "msg/QuaternionTime.msg"
         "msg/Color.msg"
         "msg/BulletSpeed.msg"
-        "msg/Exp.msg"
         "msg/Mode.msg"
         "msg/AutoaimState.msg"
         "msg/Target.msg"
-
+        
+        "msg/Exp.msg"
   DEPENDENCIES
     std_msgs
     geometry_msgs

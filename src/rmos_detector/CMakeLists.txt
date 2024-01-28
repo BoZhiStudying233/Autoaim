@@ -14,7 +14,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 set(INCLUDES ${INCLUDES} $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 set(INCLUDES ${INCLUDES} $<INSTALL_INTERFACE:/include>)
-set(3RDPARTY_LIB "/home/nuc12/Desktop/Infantry-2023/3rdparty/lib/")
+set(3RDPARTY_LIB "/v/User/Desktop/hbRMOS_1.0-master/3rdparty/lib/")
 include_directories(include/${PROJECT_NAME})
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
@@ -27,6 +27,7 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
   /usr/include/eigen3
         ${3RDPARTY_LIB}
+        ../../src/Algorithm/AIOF-IP/include
 )
 
 ament_auto_find_build_dependencies()
@@ -37,15 +38,12 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
 
 target_include_directories(${PROJECT_NAME}
                       PUBLIC ${OpenCV_INCLUDE_DIR}
-                      PUBLIC ${OpenCV_INCLUDE_DIR}
-                      PUBLIC ${InferenceEngine_INCLUDE_DIRS}
                       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                         $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(${PROJECT_NAME} 
-                      ${InferenceEngine_LIBRARIES}
-                      ${NGRAPH_LIBRARIES}
-                      ${OpenCV_LIBS})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS}
+${InferenceEngine_LIBRARIES}
+${NGRAPH_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME}
        DESTINATION lib/${PROJECT_NAME})
@@ -63,6 +61,16 @@ rclcpp_components_register_node(${PROJECT_NAME}
         EXECUTABLE basic_detector
         )
 
+
+rclcpp_components_register_node(${PROJECT_NAME}
+        PLUGIN rune_detector::RuneDetectorNode
+        EXECUTABLE rune_detector
+)
+
+rclcpp_components_register_node(${PROJECT_NAME}
+PLUGIN rmos_detector::MixDetectorNode
+EXECUTABLE mix_detector
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

@@ -11,20 +11,7 @@ namespace debug
         {
             cv::FileStorage fs("./src/Algorithm/configure/Debug/debug.xml", cv::FileStorage::READ);
             bool result;
-    
-            if(option == base::DebugOption::SAVE_IMAGE)
-            {
-                fs["save_image"]>>result;
-                fs.release();
-                return result;
-            }
-            if(option == base::DebugOption::SAVE_DRAW_IMAGE)
-            {
-                fs["save_draw_image"]>>result;
-                fs.release();
-                return result;
-            }
-            
+
             fs["contest"]>>result;
             if(result)
             {
@@ -66,5 +53,8 @@ namespace debug
             return false;
         }
     }
+        
+       
+        
 
 }

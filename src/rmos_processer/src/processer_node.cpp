@@ -9,28 +9,24 @@ namespace rmos_processer {
     ProcesserNode::ProcesserNode(const rclcpp::NodeOptions &options) : Node("processer", options) {
         RCLCPP_INFO(this->get_logger(), "Start processer_node");
         controler_ = std::make_shared<processer::Controler>();
-        this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/camera_info", rclcpp::SensorDataQoS(),
+        this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/daheng_camera_info", rclcpp::SensorDataQoS(),
                                                                                          [this](sensor_msgs::msg::CameraInfo::ConstSharedPtr camera_info_msg)
                                                                                          {
                                                                                              RCLCPP_INFO(this->get_logger(), "Receive camera infomation in processer");
-                                                                                            std::cout<<"1.0"<<std::endl;
 
                                                                                              this->camera_info_msg_ = *camera_info_msg;
 
                                                                                              this->camera_matrix_.create(3, 3, CV_64FC1);
 
-                                                                                            std::cout<<"3.0"<<std::endl;                                                                                             for (int i = 0; i < 9; i++)
+                                                                                             for (int i = 0; i < 9; i++)
                                                                                              {
                                                                                                  this->camera_matrix_.at<double>(i / 3, i % 3) = camera_info_msg->k[i];
                                                                                              }
                                                                                              this->camera_info_sub_.reset();
-                                                                                            std::cout<<"4.0"<<std::endl;
+
                                                                                          });
 
-
-
-
-
+        
 
 
         // set subscriber for imu_time,armor,and bullet_speed
@@ -50,7 +46,7 @@ namespace rmos_processer {
                 this->get_node_clock_interface(), std::chrono::duration<int>(100));
         tf2_filter_->registerCallback(&ProcesserNode::armorsCallBack, this);
 
-
+        
 
         this->quaternion_sub_callback_group_ = this->create_callback_group(CallbackGroupType::Reentrant);
         auto quaternion_sub_option = rclcpp::SubscriptionOptions();
@@ -140,9 +136,10 @@ namespace rmos_processer {
 
     }
 
+
+
     void ProcesserNode::armorsCallBack(const rmos_interfaces::msg::Armors::SharedPtr armors_msg)
     {
-        // std::cout<<"run armors callback"<<std::endl;
         this->controler_->getParam(camera_matrix_);
         if (quaternion_buf_.size() > 0) {
 
@@ -151,7 +148,6 @@ namespace rmos_processer {
             target_msg.header.frame_id = target_frame_;
             target_msg.timestamp_recv = timestamp_recv;
 
-           
             detect_marker_array_.markers.clear();
             process_marker_array_.markers.clear();
             armor_marker_.points.clear();
@@ -189,6 +185,7 @@ namespace rmos_processer {
                 double armor_roll, armor_pitch, armor_yaw;
                 tf2::Matrix3x3(tf_armor_q).getRPY(armor_roll, armor_pitch, armor_yaw);
                 new_armor.yaw = armor_yaw;
+                std::cout<<"armor_yaw="<<armor_yaw/3.1415926*180<<"   armor_pitch="<<armor_pitch/3.1415926*180<<"   armor_roll="<<armor_roll/3.1415926*180<<std::endl;
                 new_armor.yaw = controler_->tracker_.last_yaw_ +
                                 angles::shortest_angular_distance(controler_->tracker_.last_yaw_, armor_yaw);
 
@@ -207,7 +204,8 @@ namespace rmos_processer {
 
 
             cv::Point3f aiming_point;
-            int move_state = 3;
+            
+
 
             if(armors_msg->is_rune)
             {
@@ -218,7 +216,7 @@ namespace rmos_processer {
                     base::Armor target_rune_armor = new_armors[0];
                     aiming_point = target_rune_armor.position;
 
-                    cv::Point3f p_y_t = controler_->ballistic_solver_.getAngleTime(aiming_point*1000);
+                    cv::Point3f p_y_t = controler_->ballistic_solver_.getAngleTime(aiming_point*1000, armors_msg->is_rune);
                     float new_pitch = p_y_t.x;
                     float new_yaw = p_y_t.y;
 
@@ -279,106 +277,105 @@ namespace rmos_processer {
 
 
             }
+
             else
             {
-                move_state = controler_->getAimingPoint(new_armors,aiming_point, timestamp);
-                std::cout<<"move_state:"<<move_state<<std::endl;
-                if (move_state != 3) {
-                    cv::Point3f p_y_t = controler_->ballistic_solver_.getAngleTime(aiming_point*1000);
-                    float new_pitch = p_y_t.x;
-                    float new_yaw = p_y_t.y;
-                    rmos_interfaces::msg::QuaternionTime gimble_pose = quaternion_buf_.back();
-                    tf2::Quaternion tf_gimble_q;
-                    tf2::fromMsg(gimble_pose.quaternion_stamped.quaternion, tf_gimble_q);
-                    double gimble_roll, gimble_pitch, gimble_yaw;
-                    tf2::Matrix3x3(tf_gimble_q).getRPY(gimble_roll, gimble_pitch, gimble_yaw);
-                    float pitch = gimble_pitch * 180.0 / 3.1415926535;
-                    float yaw = gimble_yaw * 180.0 / 3.1415926535;
 
-                    float delta_pitch = -new_pitch - pitch;
-                    float delta_yaw = new_yaw - yaw;
+                    int move_state = controler_->getAimingPoint(new_armors,aiming_point, timestamp);
+                    if (move_state != 3) {
+                        cv::Point3f p_y_t = controler_->ballistic_solver_.getAngleTime(aiming_point*1000, armors_msg->is_rune);
+                        float new_pitch = p_y_t.x;
+                        float new_yaw = p_y_t.y;
 
-                    float gun_pitch = delta_pitch+controler_->gun_pitch_offset_;
-                    float gun_yaw = delta_yaw+controler_->gun_yaw_offset_;
+                        rmos_interfaces::msg::QuaternionTime gimble_pose = quaternion_buf_.back();
+                        tf2::Quaternion tf_gimble_q;
+                        tf2::fromMsg(gimble_pose.quaternion_stamped.quaternion, tf_gimble_q);
+                        double gimble_roll, gimble_pitch, gimble_yaw;
+                        tf2::Matrix3x3(tf_gimble_q).getRPY(gimble_roll, gimble_pitch, gimble_yaw);
+                        float pitch = gimble_pitch * 180.0 / 3.1415926535;
+                        float yaw = gimble_yaw * 180.0 / 3.1415926535;
 
-                    std::cout<<"gun_pitch:"<<gun_pitch<<"\tgun_yaw:"<<gun_yaw<<std::endl;
 
-                    target_msg.id = this->controler_->tracker_.tracked_id;
-                    target_msg.track_state = this->controler_->tracker_.tracker_state;
-                    target_msg.position.x = aiming_point.x;
-                    target_msg.position.y = aiming_point.y;
-                    target_msg.position.z = aiming_point.z;
+                        float delta_pitch = -new_pitch - pitch;
+                        float delta_yaw = new_yaw - yaw;
+                        
+                        float gun_pitch = delta_pitch+controler_->rune_gun_pitch_offset_;
+                        float gun_yaw = delta_yaw+controler_->rune_gun_yaw_offset_;
 
-                    if(controler_->tracker_.target_state(7)>0)
-                    {
-                        target_msg.outpost_direction = 1;
+                        target_msg.id = this->controler_->tracker_.tracked_id;
+                        target_msg.track_state = this->controler_->tracker_.tracker_state;
+                        target_msg.position.x = aiming_point.x;
+                        target_msg.position.y = aiming_point.y;
+                        target_msg.position.z = aiming_point.z;
+                        if(controler_->tracker_.target_state(7)>0)
+                        {
+                            target_msg.outpost_direction = 1;
+                        }
+                        else
+                        {
+                            target_msg.outpost_direction = -1;
+                        }
+
+
+                        //将瞄准点投影回2d平面，通过像素距离判断，判断开火
+                        geometry_msgs::msg::PoseStamped px;
+                        px.header = target_msg.header;
+                        px.pose.position.x = aiming_point.x*1000;
+                        px.pose.position.y = aiming_point.y*1000;
+                        px.pose.position.z = aiming_point.z*1000;
+                        std::string oral_frame = "camera";
+                        try
+                        {
+                            px.pose = tf2_buffer_->transform(px, oral_frame).pose;
+                        }
+                        catch (const tf2::LookupException &ex)
+                        {
+                            RCLCPP_ERROR(get_logger(), "Error while transforming %s", ex.what());
+                            return;
+                        }
+                        catch (const tf2::ExtrapolationException &ex)
+                        {
+                            RCLCPP_ERROR(get_logger(), "Error while transforming %s", ex.what());
+                            return;
+                        }
+                        cv::Point3f aiming_point_camera(px.pose.position.x,px.pose.position.y,px.pose.position.z);
+
+                        bool is_fire = this->controler_->judgeFire(aiming_point_camera,this->controler_->tracker_.target_state(7));
+                        target_msg.suggest_fire = is_fire;
+                        if(move_state==1)
+                        {
+                        
+                            target_msg.gun_pitch = gun_pitch;
+                            target_msg.gun_yaw = gun_yaw;
+
+                        }
+                        else
+                        {
+                            target_msg.gun_pitch = 0;
+                            target_msg.gun_yaw = 0;
+                        }
                     }
                     else
                     {
-                        target_msg.outpost_direction = -1;
-                    }
-
-
-                    //将瞄准点投影回2d平面，通过像素距离判断，判断开火
-                    geometry_msgs::msg::PoseStamped px;
-                    px.header = target_msg.header;
-                    px.pose.position.x = aiming_point.x*1000;
-                    px.pose.position.y = aiming_point.y*1000;
-                    px.pose.position.z = aiming_point.z*1000;
-                    std::string oral_frame = "camera";
-                    try
-                    {
-                        px.pose = tf2_buffer_->transform(px, oral_frame).pose;
-                    }
-                    catch (const tf2::LookupException &ex)
-                    {
-                        RCLCPP_ERROR(get_logger(), "Error while transforming %s", ex.what());
-                        return;
-                    }
-                    catch (const tf2::ExtrapolationException &ex)
-                    {
-                        RCLCPP_ERROR(get_logger(), "Error while transforming %s", ex.what());
-                        return;
-                    }
-                    cv::Point3f aiming_point_camera(px.pose.position.x,px.pose.position.y,px.pose.position.z);
-
-                    bool is_fire = this->controler_->judgeFire(aiming_point_camera,this->controler_->tracker_.target_state(7));
-                    target_msg.suggest_fire = is_fire;
-                    if(move_state==1)
-                    {
-                    
-                        target_msg.gun_pitch = gun_pitch;
-                        target_msg.gun_yaw = gun_yaw;
-
-                    }
-                    else
-                    {
+                        target_msg.id = -1;
+                        target_msg.track_state = this->controler_->tracker_.tracker_state;
+                        target_msg.position.x = 0;
+                        target_msg.position.y = 0;
+                        target_msg.position.z = 0;
                         target_msg.gun_pitch = 0;
                         target_msg.gun_yaw = 0;
                     }
+                    
+                    if(debug::get_debug_option(base::SHOW_RVIZ))
+                    {
+                        using Marker = visualization_msgs::msg::Marker;
+                        armor_marker_.action = (armors_msg->armors).empty() ? Marker::DELETE : Marker::ADD;
+                        detect_marker_array_.markers.emplace_back(armor_marker_);
+                        publishMarkers(target_msg);
+                    }
+                    detect_marker_pub_->publish(detect_marker_array_);
                 }
-                else
-                {
-                    target_msg.id = -1;
-                    target_msg.track_state = this->controler_->tracker_.tracker_state;
-                    target_msg.position.x = 0;
-                    target_msg.position.y = 0;
-                    target_msg.position.z = 0;
-                    target_msg.gun_pitch = 0;
-                    target_msg.gun_yaw = 0;
-                }
-
-                if(debug::get_debug_option(base::SHOW_RVIZ))
-                {
-                    using Marker = visualization_msgs::msg::Marker;
-                    armor_marker_.action = (armors_msg->armors).empty() ? Marker::DELETE : Marker::ADD;
-                    detect_marker_array_.markers.emplace_back(armor_marker_);
-                    publishMarkers(target_msg);
-                }
-                detect_marker_pub_->publish(detect_marker_array_);
-            }
-            // std::cout<<"777"<<std::endl;
-            target_pub_->publish(target_msg);
+                target_pub_->publish(target_msg);
         }
         else
         {
@@ -412,7 +409,7 @@ namespace rmos_processer {
     {
         if(this->autoaim_state_buf_.size()>0)
         {
-            if((*autoaim_state_msg).autoaim_state == 0)
+            if(autoaim_state_buf_.back().autoaim_state == 1 &&(*autoaim_state_msg).autoaim_state==0 )
             {
                 this->controler_->tracker_.reset();
             }

@@ -21,6 +21,7 @@ public:
         fs["post_processers"][params_position]["params"]["iou_thre"] >> iou_thre_;
         fs["post_processers"][params_position]["params"]["key_points_num"] >> key_points_num_;
 
+
         std::vector<int> remap_src_size;
         cv::FileNode remap_src_fn = fs["post_processers"][params_position]["params"]["remap_src"];
         // if(remap_src_fn.type() != cv::FileNode::SEQ) {}
@@ -132,6 +133,10 @@ public:
                     ),
                 .points = {
                         cv::Point2d(
+                                (p_tensor_[i + 8] - remap_params_.ox) / remap_params_.scale, 
+                                (p_tensor_[i + 9] - remap_params_.oy) / remap_params_.scale
+                            ),
+                        cv::Point2d(
                                 (p_tensor_[i + 11] - remap_params_.ox) / remap_params_.scale, 
                                 (p_tensor_[i + 12] - remap_params_.oy) / remap_params_.scale
                             ),
@@ -142,14 +147,6 @@ public:
                         cv::Point2d(
                                 (p_tensor_[i + 17] - remap_params_.ox) / remap_params_.scale, 
                                 (p_tensor_[i + 18] - remap_params_.oy) / remap_params_.scale
-                            ),
-                        cv::Point2d(
-                                (p_tensor_[i + 20] - remap_params_.ox) / remap_params_.scale, 
-                                (p_tensor_[i + 21] - remap_params_.oy) / remap_params_.scale
-                            ),
-                        cv::Point2d(
-                                (p_tensor_[i + 23] - remap_params_.ox) / remap_params_.scale, 
-                                (p_tensor_[i + 24] - remap_params_.oy) / remap_params_.scale
                             )
                     },
                 .id = max_id,

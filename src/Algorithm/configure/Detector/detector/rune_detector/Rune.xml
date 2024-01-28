@@ -24,5 +24,5 @@
     <delay_time>0.45</delay_time>
     <save_txt>1</save_txt>  
     <print_result>1</print_result>
-
+    <force_mode>1</force_mode><!--强制设置模式，0为不强制，1为自瞄，2为小符，3为大符-->
 </opencv_storage>

@@ -1,6 +1,6 @@
 #include "Dectector/Fitting/Fittool.h"
 
-namespace detector
+namespace RuneDetector
 {
     bool Judgement::Judge(double& judge_speed, bool is_direction_inited, bool is_clockwise)
     {
