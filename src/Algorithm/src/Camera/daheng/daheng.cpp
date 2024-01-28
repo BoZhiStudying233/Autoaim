@@ -13,7 +13,7 @@ namespace camera
         // default param
         params_[CamParamType::Height] = 1200;
         params_[CamParamType::Width] = 1920;
-        params_[CamParamType::AutoExposure] = 1;     // 自动曝光 ，0为否
+        params_[CamParamType::AutoExposure] = 0;     // 自动曝光 ，0为否
         params_[CamParamType::Exposure] = 1000; // 曝光时间 单位 us
         params_[CamParamType::AutoWhiteBalance] = 0; //自动白平衡 ，0为否
         params_[CamParamType::RGain] = 19.8;           // 红通道增益

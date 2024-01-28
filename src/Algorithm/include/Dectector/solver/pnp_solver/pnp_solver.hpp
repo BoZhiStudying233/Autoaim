@@ -20,7 +20,6 @@
 #include <iostream>
 
 #include "../../../Base/armor.hpp"
-#include "../../../Base/rune_armor.hpp"
 #include "../../detector_interfaces/solver_interface.hpp"
 
 
@@ -45,13 +44,14 @@ namespace detector
             rune_armor.push_back(cv::Point3d(0.0,rune_width / 2.0, rune_height / 2.0));
             rune_armor.push_back(cv::Point3d(0.0,-rune_width / 2.0, rune_height / 2.0));
             rune_armor.push_back(cv::Point3d(0.0,-rune_width / 2.0, -rune_height / 2.0));
+
         };
         ~PnpSolver(){};
 
         bool solveArmorPose(const base::Armor& armor,const cv::Mat& camera_matrix,const cv::Mat& dist_coeffs,cv::Mat &tVec, cv::Mat &rVec) override;
-
+        
+        //由于打符的特殊性，打符传进来的是点而不是Armor型的量，所以函数是分开的。
         bool solveRuneArmorPose(std::vector<cv::Point2f> rune_next_pos,const cv::Mat& camera_matrix,const cv::Mat& dist_coeffs,cv::Mat &tVec, cv::Mat &rVec);
-
     private:
         float small_width = 125;
         float small_height = 55;

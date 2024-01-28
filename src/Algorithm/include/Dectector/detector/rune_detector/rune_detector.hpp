@@ -5,7 +5,7 @@
 #include "../../../../AIOF-IP/include/Common.hpp"
 #include "../../../../AIOF-IP/include/Runtime.hpp"
 
-namespace detector
+namespace RuneDetector
 {
     using namespace cv;
     using namespace std;

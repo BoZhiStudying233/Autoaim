@@ -37,6 +37,7 @@
 #include "rmos_interfaces/msg/quaternion_time.hpp"
 #include "rmos_interfaces/msg/bullet_speed.hpp"
 #include "rmos_interfaces/msg/autoaim_state.hpp"
+#include "rmos_interfaces/msg/mode.hpp"
 
 
 #include "../../Algorithm/include/Processer/controler.hpp"
@@ -78,8 +79,16 @@ namespace rmos_processer
          * @brief  RVIZ可视化
          */
         void publishMarkers(const rmos_interfaces::msg::Target &target_msg);
-
-
+        /**
+         *  @brief 设置模式
+        */
+        // void setMode(int mode);
+        // base::Mode mode_ = base::Mode::NORMAL;
+        // base::Mode last_mode_ = base::Mode::NORMAL; 
+        
+        int mode__=0;//调节弹速系数时用于判断是打符模式还是自瞄模式
+        int last_mode__=0;
+        
         rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_sub_;
 
         message_filters::Subscriber<rmos_interfaces::msg::Armors> armors_sub_;

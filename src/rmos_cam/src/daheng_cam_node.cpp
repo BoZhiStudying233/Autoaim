@@ -13,6 +13,7 @@
 
 #include "../include/cam_node.hpp"
 
+
 namespace rmos_cam
 {
     DahengCamNode::DahengCamNode(const rclcpp::NodeOptions &options) : CamNode("daheng_camera", options)
@@ -30,7 +31,6 @@ namespace rmos_cam
             RCLCPP_ERROR(this->get_logger(), "Open daheng_camera.xml fail!");
             exit(0);
         }
-
         fs["width"] >> Width;
         fs["height"] >> Height;
         fs["exposure"] >> Exposure;
@@ -39,7 +39,6 @@ namespace rmos_cam
         fs["bgain"] >> BGain;
         fs["fps"] >> Fps;
         fs["gain"] >> Gamma;
-
         fs["rune_exposure"] >> this->rune_Exposure;
         fs["rune_gain"] >> this->rune_Gamma;
 
@@ -51,13 +50,6 @@ namespace rmos_cam
 
         this->normal_Exposure = Exposure;
         this->normal_Gamma = Gamma;
-
-        std::cout << "rune_Gamma:" << rune_Gamma << std::endl;
-        std::cout << "rune_Exposure:" << rune_Exposure << std::endl;
-
-        std::cout << "Gamma:" << Gamma << std::endl;
-        std::cout << "Exposure:" << Exposure << std::endl;
-
         // set paramter
         cam_dev_->set_parameter(camera::CamParamType::Height, Height);
         cam_dev_->set_parameter(camera::CamParamType::Width, Width);
@@ -70,9 +62,13 @@ namespace rmos_cam
         cam_dev_->set_parameter(camera::CamParamType::Gamma, Gamma);
         cam_dev_->set_parameter(camera::CamParamType::Fps, Fps);
 
+
+
+
         cam_dev_->open();
 
         img_pub_ = image_transport::create_camera_publisher(this, "/image_raw", rmw_qos_profile_default);
+
 
         // load camera_info
         cam_info_manager_ = std::make_unique<camera_info_manager::CameraInfoManager>(this, "DahengCam");
@@ -98,21 +94,19 @@ namespace rmos_cam
                     this->mode = (*mode_msg).mode;
                     setMode(mode);
                 });
+        camera_info_pub_ = create_publisher<sensor_msgs::msg::CameraInfo>("/daheng_camera_info", 10);
 
         capture_thread_ = std::thread{[this]() -> void
                                       {
                                           while (rclcpp::ok())
                                           {
-
-                                              // 判断是否需要模式切换
-                                              // this->mode_ = rmos_base::Mode::RUNE;
+                                              //this->mode_ = base::Mode::NORMAL_RUNE;
                                               JudgeReset();
-
                                               if (!cam_dev_->is_open())
                                               {
                                                   exit(0);
                                               }
-                                              
+                                              //sensor_msgs::msg::Image image_msg_;
 
                                               if (cam_dev_->grab_image(image_))
                                               {
@@ -121,13 +115,15 @@ namespace rmos_cam
                                                   (*image_msg_).header.frame_id = "camera";
                                                   camera_info_msg_.header.frame_id = (*image_msg_).header.frame_id;
 
+                                                  img_pub_.publish(*image_msg_, camera_info_msg_);
+                                                  camera_info_pub_->publish(camera_info_msg_);
+
                                                   if(this->auto_exp_change)
                                                     autoExpChange();
 
                                                   exp_msg.exp = cam_dev_->params_[camera::CamParamType::Exposure];
                                                   exp_pub_->publish(exp_msg);
                                                   img_pub_.publish(*image_msg_, camera_info_msg_);
-
                                               }
                                               else
                                               {
@@ -136,8 +132,8 @@ namespace rmos_cam
                                               }
                                           }
                                       }};
+            
     }
-
     void DahengCamNode::setMode(int mode)
     {
         if(mode == 1)

@@ -7,7 +7,7 @@
 
 # include "../Fitting/Fittool.h"
 
-namespace detector{
+namespace RuneDetector{
 
 using namespace std;
 using namespace cv;

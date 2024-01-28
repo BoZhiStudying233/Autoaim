@@ -16,7 +16,7 @@
 #include <Eigen/Dense>
 #include <filesystem>
 
-namespace detector{
+namespace RuneDetector{
 
 using namespace std;
 

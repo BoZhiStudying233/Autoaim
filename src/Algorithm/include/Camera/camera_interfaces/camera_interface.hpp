@@ -4,7 +4,6 @@
 
 #ifndef RMOS_CAMERA_INTERFACE_HPP
 #define RMOS_CAMERA_INTERFACE_HPP
-
 #include "Base/const.hpp"
 namespace camera
 {

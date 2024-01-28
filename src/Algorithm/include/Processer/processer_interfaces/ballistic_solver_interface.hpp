@@ -13,7 +13,7 @@ namespace processer
     class BallisticSolverInterface
     {
     public:
-        virtual cv::Point3f getAngleTime(cv::Point3f position)=0;
+        virtual cv::Point3f getAngleTime(cv::Point3f position,bool is_rune)=0;
         virtual bool setBulletSpeed(int bullet_speed)=0;
     };
 

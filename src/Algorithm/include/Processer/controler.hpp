@@ -32,7 +32,7 @@ namespace processer
 
         BallisticSolver ballistic_solver_;
         tool::Tracker tracker_;
-
+        
         // 枪管偏置
         double gun_pitch_offset_;
         double gun_yaw_offset_;
@@ -56,16 +56,15 @@ namespace processer
         double delay_{0};
         double last_time_ {0};
 
-        //大符开火决策参数
+        float gun_pitch_offset ;
+        float gun_yaw_offset ;
+
+       //大符开火决策参数
         int last_id_{-1};
         double bs_fly_time_{0};
         double ready_time_{0};
         double vane_change_timestamp_{0};
         double last_fire_timestamp_{0};
-
-
-
-
     };
 
 }

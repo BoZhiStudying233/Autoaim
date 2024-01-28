@@ -53,13 +53,14 @@ namespace camera
         // 重设参数
         bool reset_parameters(const std::map<CamParamType, int> & param_map);
 
+        // 构造
+        explicit DahengCam(const std::string camera_sn = "");
+
 
         // 改变曝光参数
         void changeExp(int exp);
 
-        // 构造
-        explicit DahengCam(const std::string camera_sn = "");
-
+        
         ~DahengCam();
 
     private:

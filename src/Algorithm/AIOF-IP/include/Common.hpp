@@ -23,6 +23,7 @@ struct DetectResult
     std::vector<cv::Point2d> points;
     int id;
     double conf;
+    float temp_tensor[50];
 };
 
 using DetectResultList = std::vector<DetectResult>;

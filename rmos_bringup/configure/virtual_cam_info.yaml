@@ -4,12 +4,12 @@ camera_name: VirtualCam
 camera_matrix:
   rows: 3
   cols: 3
-  data: [1.5818e+03, 0.0, 640.1223, 0.0, 1.5809e+03, 352.3322, 0.0, 0.0, 1.0]
+  data: [1.5704e+03, 0.0, 640.2380, 0.0, 1.5716e+03, 352.8134, 0.0, 0.0, 1.0]
 distortion_model: plumb_bob
 distortion_coefficients:
   rows: 1
   cols: 5
-  data: [-0.2308, 0.0465, 0.0, 0.0, 0.0]
+  data: [-0.2411, 0.1216, 0.0, 0.0, 0.0]
 rectification_matrix: # 暂不使用
   rows: 3
   cols: 3

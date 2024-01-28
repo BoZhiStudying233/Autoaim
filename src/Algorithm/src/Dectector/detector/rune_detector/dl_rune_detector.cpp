@@ -1,12 +1,12 @@
 #include "Dectector/detector/rune_detector/rune_detector.hpp"
 
 
-namespace detector
+namespace RuneDetector
 {
     DlRuneDetector::DlRuneDetector()
     {
-
-        rt.init("./src/Algorithm/AIOF-IP/config/rtc_rm_v7_rune.yaml");
+            //~~~
+        rt.init("./src/Algorithm/configure/Detector/detector/rune_detector/rtc_rm_v7_rune.yaml");
         std::cout<<rt.init_messages()<<std::endl;
         
         this->state = base::TrackState::LOST;

@@ -26,7 +26,7 @@ namespace base
     enum TrackState
     {
         LOST,       // 丢失目标
-        DETECTING,    // the first for finding
+        DETECTING,    // 丢失目标但在寻找目标
         TEMP_LOST,      // 丢失目标
         TRACKING,      // 持续识别目标
     };
@@ -35,7 +35,9 @@ namespace base
         NORMAL,     // 普通模式
         NORMAL_RUNE, // 小符模式
         RUNE,       // 大符模式
-        WAIT,    // 待命模式
+        OUTPOST,    // 前哨站模式
+        WAIT,
+        
     };
 
 

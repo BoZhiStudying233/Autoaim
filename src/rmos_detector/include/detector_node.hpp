@@ -20,31 +20,22 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <filesystem>
 
 //interfaces
 #include "rmos_interfaces/msg/armors.hpp"
 #include "rmos_interfaces/msg/armor.hpp"
 #include "rmos_interfaces/msg/color.hpp"
-#include "rmos_interfaces/msg/mode.hpp"
-#include "rmos_interfaces/msg/exp.hpp"
 
 #include "../../Algorithm/include/Dectector/detector_interfaces/detector_interface.hpp"
 #include "../../Algorithm/include/Dectector/detector/cj_detector/cj_detector.hpp"
 #include "../../Algorithm/include/Dectector/detector/traditional_detector/detector.hpp"
-#include "../../Algorithm/include/Dectector/detector/rune_detector/rune_detector.hpp"
 #include "../../Algorithm/include/Dectector/classifier/cj_classifier/cj_classifier.hpp"
 #include "../../Algorithm/include/Dectector/classifier/onnx_classifier/onnx_classifier.hpp"
-#include "../../Algorithm/include/Dectector/Fitting/Fitting.h"
 #include "../../Algorithm/include/Dectector/solver/pnp_solver/pnp_solver.hpp"
 #include "../../Algorithm/include/Debug/debug.hpp"
 
 namespace rmos_detector
 {
-
     class BaseDetectorNode : public rclcpp::Node
     {
     public:
@@ -60,8 +51,11 @@ namespace rmos_detector
         std::shared_ptr<image_transport::Subscriber> image_sub_;
         rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_sub_;
         rclcpp::Subscription<rmos_interfaces::msg::Color>::SharedPtr color_sub_;
-        rclcpp::Subscription<rmos_interfaces::msg::Mode>::SharedPtr mode_sub_;
-        rclcpp::Subscription<rmos_interfaces::msg::Exp>::SharedPtr exp_sub_;
+
+
+
+
+
 
     };
 
@@ -76,8 +70,8 @@ namespace rmos_detector
             this->image_sub_ = std::make_shared<image_transport::Subscriber>(image_transport::create_subscription(
                     this, "/image_raw", std::bind(&BasicDetectorNode::imageCallBack, this, std::placeholders::_1),
                     "raw",
-                    rmw_qos_profile_sensor_data));
-            this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/camera_info", rclcpp::SensorDataQoS(),
+                    rmw_qos_profile_default));
+            this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/daheng_camera_info", rclcpp::SensorDataQoS(),
                                                                                              [this](sensor_msgs::msg::CameraInfo::ConstSharedPtr camera_info_msg)
                                                                                              {
                                                                                                  RCLCPP_INFO(this->get_logger(), "Receive camera infomation");
@@ -105,23 +99,7 @@ namespace rmos_detector
                     {
                         int enemy_color = (*color_msg).color;
                         this->detector_->setEnemyColor(enemy_color);
-                        this->rune_detector_->setEnemyColor(enemy_color);
                     });
-
-            this->mode_sub_ = this->create_subscription<rmos_interfaces::msg::Mode>
-                ("/mode_info", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Mode::ConstSharedPtr mode_msg)
-                {
-                    // RCLCPP_INFO(this->get_logger(), "mode is %d", (*mode_msg).mode);
-                    int mode = (*mode_msg).mode;
-                    setMode(mode);
-                });
-            this->exp_sub_ = this->create_subscription<rmos_interfaces::msg::Exp>
-                ("/exp_info", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Exp::ConstSharedPtr exp_msg)
-                {
-                    // RCLCPP_INFO(this->get_logger(), "exp is %d", (*exp_msg).exp);
-                    this->Exposure = (*exp_msg).exp;
-                });
-
             // publisher
             this->armors_pub_ = this->create_publisher<rmos_interfaces::msg::Armors>("/rmos_detector/armors", rclcpp::SensorDataQoS());
 
@@ -132,8 +110,6 @@ namespace rmos_detector
 
             //cj_detector_ = std::make_shared<detector::CjDetector>();
             detector_ = std::make_shared<detector::Detector>();
-            rune_detector_ = std::make_shared<detector::DlRuneDetector>();
-            fitting_ = std::make_shared<detector::Fitting>();
             //cj_classifier_ = std::make_shared<detector::CjClassifier>();
             pnp_solver_ = std::make_shared<detector::PnpSolver>();
             onnx_classifier_ =  std::make_shared<detector::OnnxClassifier>();
@@ -142,44 +118,18 @@ namespace rmos_detector
             /*publish static TF*/
             this->tf_publisher_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
 
+            
+
+
         }
 
     protected:
         void imageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr &image_msg);
 
-        /*mode*/
-        void setMode(int mode);
-        base::Mode mode_ = base::Mode::NORMAL;
-        base::Mode last_mode_ = base::Mode::NORMAL;        
-
-        /*save image*/
-        void saveImage(double timestamp, cv::Mat image);
-        std::string path = "./rmos_bringup/image_save/";
-        std::string image_folder_path;
-        int image_num = 0;
-        bool have_mkdir = false;
-        double last_save_timestamp = 0;
-        double save_delta_time;     // 保存图片的时间间隔     
-
-        void saveDrawImage(double timestamp, cv::Mat image);
-        std::string path_draw = "./rmos_bringup/draw_image_save/";
-        std::string draw_image_folder_path;
-        int draw_image_num = 0;
-        bool have_mkdir_draw = false;
-        int Exposure = 0;           
-
-        /**
-         * @brief 计算文件夹内文件数量
-        */        
-        int countFilesInDirectory(std::string path); 
-
         //std::shared_ptr<detector::CjDetector> cj_detector_;
         std::shared_ptr<detector::Detector> detector_;
-        std::shared_ptr<detector::DlRuneDetector> rune_detector_;
 
-        std::shared_ptr<detector::Fitting> fitting_;
-
-        // std::shared_ptr<detector::CjClassifier> cj_classifier_;
+       // std::shared_ptr<detector::CjClassifier> cj_classifier_;
         std::shared_ptr<detector::OnnxClassifier> onnx_classifier_;
 
         std::shared_ptr<detector::PnpSolver> pnp_solver_;
@@ -191,10 +141,9 @@ namespace rmos_detector
         /*debug*/
         image_transport::CameraPublisher debug_img_pub_;
         image_transport::CameraPublisher debug_bin_img_pub_;
-        image_transport::CameraPublisher debug_R_img_pub_;
         sensor_msgs::msg::Image::SharedPtr debug_image_msg_;
         sensor_msgs::msg::Image::SharedPtr debug_bin_image_msg_;      
-        sensor_msgs::msg::Image::SharedPtr debug_R_image_msg_;           
+          
 
         //camera param
         sensor_msgs::msg::CameraInfo camera_info_msg_;

@@ -11,8 +11,8 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPATH=\"\\\"${PROJECT_SOURCE_DIR}\\\"\"")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D${CMAKE_SYSTEM_NAME}")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
+set(3RDPARTY_LIB "/v/User/Desktop/hbRMOS_1.0-master/3rdparty/lib/")
 
-set(3RDPARTY_LIB "/home/nuc12/Desktop/Infantry-2023/3rdparty/lib/")
 ## By adding -Wall and -Werror, the compiler does not ignore warnings anymore,
 ## enforcing cleaner code.
 # add_definitions(-Wall -Werror)
@@ -33,6 +33,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
 )
 
 target_link_libraries(${PROJECT_NAME} gxiapi ${OpenCV_LIBS})
+
 
 
 
