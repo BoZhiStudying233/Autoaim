@@ -13,10 +13,11 @@
 ## 运行节点
 
 - 相机节点： daheng_cam  启动命令：`ros2 run rmos_cam daheng_camera`
-- 传统识别节点：basic_detector 启动命令： `ros2 run rmos_detector rune_detector`
+- 识别节点：rune_detector 启动命令： `ros2 run rmos_detector rune_detector`
 - 解算节点：processer              启动命令：`ros2 run rmos_processer processer`
 - 通信节点 ： can_comm            启动命令：`ros2 run rmos_transporter can_comm`
-- 
+
+  
 ## 如何启动程序
 `source install/setup.bash`
 
