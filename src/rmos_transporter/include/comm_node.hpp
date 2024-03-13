@@ -155,6 +155,9 @@ namespace rmos_transporter
         /*time*/
         double last_time_;
 
+        /* Send Timer */
+        rclcpp::TimerBase::SharedPtr receive_timer_;
+        
         // msg
         rmos_interfaces::msg::QuaternionTime quaternion_time_msg_;
         rmos_interfaces::msg::Color color_msg_;

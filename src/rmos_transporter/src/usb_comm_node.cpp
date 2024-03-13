@@ -44,6 +44,7 @@ namespace rmos_transporter
                  std::bind(&UsbCommNode::targetCallBack, this, std::placeholders::_1),
                  target_sub_options);
 
+        this->receive_timer_ = this->create_wall_timer(1ms, std::bind(&UsbCommNode::recevieCallBack, this));
         // 可尝试定时器会不会出问题 再用线程
         // this->recevie_thread_ = std::thread(&UsbCommNode::recevieCallBack, this);
 
