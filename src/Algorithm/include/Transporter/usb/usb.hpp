@@ -34,7 +34,6 @@ typedef unsigned int    uint32_t;
 
 #pragma pack(push, 1)
 
-// 49字节
 typedef struct
 {
   // 包头
@@ -86,7 +85,6 @@ typedef struct
   uint8_t _EOF;
 } RMOSRefereeReceivePackage;
 
-// 23字节
 typedef struct
 {
   // 包头
@@ -97,15 +95,14 @@ typedef struct
 	float LeftMotorAngle;
 	// imu数据
 	uint32_t TimeStamp;
-  int16_t q0;
-  int16_t q1;
-  int16_t q2;
-  int16_t q3;
+  float q0;
+  float q1;
+  float q2;
+  float q3;
   // 包尾
   uint8_t _EOF;
 } NavIMUReceivePackage;
 
-// 15字节
 typedef struct
 {
     // 包头
@@ -119,7 +116,6 @@ typedef struct
     uint8_t _EOF;
 } NavVelocitySendPackage;
 
-// 15字节
 typedef struct
 {
     // 包头
@@ -127,15 +123,14 @@ typedef struct
     uint8_t ID;
 		// imu数据
 		uint32_t TimeStamp;
-    int16_t q0;
-    int16_t q1;
-    int16_t q2;
-    int16_t q3;
+    float q0;
+    float q1;
+    float q2;
+    float q3;
     // 包尾
     uint8_t _EOF;
 } RMOSIMUReceivePackage;
 
-// 15字节
 typedef struct
 {
     // 包头
