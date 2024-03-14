@@ -180,82 +180,85 @@ namespace rmos_transporter
         int read_size = transporter_->read(receive_package, 64);
         // RCLCPP_INFO(gimbal_hw_node_->get_logger(), "read size : %d", read_size);
 
-        switch (receive_package[1])
+        if (read_size == 64)
         {
-            
-            case RMOS_REFEREE_RECEIVE_ID:
+            switch (receive_package[1])
             {
-                transporter::RMOSRefereeReceivePackage package;
-                memcpy(&package, receive_package, 
-                       sizeof(transporter::RMOSRefereeReceivePackage));
+                
+                case RMOS_REFEREE_RECEIVE_ID:
+                {
+                    transporter::RMOSRefereeReceivePackage package;
+                    memcpy(&package, receive_package, 
+                        sizeof(transporter::RMOSRefereeReceivePackage));
 
-                // color
-                if (package.robot_id < 10) {
-                    color_msg_.color = (int) (base::Color::BLUE);
-                } else if (package.robot_id > 100) {
-                    color_msg_.color = (int) base::Color::RED;
-                } else {
-                    color_msg_.color = (int) (base::Color::BLUE);
+                    // color
+                    if (package.robot_id < 10) {
+                        color_msg_.color = (int) (base::Color::BLUE);
+                    } else if (package.robot_id > 100) {
+                        color_msg_.color = (int) base::Color::RED;
+                    } else {
+                        color_msg_.color = (int) (base::Color::BLUE);
+                    }
+                    this->color_pub_->publish(color_msg_);
+
+                    // TODO : 除哨兵外的车需要的信息
+
+                    break;
                 }
-                this->color_pub_->publish(color_msg_);
+                case RMOS_IMU_0_RECEIVE_ID:
+                {
+                    transporter::RMOSIMUReceivePackage package;
+                    memcpy(&package, receive_package, 
+                        sizeof(transporter::RMOSIMUReceivePackage));
+                    int time_offset = 0;
+                    quaternion_time_msg_.quaternion_stamped.header.stamp = this->now() + rclcpp::Duration(0,time_offset);
+                    quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)package.q0 / 32768.0;
+                    quaternion_time_msg_.quaternion_stamped.quaternion.x = (double)package.q1 / 32768.0;
+                    quaternion_time_msg_.quaternion_stamped.quaternion.y = (double)package.q2 / 32768.0;
+                    quaternion_time_msg_.quaternion_stamped.quaternion.z = (double)package.q3 / 32768.0;
+                    // 可能需要归一化？  可以改成fp32传输
 
-                // TODO : 除哨兵外的车需要的信息
+                    geometry_msgs::msg::TransformStamped t;
+                    t.header.stamp =  quaternion_time_msg_.quaternion_stamped.header.stamp;
+                    t.header.frame_id = "world"; //注意坐标系
+                    t.child_frame_id = "IMU";
+                    t.transform.rotation.x = quaternion_time_msg_.quaternion_stamped.quaternion.x;
+                    t.transform.rotation.y = quaternion_time_msg_.quaternion_stamped.quaternion.y;
+                    t.transform.rotation.z = quaternion_time_msg_.quaternion_stamped.quaternion.z;
+                    t.transform.rotation.w = quaternion_time_msg_.quaternion_stamped.quaternion.w;
+                    tf_publisher_->sendTransform(t);
+                    memcpy(&quaternion_time_msg_.timestamp_recv, &package.TimeStamp, 4);
+                        this->quaternion_pub_->publish(quaternion_time_msg_);
+                    break;
+                }
+                case RMOS_IMU_1_RECEIVE_ID:
+                {
+                    transporter::RMOSIMUReceivePackage package;
+                    memcpy(&package, receive_package, 
+                        sizeof(transporter::RMOSIMUReceivePackage));
+                    int time_offset = 0;
+                    quaternion_time_msg_.quaternion_stamped.header.stamp = this->now() + rclcpp::Duration(0,time_offset);
+                    quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)package.q0 / 32768.0;
+                    quaternion_time_msg_.quaternion_stamped.quaternion.x = (double)package.q1 / 32768.0;
+                    quaternion_time_msg_.quaternion_stamped.quaternion.y = (double)package.q2 / 32768.0;
+                    quaternion_time_msg_.quaternion_stamped.quaternion.z = (double)package.q3 / 32768.0;
+                    // 可能需要归一化？  可以改成fp32传输
+                        
+                    geometry_msgs::msg::TransformStamped t;
+                    t.header.stamp =  quaternion_time_msg_.quaternion_stamped.header.stamp;
+                    t.header.frame_id = "world"; //注意坐标系
+                    t.child_frame_id = "IMU";
+                    t.transform.rotation.x = quaternion_time_msg_.quaternion_stamped.quaternion.x;
+                    t.transform.rotation.y = quaternion_time_msg_.quaternion_stamped.quaternion.y;
+                    t.transform.rotation.z = quaternion_time_msg_.quaternion_stamped.quaternion.z;
+                    t.transform.rotation.w = quaternion_time_msg_.quaternion_stamped.quaternion.w;
+                    tf_publisher_->sendTransform(t);
+                    memcpy(&quaternion_time_msg_.timestamp_recv, &package.TimeStamp, 4);
+                        this->quaternion_pub_->publish(quaternion_time_msg_);
+                    break;
+                }
 
-                break;
             }
-            case RMOS_IMU_0_RECEIVE_ID:
-            {
-                transporter::RMOSIMUReceivePackage package;
-                memcpy(&package, receive_package, 
-                       sizeof(transporter::RMOSIMUReceivePackage));
-                int time_offset = 0;
-                quaternion_time_msg_.quaternion_stamped.header.stamp = this->now() + rclcpp::Duration(0,time_offset);
-                quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)package.q0 / 32768.0;
-                quaternion_time_msg_.quaternion_stamped.quaternion.x = (double)package.q1 / 32768.0;
-                quaternion_time_msg_.quaternion_stamped.quaternion.y = (double)package.q2 / 32768.0;
-                quaternion_time_msg_.quaternion_stamped.quaternion.z = (double)package.q3 / 32768.0;
-                // 可能需要归一化？  可以改成fp32传输
-
-                geometry_msgs::msg::TransformStamped t;
-                t.header.stamp =  quaternion_time_msg_.quaternion_stamped.header.stamp;
-                t.header.frame_id = "world"; //注意坐标系
-                t.child_frame_id = "IMU";
-                t.transform.rotation.x = quaternion_time_msg_.quaternion_stamped.quaternion.x;
-                t.transform.rotation.y = quaternion_time_msg_.quaternion_stamped.quaternion.y;
-                t.transform.rotation.z = quaternion_time_msg_.quaternion_stamped.quaternion.z;
-                t.transform.rotation.w = quaternion_time_msg_.quaternion_stamped.quaternion.w;
-                tf_publisher_->sendTransform(t);
-                memcpy(&quaternion_time_msg_.timestamp_recv, &package.TimeStamp, 4);
-                       this->quaternion_pub_->publish(quaternion_time_msg_);
-                break;
-            }
-            case RMOS_IMU_1_RECEIVE_ID:
-            {
-                transporter::RMOSIMUReceivePackage package;
-                memcpy(&package, receive_package, 
-                       sizeof(transporter::RMOSIMUReceivePackage));
-                int time_offset = 0;
-                quaternion_time_msg_.quaternion_stamped.header.stamp = this->now() + rclcpp::Duration(0,time_offset);
-                quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)package.q0 / 32768.0;
-                quaternion_time_msg_.quaternion_stamped.quaternion.x = (double)package.q1 / 32768.0;
-                quaternion_time_msg_.quaternion_stamped.quaternion.y = (double)package.q2 / 32768.0;
-                quaternion_time_msg_.quaternion_stamped.quaternion.z = (double)package.q3 / 32768.0;
-                // 可能需要归一化？  可以改成fp32传输
-                    
-                geometry_msgs::msg::TransformStamped t;
-                t.header.stamp =  quaternion_time_msg_.quaternion_stamped.header.stamp;
-                t.header.frame_id = "world"; //注意坐标系
-                t.child_frame_id = "IMU";
-                t.transform.rotation.x = quaternion_time_msg_.quaternion_stamped.quaternion.x;
-                t.transform.rotation.y = quaternion_time_msg_.quaternion_stamped.quaternion.y;
-                t.transform.rotation.z = quaternion_time_msg_.quaternion_stamped.quaternion.z;
-                t.transform.rotation.w = quaternion_time_msg_.quaternion_stamped.quaternion.w;
-                tf_publisher_->sendTransform(t);
-                memcpy(&quaternion_time_msg_.timestamp_recv, &package.TimeStamp, 4);
-                       this->quaternion_pub_->publish(quaternion_time_msg_);
-                break;
-            }
-
         }
     }
 
