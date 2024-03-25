@@ -17,7 +17,9 @@ set(INCLUDES ${INCLUDES} $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 set(INCLUDES ${INCLUDES} $<INSTALL_INTERFACE:/include>)
 include_directories(include/${PROJECT_NAME})
 
+
 set(3RDPARTY_LIB "/home/niuoruo/workspace/sentry/ws/Infantry/3rdparty/lib/")
+
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()

@@ -299,8 +299,8 @@ namespace rmos_processer {
                         float delta_pitch = -new_pitch - pitch;
                         float delta_yaw = new_yaw - yaw;
                         
-                        float gun_pitch = delta_pitch+controler_->rune_gun_pitch_offset_;
-                        float gun_yaw = delta_yaw+controler_->rune_gun_yaw_offset_;
+                        float gun_pitch = delta_pitch+controler_->gun_pitch_offset_;
+                        float gun_yaw = delta_yaw+controler_->gun_yaw_offset_;
 
                         target_msg.id = this->controler_->tracker_.tracked_id;
                         target_msg.track_state = this->controler_->tracker_.tracker_state;

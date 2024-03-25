@@ -53,6 +53,8 @@ namespace processer
         double y = y_temp;
         double x = sqrt(position.x * position.x + position.y * position.y) / 1000.0;
 
+        bullet_speed_ = 30.0;
+
         for (int i = 0; i < 40; i++) {
             angle = atan2(y_temp, x);
             // t_actual = (exp(this->normal_ballistic_param_.k * x) - 1.0) /
