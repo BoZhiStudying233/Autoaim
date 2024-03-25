@@ -11,7 +11,8 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPATH=\"\\\"${PROJECT_SOURCE_DIR}\\\"\"")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D${CMAKE_SYSTEM_NAME}")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
-set(3RDPARTY_LIB "/home/bozhi/Desktop/Code/Infantry/Infantry/3rdparty/lib/")
+
+set(3RDPARTY_LIB "/home/niuoruo/workspace/sentry/ws/Infantry/3rdparty/lib/")
 
 ## By adding -Wall and -Werror, the compiler does not ignore warnings anymore,
 ## enforcing cleaner code.
