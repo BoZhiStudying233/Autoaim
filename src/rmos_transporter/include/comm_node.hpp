@@ -22,6 +22,7 @@
 
 
 #include "../../Algorithm/include/Transporter/can/can.hpp"
+#include "../../Algorithm/include/Transporter/usb/usb.hpp"
 #include "../../Algorithm/include/Debug/debug.hpp"
 
 
@@ -119,7 +120,60 @@ namespace rmos_transporter
 
     };
 
+    class UsbCommNode : public CommNode{
+    public:
+        UsbCommNode(const rclcpp::NodeOptions & options);
+        ~UsbCommNode();
+    protected:
+        /**
+         *  @brief  target_sub_的回调函数，将msg转换后通过can发送
+         */
+        void targetCallBack(const rmos_interfaces::msg::Target::SharedPtr target);
 
+        /**
+         *  @brief  将msg中的自瞄状态信息，转换为字节形式
+         */
+        void target2state(const rmos_interfaces::msg::Target::SharedPtr target, u_char *buf);
+
+        /**
+         *  @brief  读取usb数据的线程函数
+         */
+        void recevieCallBack();
+
+        void ForceSetMode(rmos_interfaces::msg::Mode &mode_msg);
+        void tellMode(rmos_interfaces::msg::Mode mode_msg);
+
+        std::shared_ptr<transporter_sdk::TransporterInterface> transporter_; // usb通信接口
+
+        /* package */
+        transporter::RMOSSendPackage send_package_;
+
+        /* Callback Group */
+        rclcpp::CallbackGroup::SharedPtr receive_callback_group_;
+        rclcpp::CallbackGroup::SharedPtr target_sub_callback_group_;
+
+        /*time*/
+        double last_time_;
+
+        /* Send Timer */
+        rclcpp::TimerBase::SharedPtr receive_timer_;
+        
+        // msg
+        rmos_interfaces::msg::QuaternionTime quaternion_time_msg_;
+        rmos_interfaces::msg::Color color_msg_;
+        rmos_interfaces::msg::Mode mode_msg_;
+        rmos_interfaces::msg::BulletSpeed bs_msg_;
+        rmos_interfaces::msg::AutoaimState autoaim_state_msg_;
+
+        // params
+        int interface_usb_vid_;
+        int interface_usb_pid_;
+        int interface_usb_read_endpoint_;
+        int interface_usb_write_endpoint_;
+        int interface_usb_read_timeout_;
+        int interface_usb_write_timeout_;
+
+    };
 
 }
 

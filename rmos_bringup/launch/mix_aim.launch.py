@@ -49,6 +49,17 @@ def generate_launch_description():
         name='can_comm',
         output='screen',
     )
+    
+    # communicate_node_ = Node(
+    #     package='rmos_transporter',
+    #     namespace= 'rmos_transporter',
+    #     executable='usb_comm',
+    #     name='usb_comm',
+    #     parameters=[os.path.join(get_package_share_directory('rmos_transporter'), 
+    #                'config', 'hardware_settings.yaml')],
+    #     output='screen',
+    # )
+
     processer_node = Node(
         package='rmos_processer',
         namespace= 'rmos_processer',
