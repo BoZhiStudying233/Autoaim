@@ -55,7 +55,7 @@ namespace tool
         double max_match_yaw_diff_;
         int detect_count_;
         int lost_count_;
-        int outpost_direction_{1};
+        int outpost_direction_{0};
 
     private:
         void initEKF(const base::Armor & a);

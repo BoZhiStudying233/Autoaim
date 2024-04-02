@@ -10,7 +10,7 @@
 
 namespace processer
 {
-    struct NormalBallisticParam
+    struct BallisticParam
     {
 
         // 补偿系数
@@ -27,30 +27,19 @@ namespace processer
 
 
     };
-    struct RuneBallisticParam
-    {
-        //打符补偿系数参数
-        float level_first;
-        float level_second;
-        float level_third;
-        float level_fourth;
-    };
-    
     class BallisticSolver :  BallisticSolverInterface
     {
     public:
         BallisticSolver();
         ~BallisticSolver();
-        cv::Point3f getAngleTime(cv::Point3f position, bool is_rune) override;
+        cv::Point3f getAngleTime(cv::Point3f position)override;
         bool setBulletSpeed(int bullet_speed)override;
 
         int bullet_speed_;
     private:
-        void setBS_coeff(cv::Point3f position, bool is_rune);
+        void setBS_coeff(cv::Point3f position);
 
-        NormalBallisticParam normal_ballistic_param_;
-        RuneBallisticParam rune_ballistic_param_;
-
+        BallisticParam ballistic_param_;
         double bs_coeff;        // 弹速系数
 
 

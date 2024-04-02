@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 project(rmos_processer)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(NOT CMAKE_BUILD_TYPE)
 set(CMAKE_BUILD_TYPE Release)
@@ -14,9 +14,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 set(INCLUDES ${INCLUDES} $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 set(INCLUDES ${INCLUDES} $<INSTALL_INTERFACE:/include>)
-
-set(3RDPARTY_LIB "/home/niuoruo/workspace/sentry/ws/Infantry/3rdparty/lib/")
-
+set(3RDPARTY_LIB "/home/wang/IRobot/RMOS/3rdparty/lib/")
 include_directories(include/${PROJECT_NAME})
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)

@@ -36,15 +36,11 @@ namespace base
         NORMAL_RUNE, // 小符模式
         RUNE,       // 大符模式
         OUTPOST,    // 前哨站模式
-        WAIT,
-        
     };
 
 
     enum DebugOption{
     CONTEST,
-    SAVE_IMAGE,
-    SAVE_DRAW_IMAGE,
     SHOW_ARMOR,  
     SHOW_BIN,
     SHOW_DETECT_COST,

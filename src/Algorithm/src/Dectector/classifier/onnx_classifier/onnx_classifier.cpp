@@ -21,9 +21,9 @@ namespace detector {
         }                                                        \
     } while (0);
 
-    std::string robot_names[16]={"Base","Hero","Engineer","Infantry3","Infantry4",
+    std::string robot_names[15]={"Base","Hero","Engineer","Infantry3","Infantry4",
                                  "Infantry5","Sentry","Outpost","Error1","Error2",
-                                 "Error4","Balance3","Balance4","Balance5"};
+                                 "Error4","Balance3","Balance4"};
 
     bool OnnxClassifier::classifyArmors(const cv::Mat &image, std::vector <base::Armor> &armors)
     {
@@ -37,12 +37,6 @@ namespace detector {
             temp = image(cv::Rect2d(armor.rect));
             gamma(temp, temp, 0.6);
             cv::Mat num_image = cv::Mat::zeros(144,240,CV_8UC3);
-            if(temp.cols <= 10 || temp.rows <= 10)
-            {
-                armor.type = base::ArmorType::WRONG;
-                continue;
-            }
-
             cv::resize(temp,num_image,num_image.size());
             //cv::imshow("num",num_image);
             double confidence = 0;
@@ -142,7 +136,7 @@ namespace detector {
     OnnxClassifier::OnnxClassifier()
     {
         g_ort = OrtGetApiBase()->GetApi(ORT_API_VERSION);
-        char onnxmodel_path[90] = "./src/Algorithm/configure/Detector/classifier/onnx_classifier/model/modelv3_150.onnx"; //25: 0.1-0.2 50:0.1-0.4 75:0.1-0.8
+        char onnxmodel_path[90] = "./src/Algorithm/configure/Detector/classifier/onnx_classifier/model/modelv4_150.onnx"; //25: 0.1-0.2 50:0.1-0.4 75:0.1-0.8
         const float set_cls_conf_thres = 0.6;
         model_path_ = onnxmodel_path;
         infer_size_ =  cv::Size(54,54);
@@ -211,9 +205,9 @@ namespace detector {
         const char *input_names[] = {"input"};
         const char *output_names[] = {"output"};
 
-        std::array<float, 14> results_{};
+        std::array<float, 13> results_{};
         int result_{0};
-        const int64_t output_shape[] = {1, 14};
+        const int64_t output_shape[] = {1, 13};
         const size_t output_shape_len = sizeof(output_shape) / sizeof(output_shape[0]);
 
         OrtValue *output_tensor = NULL;

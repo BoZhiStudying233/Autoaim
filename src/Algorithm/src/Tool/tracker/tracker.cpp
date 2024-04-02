@@ -54,6 +54,7 @@ namespace tool
 
         tracked_id = tracked_armor.num_id;
         tracker_state = base::DETECTING;
+        outpost_direction_ = 0;
 
     }
 
@@ -140,14 +141,34 @@ namespace tool
             }
         }
 
-        if(tracked_id == 7) 
+        if(tracked_id == 7 && outpost_direction_ == 0) 
         {
-             if(target_state(7)>0.5)
+            if(target_state(7)>0.5)
             {
                target_state(7) = 2.512;
                outpost_direction_ = 1;
             }
             else if(target_state(7)<-0.5)
+            {
+              target_state(7) = -2.512;
+              outpost_direction_ = -1;
+            }
+            target_state(8) = 0.2712;
+            target_state(1) = 0;
+            target_state(3) = 0;
+            target_state(5) = 0;
+            ekf.setState(target_state);
+            
+        }
+
+        if(tracked_id == 7 && outpost_direction_ !=0)
+        {
+            if(outpost_direction_ == 1)
+            {
+               target_state(7) = 2.512;
+               outpost_direction_ = 1;
+            }
+            else if(outpost_direction_ == -1)
             {
               target_state(7) = -2.512;
               outpost_direction_ = -1;

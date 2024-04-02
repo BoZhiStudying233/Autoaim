@@ -56,11 +56,6 @@ namespace camera
         // 构造
         explicit DahengCam(const std::string camera_sn = "");
 
-
-        // 改变曝光参数
-        void changeExp(int exp);
-
-        
         ~DahengCam();
 
     private:

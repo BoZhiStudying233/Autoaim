@@ -23,14 +23,6 @@ namespace processer
         fs["r_yaw"] >> r_yaw;
         fs["delay"] >> delay_;
         fs["true_x"] >> true_x_;
-
-        fs["gun_pitch_offset"] >> gun_pitch_offset_;
-        fs["gun_yaw_offset"] >> gun_yaw_offset_;
-        fs["rune_gun_pitch_offset"] >> rune_gun_pitch_offset_;
-        fs["rune_gun_yaw_offset"] >> rune_gun_yaw_offset_;
-
-        fs["bs_fly_time"] >> bs_fly_time_;
-        fs["ready_time"] >> ready_time_;
         fs.release();
 
         // EKF
@@ -134,7 +126,7 @@ namespace processer
             dt_ = time - last_time_;
             if(tracker_.tracked_id == 7 )
             {
-                tracker_.lost_thres = static_cast<int>(lost_time_thres_ / dt_)*5;
+                tracker_.lost_thres = static_cast<int>(lost_time_thres_ / dt_)*20;
             }
             else if (tracker_.tracked_id==11||tracker_.tracked_id==12||tracker_.tracked_id==13)
             {
@@ -166,7 +158,7 @@ namespace processer
             //predict
             cv::Point3d p_center = cv::Point3d(xc, yc, za + dz/ 2);
             cv::Point3d velocity_linear = cv::Point3d(vx, vy, vz);
-            double all_time = ballistic_solver_.getAngleTime(p_center * 1000, false).z + delay_;
+            double all_time = ballistic_solver_.getAngleTime(p_center * 1000).z + delay_;
 
             cv::Point3d linear_change = cv::Point3d(velocity_linear.x * (all_time+0.05),
                                                     velocity_linear.y * (all_time+0.05),
@@ -236,14 +228,14 @@ namespace processer
             }
 
             //求解最优点
-            double limit_area = 0.6 + abs(v_yaw)*0.04;
+            double limit_area = 0.6 + abs(v_yaw)*0.08;
             if(limit_area>0.99)
             {
                 limit_area = 0.99;
             }
             if(this->tracker_.tracked_id == 7)
             {
-                limit_area = 0.98;
+                limit_area = 0.993;
             }
 
             if(angle_to_center[min_dis_point_index] < -limit_area)
@@ -283,7 +275,7 @@ namespace processer
 
     }
 
-    bool Controler::judgeFire(cv::Point3f aiming_point_camera , double v_yaw)
+    bool Controler::judgeFire(cv::Point3f aiming_point_camera , double v_yaw, double roll,cv::Point2f& rect_points_out_1,cv::Point2f& rect_points_out_2,cv::Point2f& rect_points_out_3,cv::Point2f& aim_point_2d_out)
     {
         cv::Point2f aim_point_2d;
         cv::Mat a;
@@ -294,32 +286,46 @@ namespace processer
         aim_point_2d.x = std::ceil(b_new.x);
         aim_point_2d.y = std::ceil(b_new.y);
 
-        double x = aim_point_2d.x;
-        double delta_x = abs(x-this->true_x_);
-        // std::cout<<"x  is"<<x<<std::endl;
-
+ 
+        
+        aim_point_2d_out = aim_point_2d;
     
-
-        double fire_area = abs(78.5/v_yaw);
-        //std::cout<<"v_yaw is"<<v_yaw<<std::endl;
-        //std::cout<<"fire_area is"<<fire_area<<std::endl;
-        if(fire_area<12){
-            fire_area=12;
-        }
-        if(fire_area>200)
+        double fire_area = abs(10/v_yaw);
+        if(fire_area>10)
         {
-            fire_area = 200;
+            fire_area = 40;
         }
-        // std::cout<<"delta_x is"<<delta_x<<std::endl;
+        
 
-        if(delta_x<fire_area)
+        cv::Point2f center(this->true_x_,360);
+        cv::Size size_of_rect(fire_area*2,710);
+        cv::RotatedRect fire_rect(center,size_of_rect,-(float)roll);
+        cv::Point2f rect_points[4];
+        fire_rect.points(rect_points);
+        rect_points_out_1 = rect_points[0];
+        rect_points_out_2 = rect_points[1];
+        rect_points_out_3 = rect_points[2];
+      
+
+        std::vector<cv::Point2f> contour;
+        for(int i=0;i<4;i++)
+        {
+            contour.push_back(rect_points[i]);
+        }
+
+        double indicator = cv::pointPolygonTest(contour,aim_point_2d,true);
+
+
+        if(indicator>0)
         {
             return true;
         }
         else
         {
             return false;
+        
         }
+
 
     }
 

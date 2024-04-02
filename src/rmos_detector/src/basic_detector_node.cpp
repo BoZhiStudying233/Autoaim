@@ -62,8 +62,8 @@ namespace rmos_detector
 
         //相机到IMU存在位置的偏移，每辆车不同，请在参数文件自行更改
         t.transform.translation.x = 0.005;
-        t.transform.translation.y = 0;
-        t.transform.translation.z = 0;
+        t.transform.translation.y = 0.0;
+        t.transform.translation.z = 0.0;
         this->tf_publisher_->sendTransform(t) ;
 
 
@@ -133,7 +133,6 @@ namespace rmos_detector
             std::string text3 = std::to_string(int(distance));
             cv::putText(image, text3, armor.right.down, cv::FONT_HERSHEY_SIMPLEX, 0.5,
                         cv::Scalar(0, 255, 0), 0.5);
-            std::cout << "distance________" << distance << std::endl;
             armors_msg.armors.push_back(armor_msg);
 
         }
@@ -145,6 +144,22 @@ namespace rmos_detector
 
         if(debug::get_debug_option(base::SHOW_ARMOR))
         {
+             // 提取旋转矩形的四个角点
+            cv::Point2f ps[4];
+            this->debug_fire_rect_.points(ps);
+        
+            // 构建轮廓线
+            std::vector<std::vector<cv::Point>> tmpContours;    // 创建一个InputArrayOfArrays 类型的点集
+            std::vector<cv::Point> contours;
+            for (int i = 0; i != 4; ++i) {
+                contours.emplace_back(cv::Point2i(ps[i]));
+            }
+            tmpContours.insert(tmpContours.end(), contours);
+        
+            // 绘制轮廓，即旋转矩形
+            drawContours(image, tmpContours,0,cv::Scalar(0, 255, 255), 5,16);  // 填充mask
+            
+            cv::line(image,this->aim_point_,this->aim_point_ ,cv::Scalar(255, 0, 255),5);
             debug_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
             debug_img_pub_.publish(*debug_image_msg_,camera_info_msg_);
         }

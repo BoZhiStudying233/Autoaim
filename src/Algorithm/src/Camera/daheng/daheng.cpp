@@ -301,23 +301,4 @@ namespace camera
 
 
     }
-
-    void DahengCam::changeExp(int exp)
-    {
-        // status_ = GXStreamOff(device_);
-        // status_ = GXCloseDevice(device_);
-        // status_ = init_sdk();
-        // status_ = GXStreamOff(device_);
-
-        GX_STATUS status;
-
-        params_[CamParamType::Exposure] = exp;
-        status = GXSetEnum(device_, GX_ENUM_EXPOSURE_AUTO, GX_EXPOSURE_AUTO_OFF);
-
-        status = GXSetFloat(device_, GX_FLOAT_AUTO_EXPOSURE_TIME_MIN, params_[CamParamType::Exposure] - 200);
-        status = GXSetFloat(device_, GX_FLOAT_AUTO_EXPOSURE_TIME_MAX, params_[CamParamType::Exposure] + 200);
-        status = GXSetFloat(device_, GX_FLOAT_EXPOSURE_TIME, params_[CamParamType::Exposure]);
-
-        // status_ = GXStreamOn(device_);
-    }
 } // namespace camera

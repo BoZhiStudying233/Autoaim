@@ -25,6 +25,7 @@
 #include "rmos_interfaces/msg/armors.hpp"
 #include "rmos_interfaces/msg/armor.hpp"
 #include "rmos_interfaces/msg/color.hpp"
+#include "rmos_interfaces/msg/aimpoint.hpp"
 
 #include "../../Algorithm/include/Dectector/detector_interfaces/detector_interface.hpp"
 #include "../../Algorithm/include/Dectector/detector/cj_detector/cj_detector.hpp"
@@ -51,6 +52,7 @@ namespace rmos_detector
         std::shared_ptr<image_transport::Subscriber> image_sub_;
         rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_sub_;
         rclcpp::Subscription<rmos_interfaces::msg::Color>::SharedPtr color_sub_;
+        rclcpp::Subscription<rmos_interfaces::msg::Aimpoint>::SharedPtr aim_sub_;
 
 
 
@@ -71,7 +73,7 @@ namespace rmos_detector
                     this, "/image_raw", std::bind(&BasicDetectorNode::imageCallBack, this, std::placeholders::_1),
                     "raw",
                     rmw_qos_profile_default));
-            this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/daheng_camera_info", rclcpp::SensorDataQoS(),
+            this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/camera_info", rclcpp::SensorDataQoS(),
                                                                                              [this](sensor_msgs::msg::CameraInfo::ConstSharedPtr camera_info_msg)
                                                                                              {
                                                                                                  RCLCPP_INFO(this->get_logger(), "Receive camera infomation");
@@ -100,6 +102,17 @@ namespace rmos_detector
                         int enemy_color = (*color_msg).color;
                         this->detector_->setEnemyColor(enemy_color);
                     });
+            this->aim_sub_ = this->create_subscription<rmos_interfaces::msg::Aimpoint>
+                    ("/aim", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Aimpoint::ConstSharedPtr aim_msg)
+                    {
+                       this->aim_point_.x = (*aim_msg).aim_point.x;
+                       this->aim_point_.y = (*aim_msg).aim_point.y;
+
+                       cv::RotatedRect rect(cv::Point2f((*aim_msg).point_1.x, (*aim_msg).point_1.y),
+                                            cv::Point2f((*aim_msg).point_2.x, (*aim_msg).point_2.y),
+                                            cv::Point2f((*aim_msg).point_3.x, (*aim_msg).point_3.y));
+                       this->debug_fire_rect_ = rect;
+                    });
             // publisher
             this->armors_pub_ = this->create_publisher<rmos_interfaces::msg::Armors>("/rmos_detector/armors", rclcpp::SensorDataQoS());
 
@@ -118,7 +131,6 @@ namespace rmos_detector
             /*publish static TF*/
             this->tf_publisher_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
 
-            
 
 
         }
@@ -142,7 +154,10 @@ namespace rmos_detector
         image_transport::CameraPublisher debug_img_pub_;
         image_transport::CameraPublisher debug_bin_img_pub_;
         sensor_msgs::msg::Image::SharedPtr debug_image_msg_;
-        sensor_msgs::msg::Image::SharedPtr debug_bin_image_msg_;      
+        sensor_msgs::msg::Image::SharedPtr debug_bin_image_msg_;
+
+        cv::RotatedRect debug_fire_rect_{ cv::RotatedRect(cv::Point2f(0, 0), cv::Point2f(0, 0), cv::Point2f(0, 0))};
+        cv::Point2f aim_point_{cv::Point2f(0, 0)};      
           
 
         //camera param

@@ -8,5 +8,6 @@ uint32 timestamp_recv   # 电控发来的陀螺仪时间戳
 int8 outpost_direction
 
 geometry_msgs/Point position
+float32 distance
 
 

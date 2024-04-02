@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 project(rmos_detector)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(NOT CMAKE_BUILD_TYPE)
 set(CMAKE_BUILD_TYPE Release)
@@ -14,22 +14,18 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 set(INCLUDES ${INCLUDES} $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 set(INCLUDES ${INCLUDES} $<INSTALL_INTERFACE:/include>)
-
-set(3RDPARTY_LIB "/home/niuoruo/workspace/sentry/ws/Infantry/3rdparty/lib/")
-
+set(3RDPARTY_LIB "/home/wang/IRobot/RMOS/3rdparty/lib/")
 include_directories(include/${PROJECT_NAME})
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
 find_package(OpenCV 4 REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(InferenceEngine)
-find_package(ngraph REQUIRED)
+
 
 include_directories(
   ${EIGEN3_INCLUDE_DIR}
   /usr/include/eigen3
         ${3RDPARTY_LIB}
-        ../../src/Algorithm/AIOF-IP/include
 )
 
 ament_auto_find_build_dependencies()
@@ -43,9 +39,7 @@ target_include_directories(${PROJECT_NAME}
                       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                         $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS}
-${InferenceEngine_LIBRARIES}
-${NGRAPH_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
 install(TARGETS ${PROJECT_NAME}
        DESTINATION lib/${PROJECT_NAME})
@@ -63,16 +57,6 @@ rclcpp_components_register_node(${PROJECT_NAME}
         EXECUTABLE basic_detector
         )
 
-
-rclcpp_components_register_node(${PROJECT_NAME}
-        PLUGIN rune_detector::RuneDetectorNode
-        EXECUTABLE rune_detector
-)
-
-rclcpp_components_register_node(${PROJECT_NAME}
-PLUGIN rmos_detector::MixDetectorNode
-EXECUTABLE mix_detector
-)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
