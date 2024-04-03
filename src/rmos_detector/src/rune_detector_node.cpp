@@ -33,7 +33,7 @@ namespace rune_detector
 {
     void RuneDetectorNode::imageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr &image_msg)
     {
-
+        this->mode_ = base::Mode::NORMAL_RUNE;
         if(this->mode_ == base::Mode::RUNE||this->mode_ == base::Mode::NORMAL_RUNE)
         {
             //发布相机到陀螺仪的静态tf

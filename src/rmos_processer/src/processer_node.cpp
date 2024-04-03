@@ -9,7 +9,7 @@ namespace rmos_processer {
     ProcesserNode::ProcesserNode(const rclcpp::NodeOptions &options) : Node("processer", options) {
         RCLCPP_INFO(this->get_logger(), "Start processer_node");
         controler_ = std::make_shared<processer::Controler>();
-        this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/daheng_camera_info", rclcpp::SensorDataQoS(),
+        this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/camera_info", rclcpp::SensorDataQoS(),
                                                                                          [this](sensor_msgs::msg::CameraInfo::ConstSharedPtr camera_info_msg)
                                                                                          {
                                                                                              RCLCPP_INFO(this->get_logger(), "Receive camera infomation in processer");
