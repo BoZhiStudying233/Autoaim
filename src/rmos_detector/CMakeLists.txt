@@ -15,7 +15,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 set(INCLUDES ${INCLUDES} $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 set(INCLUDES ${INCLUDES} $<INSTALL_INTERFACE:/include>)
 
-set(3RDPARTY_LIB "/home/oem/Desktop/Viper_Autoaim/3rdparty/lib/")
+set(3RDPARTY_LIB "${CMAKE_SOURCE_DIR}/../../3rdparty/lib/")
 
 include_directories(include/${PROJECT_NAME})
 # find dependencies
