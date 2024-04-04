@@ -14,12 +14,12 @@ namespace rmos_transporter
     {
 
         std::map<std::string, int> transporter_params {
-            {"interface_usb_vid", 0},
-            {"interface_usb_pid", 0},
-            {"interface_usb_read_endpoint", 0},
-            {"interface_usb_write_endpoint", 0},
-            {"interface_usb_read_timeout", 0},
-            {"interface_usb_write_timeout", 0},
+            {"interface_usb_vid", 0x0483},
+            {"interface_usb_pid", 0x5470},
+            {"interface_usb_read_endpoint", 0x81},
+            {"interface_usb_write_endpoint", 0x01},
+            {"interface_usb_read_timeout", 1},
+            {"interface_usb_write_timeout", 1},
         };
 
         this->declare_parameters("", transporter_params);
@@ -30,6 +30,8 @@ namespace rmos_transporter
         this->get_parameter<int>("interface_usb_write_endpoint", interface_usb_write_endpoint_);
         this->get_parameter<int>("interface_usb_read_timeout", interface_usb_read_timeout_);
         this->get_parameter<int>("interface_usb_write_timeout", interface_usb_write_timeout_);
+
+        //To fix : 读不到参数
 
         // create callback group
         this->receive_callback_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -49,6 +51,14 @@ namespace rmos_transporter
         // this->recevie_thread_ = std::thread(&UsbCommNode::recevieCallBack, this);
 
         quaternion_time_msg_.quaternion_stamped.header.frame_id = std::string("Imu");
+
+        //强制传参
+        interface_usb_vid_ = 0x0483;
+        interface_usb_pid_ = 0x5740;
+        interface_usb_read_endpoint_ = 0x81;
+        interface_usb_write_endpoint_ = 0x01;
+        interface_usb_read_timeout_ = 1;
+        interface_usb_write_timeout_ = 1;
 
         RCLCPP_INFO(this->get_logger(), "Init Transporter");
         transporter_ = std::make_shared<transporter_sdk::UsbcdcTransporter>(
@@ -199,7 +209,18 @@ namespace rmos_transporter
                 }
                 this->color_pub_->publish(color_msg_);
 
-                // TODO : 除哨兵外的车需要的信息
+                //mode 
+                if (package.mode == 2){
+                    mode_msg_.mode = (int) base::Mode::NORMAL;
+                }
+                if (package.mode == 4){
+                    mode_msg_.mode = (int) base::Mode::RUNE;
+                }
+                if (package.mode == 8){
+                    mode_msg_.mode = (int) base::Mode::NORMAL_RUNE;
+                }
+                tellMode(mode_msg_);
+                this->mode_pub_->publish(mode_msg_);                
 
                 break;
             }
@@ -228,31 +249,31 @@ namespace rmos_transporter
                     this->quaternion_pub_->publish(quaternion_time_msg_);
                 break;
             }
-            case RMOS_IMU_1_RECEIVE_ID:
-            {
-                transporter::RMOSIMUReceivePackage package;
-                memcpy(&package, receive_package, 
-                    sizeof(transporter::RMOSIMUReceivePackage));
-                int time_offset = 0;
-                quaternion_time_msg_.quaternion_stamped.header.stamp = this->now() + rclcpp::Duration(0,time_offset);
-                quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)package.q0;
-                quaternion_time_msg_.quaternion_stamped.quaternion.x = (double)package.q1;
-                quaternion_time_msg_.quaternion_stamped.quaternion.y = (double)package.q2;
-                quaternion_time_msg_.quaternion_stamped.quaternion.z = (double)package.q3;
+            // case RMOS_IMU_1_RECEIVE_ID:
+            // {
+            //     transporter::RMOSIMUReceivePackage package;
+            //     memcpy(&package, receive_package, 
+            //         sizeof(transporter::RMOSIMUReceivePackage));
+            //     int time_offset = 0;
+            //     quaternion_time_msg_.quaternion_stamped.header.stamp = this->now() + rclcpp::Duration(0,time_offset);
+            //     quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)package.q0;
+            //     quaternion_time_msg_.quaternion_stamped.quaternion.x = (double)package.q1;
+            //     quaternion_time_msg_.quaternion_stamped.quaternion.y = (double)package.q2;
+            //     quaternion_time_msg_.quaternion_stamped.quaternion.z = (double)package.q3;
                         
-                geometry_msgs::msg::TransformStamped t;
-                t.header.stamp =  quaternion_time_msg_.quaternion_stamped.header.stamp;
-                t.header.frame_id = "world"; //注意坐标系
-                t.child_frame_id = "IMU";
-                t.transform.rotation.x = quaternion_time_msg_.quaternion_stamped.quaternion.x;
-                t.transform.rotation.y = quaternion_time_msg_.quaternion_stamped.quaternion.y;
-                t.transform.rotation.z = quaternion_time_msg_.quaternion_stamped.quaternion.z;
-                t.transform.rotation.w = quaternion_time_msg_.quaternion_stamped.quaternion.w;
-                tf_publisher_->sendTransform(t);
-                memcpy(&quaternion_time_msg_.timestamp_recv, &package.TimeStamp, 4);
-                    this->quaternion_pub_->publish(quaternion_time_msg_);
-                break;
-            }
+            //     geometry_msgs::msg::TransformStamped t;
+            //     t.header.stamp =  quaternion_time_msg_.quaternion_stamped.header.stamp;
+            //     t.header.frame_id = "world"; //注意坐标系
+            //     t.child_frame_id = "IMU";
+            //     t.transform.rotation.x = quaternion_time_msg_.quaternion_stamped.quaternion.x;
+            //     t.transform.rotation.y = quaternion_time_msg_.quaternion_stamped.quaternion.y;
+            //     t.transform.rotation.z = quaternion_time_msg_.quaternion_stamped.quaternion.z;
+            //     t.transform.rotation.w = quaternion_time_msg_.quaternion_stamped.quaternion.w;
+            //     tf_publisher_->sendTransform(t);
+            //     memcpy(&quaternion_time_msg_.timestamp_recv, &package.TimeStamp, 4);
+            //         this->quaternion_pub_->publish(quaternion_time_msg_);
+            //     break;
+            // }
         
         }
     }

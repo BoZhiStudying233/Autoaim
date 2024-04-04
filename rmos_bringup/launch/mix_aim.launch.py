@@ -55,7 +55,7 @@ def generate_launch_description():
     #     namespace= 'rmos_transporter',
     #     executable='usb_comm',
     #     name='usb_comm',
-    #     parameters=[os.path.join(get_package_share_directory('rmos_transporter'), 
+    #     parameters=[os.path.join(get_package_share_directory('rmos_bringup'), 
     #                'config', 'hardware_settings.yaml')],
     #     output='screen',
     # )
