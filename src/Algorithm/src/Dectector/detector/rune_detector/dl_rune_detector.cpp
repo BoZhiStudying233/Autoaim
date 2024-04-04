@@ -56,7 +56,7 @@ namespace RuneDetector
         }
     }
 
-    bool DlRuneDetector::DlRuneDetect(Mat& image,base::RuneArmor& target_rune_armor)
+    bool DlRuneDetector::DlRuneDetect(Mat& image,base::RuneArmor& target_rune_armor, vector<base::RuneArmor>& rune_armors)//第三个参数存储所有识别到的扇叶，获得点来拟合三维圆
     {
         // 设置网络模型            
         std::vector<DetectResultList> outputs;
@@ -76,8 +76,9 @@ namespace RuneDetector
 
         FilterDetectResult(output);
 
-        if(classifer(output))
+        if(classifer(output, rune_armors))
         {
+            //用于找到二维圆的圆心
             DlDetectCircleCenter();
             this->target.circle_center = circle_center;
             
@@ -221,7 +222,7 @@ namespace RuneDetector
         return true;
     }
 
-    bool DlRuneDetector::classifer(std::vector<DetectResult> output)
+    bool DlRuneDetector::classifer(std::vector<DetectResult> output, vector<base::RuneArmor>& rune_armors)
     {
         if(output.size() == 0)
             return false;        
@@ -249,27 +250,37 @@ namespace RuneDetector
                     this->target = base::RuneArmor(output[i].points);
                     last_target_conf = output[i].conf; 
                     find_target = true;        
+                    rune_armors.push_back(base::RuneArmor(output[i].points));
+
+
                 }       
                 
-                else if(!find_no_activate && output[i].id == 2)
+                if(find_no_activate&&output[i].id==2)
                 {
-                    // 第一次发现目标
-                    if(this->state == base::TrackState::LOST)
-                    {
-                        this->target = base::RuneArmor(output[i].points);          
-                    } 
-                    else
-                    {
-                        base::RuneArmor temp_rune_armor = base::RuneArmor(output[i].points);
-                        double temp_distance = calDistance(temp_rune_armor.dl_armor_center, this->last_target.dl_armor_center); 
-                        if(temp_distance < min_distance)
-                        {
-                            this->target = temp_rune_armor;  
-                            min_distance = temp_distance;                         
-                        }
-                    } 
-                    find_target = true; 
-                }
+                    rune_armors.push_back(base::RuneArmor(output[i].points));//get rune_armors
+                }//此处这么把已击打扇叶也加了进来，不知道会不会出问题。。
+
+
+                //此处用于反符,但效果不好没应用过，暂且把他注释掉以写三维圆
+                // else if(!find_no_activate && output[i].id == 2)/
+                // {
+                //     // 第一次发现目标
+                //     if(this->state == base::TrackState::LOST)
+                //     {
+                //         this->target = base::RuneArmor(output[i].points);
+                //     }
+                //     else
+                //     {
+                //         base::RuneArmor temp_rune_armor = base::RuneArmor(output[i].points);
+                //         double temp_distance = calDistance(temp_rune_armor.dl_armor_center, this->last_target.dl_armor_center); 
+                //         if(temp_distance < min_distance)
+                //         {
+                //             this->target = temp_rune_armor;  
+                //             min_distance = temp_distance;                         
+                //         }
+                //     }
+                //     find_target = true; 
+                // }
             }
 
             else
@@ -285,27 +296,34 @@ namespace RuneDetector
                     this->target = base::RuneArmor(output[i].points);
                     last_target_conf = output[i].conf; 
                     find_target = true;        
+                    rune_armors.push_back(base::RuneArmor(output[i].points));
                 }       
                 
-                else if(!find_no_activate && output[i].id == 5)
+                if(find_no_activate && output[i].id == 5)
                 {
-                    // 第一次发现目标
-                    if(this->state == base::TrackState::LOST)
-                    {
-                        this->target = base::RuneArmor(output[i].points);        
-                    } 
-                    else
-                    {
-                        base::RuneArmor temp_rune_armor = base::RuneArmor(output[i].points);
-                        double temp_distance = calDistance(temp_rune_armor.dl_armor_center, this->last_target.dl_armor_center); 
-                        if(temp_distance < min_distance)
-                        {
-                            this->target = temp_rune_armor;  
-                            min_distance = temp_distance;                         
-                        }
-                    } 
-                    find_target = true;  
+                    rune_armors.push_back(base::RuneArmor(output[i].points));
                 }
+
+
+                // else if(!find_no_activate && output[i].id == 5)
+                // {
+                //     // 第一次发现目标
+                //     if(this->state == base::TrackState::LOST)
+                //     {
+                //         this->target = base::RuneArmor(output[i].points);        
+                //     } 
+                //     else
+                //     {
+                //         base::RuneArmor temp_rune_armor = base::RuneArmor(output[i].points);
+                //         double temp_distance = calDistance(temp_rune_armor.dl_armor_center, this->last_target.dl_armor_center); 
+                //         if(temp_distance < min_distance)
+                //         {
+                //             this->target = temp_rune_armor;  
+                //             min_distance = temp_distance;                         
+                //         }
+                //     } 
+                //     find_target = true;  
+                // }
             }
         }
         // 若返回关键点点数量不等于5,即有关键点缺损，则返回false
@@ -411,9 +429,9 @@ namespace RuneDetector
         Point2f all_points = Point2f(0.0, 0.0);
         for(int i = 0; i < 4; i++)
         {
-            bool is_show_point = false;
-            if(i == 0)
-                is_show_point = true;
+            // bool is_show_point = false;
+            // if(i == 0)
+            //     is_show_point = true;屎山，考虑删了
 
             this->target.points[i] = this->target.dl_points[i];
             all_points += this->target.points[i];

@@ -69,7 +69,7 @@ namespace rune_detector
             rclcpp::Clock steady_clock_{RCL_STEADY_TIME};
             double timestamp = t.header.stamp.sec + t.header.stamp.nanosec*1e-9;
             auto time1 = steady_clock_.now();
-            auto image = cv_bridge::toCvShare(image_msg, "bgr8")->image;
+            cv::Mat image = cv_bridge::toCvShare(image_msg, "bgr8")->image;
             if(debug::get_debug_option(base::SAVE_IMAGE))
             {
                 saveImage(timestamp, image);
@@ -82,72 +82,76 @@ namespace rune_detector
             rmos_interfaces::msg::Armors armors_msg;
             rmos_interfaces::msg::Armor armor_msg;
             armors_msg.header = image_msg->header;
-            if(this->mode_ == base::Mode::RUNE || this->mode_ == base::Mode::NORMAL_RUNE)
-            {
-                base::RuneArmor target_rune_armor;
-                this->rune_detector_->DlRuneDetect(image,target_rune_armor);
+        if(this->mode_ == base::Mode::RUNE || this->mode_ == base::Mode::NORMAL_RUNE)
+        {
+            base::RuneArmor target_rune_armor;
+            std::vector<base::RuneArmor> rune_armors;
+        
+            this->rune_detector_->DlRuneDetect(image,target_rune_armor, rune_armors);
 
-                armor_msg.num_id = rune_detector_->id;
-                std::string text = "id:" + std::to_string(rune_detector_->id);
-                cv::putText(image, text, (cv::Point2i(0, 20), cv::Point2i(20, 20)), cv::FONT_HERSHEY_SIMPLEX, 1,
-                            cv::Scalar(0, 255, 0), 0.5);
+            armor_msg.num_id = rune_detector_->id;
+            std::string text = "id:" + std::to_string(rune_detector_->id);
+            cv::putText(image, text, (cv::Point2i(0, 20), cv::Point2i(20, 20)), cv::FONT_HERSHEY_SIMPLEX, 1,
+                        cv::Scalar(0, 255, 0), 0.5);
 
-                target_rune_armor.timestamp = timestamp;
-                // std::cout << "timestamp:" << timestamp<< std::endl;
-                std::vector<cv::Point2f>rune_next_pos;            
+            target_rune_armor.timestamp = timestamp;
+            // std::cout << "timestamp:" << timestamp<< std::endl;
+            Eigen::Vector3d tVec;
                 
-                if(fitting_->run(target_rune_armor, rune_next_pos, rune_detector_->state, this->mode_))
+            geometry_msgs::msg::TransformStamped transform_to_world, transform_to_camera;
+            try
+                {//实车记得改坐标系名称！ remeber to change
+                    transform_to_world = tf_buffer->lookupTransform("world", "camera_optical_frame", tf2::TimePointZero);
+                    transform_to_camera = tf_buffer->lookupTransform("camera_optical_frame", "world", tf2::TimePointZero);
+                }
+            catch (tf2::TransformException & ex)
                 {
-                    // 若预测后的点在图片上才可画图，否则程序会异常终止
-                    bool can_draw = true;
-                    for(int i = 0; i < 4; i++)
-                    {
-                        if(rune_next_pos[i].x < 0 || rune_next_pos[i].y < 0 || rune_next_pos[i].x > image.cols || rune_next_pos[i].y > image.rows)
-                            can_draw = false;
+                    RCLCPP_ERROR(this->get_logger(), "Could not get the transformation!!");
                     }
                     
-                    if(can_draw)
-                    {
-                        for(int i = 0; i < 4; i++)
-                        {
-                            cv::circle(image, rune_next_pos[i], 2*(i+1), cv::Scalar(255,0,255), -1);
-                            cv::line(image, rune_next_pos[i], rune_next_pos[(i+1)%4], cv::Scalar(50, 100, 50));
-                        }
-                    }   
+            if(fitting_->run(target_rune_armor, tVec, rune_detector_->state, this->mode_, rune_armors, this->camera_matrix_, this->dist_coeffs_, transform_to_world, transform_to_camera))
+            {
+                // 若预测后的点在图片上才可画图，否则程序会异常终止
+                bool can_draw = true;
 
-                    //pnp solve
-                    cv::Mat tVec;
-                    cv::Mat rVec;
-                    bool is_solve;
-                    is_solve = this->pnp_solver_->solveRuneArmorPose(rune_next_pos,this->camera_matrix_,this->dist_coeffs_,tVec,rVec);
-                    if(!is_solve)
-                    {
-                        RCLCPP_WARN(this->get_logger(), "camera param empty");
-                    }
-                    armor_msg.pose.position.x = tVec.at<double>(0, 0)/1000;
-                    armor_msg.pose.position.y = tVec.at<double>(1, 0)/1000;
-                    armor_msg.pose.position.z = tVec.at<double>(2, 0)/1000;
+                armor_msg.pose.position.x = tVec.x()/1000;
+                armor_msg.pose.position.y = tVec.y()/1000;
+                armor_msg.pose.position.z = tVec.z()/1000;//相机坐标系下，目标符中心的坐标  
+                
+                Eigen::Vector3d CamaraVector = Eigen::Vector3d(0,0,1);
+                cv::Mat rVec = cv::Mat::zeros(3, 1, CV_64F);
+
+                //tVec = Eigen::Vector3d(tVec.x()/tVec.norm(),tVec.y()/tVec.norm(),tVec.z()/tVec.norm());//获取单位向量
+                //cv::eigen2cv(CamaraVector.cross(tVec), rVec);
+
+                //double VectorTheta = acos(CamaraVector.dot(tVec)/(CamaraVector.norm()*tVec.norm()));
+                
+                // rVec = rVec/rVec.norm() * VectorTheta;
+                
                     // rvec to 3x3 rotation matrix
                     cv::Mat rotation_matrix;
-                    cv::Rodrigues(rVec, rotation_matrix);
-                    // rotation matrix to quaternion
-                    tf2::Matrix3x3 tf2_rotation_matrix(
-                            rotation_matrix.at<double>(0, 0), rotation_matrix.at<double>(0, 1),
-                            rotation_matrix.at<double>(0, 2), rotation_matrix.at<double>(1, 0),
-                            rotation_matrix.at<double>(1, 1), rotation_matrix.at<double>(1, 2),
-                            rotation_matrix.at<double>(2, 0), rotation_matrix.at<double>(2, 1),
-                            rotation_matrix.at<double>(2, 2));
-                    tf2::Quaternion tf2_quaternion;
-                    tf2_rotation_matrix.getRotation(tf2_quaternion);
-                    armor_msg.pose.orientation.x = tf2_quaternion.x();
-                    armor_msg.pose.orientation.y = tf2_quaternion.y();
-                    armor_msg.pose.orientation.z = tf2_quaternion.z();
-                    armor_msg.pose.orientation.w = tf2_quaternion.w();
 
-                    armors_msg.armors.push_back(armor_msg);
-                }
-                armors_msg.is_rune = true;
+                rVec.at<double>(0) = 0.1;//胡乱赋一个值
+
+                cv::Rodrigues(rVec, rotation_matrix);
+                // rotation matrix to quaternion
+                tf2::Matrix3x3 tf2_rotation_matrix(
+                        rotation_matrix.at<double>(0, 0), rotation_matrix.at<double>(0, 1),
+                        rotation_matrix.at<double>(0, 2), rotation_matrix.at<double>(1, 0),
+                        rotation_matrix.at<double>(1, 1), rotation_matrix.at<double>(1, 2),
+                        rotation_matrix.at<double>(2, 0), rotation_matrix.at<double>(2, 1),
+                    rotation_matrix.at<double>(2, 2));//旋转矩阵
+                tf2::Quaternion tf2_quaternion;
+                tf2_rotation_matrix.getRotation(tf2_quaternion);
+                armor_msg.pose.orientation.x = tf2_quaternion.x();
+                armor_msg.pose.orientation.y = tf2_quaternion.y();
+                armor_msg.pose.orientation.z = tf2_quaternion.z();
+                armor_msg.pose.orientation.w = tf2_quaternion.w();//四元数
+
+                armors_msg.armors.push_back(armor_msg);
             }
+            armors_msg.is_rune = true;
+        }
             auto time2 = steady_clock_.now();
 
             std::string text = "Exposure:" + std::to_string(this->Exposure);
@@ -158,14 +162,16 @@ namespace rune_detector
                 saveDrawImage(timestamp, image);
             }
 
-            if(debug::get_debug_option(base::SHOW_DETECT_COST))RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
+            if(debug::get_debug_option(base::SHOW_DETECT_COST))
+                RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
 
             if(debug::get_debug_option(base::SHOW_ARMOR))
             {
                 debug_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
                 debug_img_pub_.publish(*debug_image_msg_,camera_info_msg_);
-                //cv::imshow("image", image);
-                std::cout<<"debug_image_running!!"<<std::endl;
+                cv::imshow("image", image);
+                cv::waitKey(1);
+                //std::cout<<"debug_image_running!!"<<std::endl;
             }
 
             if(debug::get_debug_option(base::SHOW_BIN))
@@ -177,7 +183,9 @@ namespace rune_detector
 
                 debug_bin_img_pub_.publish(*debug_bin_image_msg_,camera_info_msg_);
             }
-
+            // double t1 = armors_msg.header.stamp.sec+armors_msg.header.stamp.nanosec*1e-9;//这段用于测试程序耗时用
+            // double t2 = rclcpp::Clock().now().nanoseconds()*1e-9;
+            //std::cout<<"time="<<t2-t1<<std::endl;
             armors_pub_->publish(armors_msg); 
         }
         else if (this->mode_ == base::Mode::NORMAL)

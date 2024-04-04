@@ -24,6 +24,7 @@ namespace RuneDetector
             {
                 if(judge_speed > 2.7 || judge_speed < -0.4)
                 {
+                    //cout<<"judge_speed="<<judge_speed<<endl;
                     cout<<"bad data for clockwise"<<endl;
                     solveBadData();
                     return false;
@@ -88,7 +89,7 @@ namespace RuneDetector
     {
         double sum = 0;
         for(int i = 0; i < n; i++)
-            sum += speedJudge[i];
+            sum += this->speedJudge[i];
         this->mean = sum / n;
     }
 

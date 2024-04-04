@@ -1,0 +1,17 @@
+src/Algorithm/src/Dectector/Fitting/Fittool.cpp
+src/Algorithm/src/Dectector/Fitting/Fitting.cpp
+src/Algorithm/include/Dectector/Fitting/Fitting.h
+src/Algorithm/include/Dectector/Fitting/Fittool.h
+
+
+src/Algorithm/src/Processer/controler.cpp
+src/Algorithm/src/Processer/ballistic_solver.cpp
+src/Algorithm/src/Base/rune_armor.cpp
+src/Algorithm/include/Base/rune_armor.hpp
+src/Algorithm/src/Dectector/detector/rune_detector/dl_rune_detector.cpp
+src/Algorithm/include/Dectector/detector/rune_detector/rune_detector.hpp
+
+
+src/rmos_detector/include/rune_detector_node.hpp
+src/rmos_detector/src/rune_detector_node.cpp
+src/rmos_detector/include/rune_detector_node.hpp

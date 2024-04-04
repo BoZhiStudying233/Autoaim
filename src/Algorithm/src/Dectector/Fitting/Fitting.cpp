@@ -1,12 +1,25 @@
 #include "Dectector/Fitting/Fitting.h"
+#include <cmath>
 
+#include <tf2_eigen/tf2_eigen.h>
+
+#include <tf2/transform_datatypes.h>
+#include <tf2/exceptions.h>
+
+
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+
+#include <tf2/convert.h>
+#include <tf2_eigen/tf2_eigen.h>
 namespace RuneDetector
 {
 
     /*-----------Fitting-----------*/
     Fitting::Fitting(){}
 
-    bool Fitting::run(base::RuneArmor armor_1, vector<cv::Point2f> &nextPosition, TrackState armor_state, base::Mode rune_mode)
+    bool Fitting::run(base::RuneArmor armor_1,Eigen::Vector3d &tVector, TrackState armor_state, base::Mode rune_mode, vector<base::RuneArmor>& rune_armors, Mat camera_matrix, Mat dist_coeffs, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera)
     {
         // 数据处理
         if (!processDataState(armor_1, armor_state))
@@ -21,14 +34,212 @@ namespace RuneDetector
         if(rune_mode == base::Mode::RUNE && fitting_data.size() < N_min)
             return false;
 
-        nextPosition.clear();
+        // nextPosition.clear();
         vector<cv::Point2f> pts;
-        armor_1.getPoints(pts);
+        // armor_1.getPoints(pts);
+
         double delta = fit.run(fitting_data, N, rune_mode);            // 旋转角度
-        for (int i = 0; i < 4; i++)
-            nextPosition.push_back(calNextPosition(pts[i], armor_1.circle_center, delta));
+        delta = 0;
+
+        //圆拟合
+        
+        getTrajData(armor_buffer, camera_matrix, dist_coeffs, transform_to_world, transform_to_camera);
+        
+        this->armor_pose_points.clear();
+        this->angle_points.clear();
+
+
+        for(int i=0;i<360;i++)
+        {
+            if(watched_points[i].is_get==true)
+            {
+                this->armor_pose_points.push_back(watched_points[i].point);
+                angle_points.push_back(i);
+            }
+        }
+        cout<<"点数为"<<armor_pose_points.size()<<std::endl;
+        // correctPoints(armor_pose_points)     此函数内的深度考虑改为[2]后测试
+        buff_trajectory = fitCircle(armor_pose_points, transform_to_world, transform_to_camera);
+        //tVector = watched_points[round(armor_1.angle+delta)].point.x,watched_points[round(armor_1.angle+delta)].point.y,watched_points[round(armor_1.angle+delta)].point.z
+        if(buff_trajectory.is_get)
+        {
+            // correctAxis(buff_trajectory, armor_pose_points, angle_points);
+            std::cout<<"buff_trajectory.x_axis="<<buff_trajectory.x_axis<<std::endl;
+            std::cout<<"buff_trajectory.radius="<<buff_trajectory.radius<<std::endl;
+            // Eigen::Vector3d Vec1 = tfPoint(transform_to_world, buff_trajectory.x_axis);
+            // std::cout<<"1="<<Vec1<<std::endl;
+            // std::cout<<"2="<<tfPoint(transform_to_camera, Vec1)<<std::endl;
+            //std::cout<<"buff_trajectory.y_axis * sin(armor_1.angle+delta)="<<buff_trajectory.radius * buff_trajectory.y_axis * sin(armor_1.angle+delta)+buff_trajectory.center<<std::endl;
+            tVector = buff_trajectory.radius * buff_trajectory.x_axis * cos(armor_1.angle+delta) + buff_trajectory.radius * buff_trajectory.y_axis * sin(armor_1.angle+delta) + buff_trajectory.center;
+            tVector = tfPoint(transform_to_camera, tVector);
+            std::cout<<"tVector="<<tVector<<std::endl;
+        }
+        else 
+            return false;
+
+        
+        
         
         return true;         
+    }
+        void Fitting::correctPoints(std::vector<Eigen::Vector3d> &armor_points)
+    {
+        if (armor_points.size() <= 0)
+        {
+            return;
+        }
+        float depth_aver = 0.0f;
+        std::for_each(armor_points.begin(), armor_points.end(), [&](const Eigen::Vector3d &d)
+                      { depth_aver += d[1]; });
+        depth_aver /= armor_points.size();
+
+        float depth_std = 0.0;
+
+        std::for_each(armor_points.begin(), armor_points.end(), [&](const Eigen::Vector3d &d)
+                      { depth_std += pow((d[1] - depth_aver), 2); });
+        depth_std = sqrt(depth_std / armor_points.size());
+
+        std::for_each(
+            armor_points.begin(), armor_points.end(), [&](Eigen::Vector3d &armor_point)
+            {
+                if (armor_point[1] < depth_aver - 0.5 * depth_std || armor_point[1] > depth_aver + 0.5 * depth_std)
+                {
+                    armor_point = armor_point / armor_point[1] * depth_aver;
+                }
+            });
+    }
+
+
+    void Fitting::correctAxis(BuffTrajectory &buff_traj, const std::vector<Eigen::Vector3d> &armor_points, const std::vector<float> &angle_points)
+    {
+
+        int axis_score[2][2] = {0}; //0:x,1:y 0:原，1:反
+        Eigen::Vector3d axis_set[2][2] = {buff_traj.x_axis, -buff_traj.x_axis, buff_traj.y_axis, -buff_traj.y_axis};
+        int index_x, index_y;
+        for (int k = 0; k < armor_points.size(); k++)
+        {
+            index_x = 0;
+            index_y = 0;
+            double min_dis = 999.0;
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    Eigen::Vector3d predict_point = buff_traj.center + axis_set[0][i] * buff_traj.radius * cos(angle_points[k]*CV_PI/180) + axis_set[1][j] * buff_traj.radius * sin(angle_points[k]*CV_PI/180);
+                    if ((predict_point - armor_points[k]).norm() < min_dis)
+                    {
+                        index_x = i;
+                        index_y = j;
+                        min_dis = (predict_point - armor_points[k]).norm();
+                    }
+                }
+            }
+            axis_score[index_x][index_y] += 1;  
+        }
+        if (axis_score[0][0] < axis_score[0][1])
+        {
+            buff_traj.x_axis *= -1;
+        }
+        if (axis_score[1][0] < axis_score[1][1])
+        {
+            buff_traj.y_axis *= -1;
+        }      
+    }
+    const BuffTrajectory &Fitting::fitCircle(const std::vector<Eigen::Vector3d> &armor_points, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera)
+    {
+        const int CURVE_FIT_SIZE = armor_points.size();//remeber to change it
+        buff_trajectory.is_get = false;
+        if (armor_points.size() <= 90)
+        {
+            cout<<"armor_points.size()="<<armor_points.size()<<"   点数过少，无法拟合三维圆"<<std::endl;
+            return buff_trajectory;
+        }
+        cout<<"armor_points.size()="<<armor_points.size()<<endl;
+        buff_trajectory.is_get = true;
+        Eigen::MatrixXd M(CURVE_FIT_SIZE, 3);
+
+        for (int i = 0; i < CURVE_FIT_SIZE; i++)
+        { 
+            for (int j = 0; j < 3; j++)
+            {
+                M(i, j) = armor_points[i][j];
+            }
+        }
+
+        Eigen::MatrixXd  L1 = Eigen::MatrixXd::Ones(CURVE_FIT_SIZE, 1);
+        
+        Eigen::Vector3d A = (M.transpose() * M).inverse() * M.transpose() * L1; //平面法向量
+
+
+
+        //计算两点之间的向量
+        Eigen::MatrixXd B((CURVE_FIT_SIZE - 1) * CURVE_FIT_SIZE / 2, 3);
+        int count = 0;
+        for (int i = 0; i < CURVE_FIT_SIZE - 1; i++)
+        {
+            for (int j = i + 1; j < CURVE_FIT_SIZE; j++)
+            {
+                B.row(count) = M.row(j) - M.row(i);
+                count++;
+            }
+        }
+        // //求取两两平方差
+        count = 0;
+        Eigen::MatrixXd  L2((CURVE_FIT_SIZE - 1) * CURVE_FIT_SIZE / 2, 1);
+        for (int i = 0; i < CURVE_FIT_SIZE - 1; i++)
+        {
+            for (int j = i + 1; j < CURVE_FIT_SIZE; j++)
+            {
+                L2(count, 0) = (pow(M.row(j).norm(), 2) - pow(M.row(i).norm(), 2)) / 2;
+                count++;
+            }
+        }
+
+        // Eigen::Matrix<double, 3, 3> matrix = B.transpose() * B;
+        //get D Matrix
+        Eigen::Matrix<double, 4, 4> D;
+
+        D << B.transpose() * B, A, A.transpose(), 0;
+
+        //get L3 Matrix
+        Eigen::Vector4d L3;
+        L3 << B.transpose() * L2, 1;
+
+        // //式（7）
+        Eigen::Vector4d C = D.transpose().inverse() * L3;
+
+        Eigen::Vector3d center(C[0], C[1], C[2]);
+
+        // // //式（8）
+        float radius = 0;
+        for (int i = 0; i < CURVE_FIT_SIZE; i++)
+        {
+            radius += (armor_points[i] - center).norm();
+        }
+        radius = radius / CURVE_FIT_SIZE;
+        
+        Eigen::Vector3d y_axis = A.cross(tfPoint(transform_to_world,Eigen::Vector3d(1, 0, 0)));
+        Eigen::Vector3d x_axis = A.cross(y_axis);
+
+        x_axis = x_axis / x_axis.norm();
+        y_axis = y_axis / y_axis.norm();
+
+        buff_trajectory.radius = radius;
+        buff_trajectory.center = center;
+        buff_trajectory.x_axis = x_axis;
+        buff_trajectory.y_axis = y_axis;
+        Eigen::Vector3d VecY = tfPoint(transform_to_camera, y_axis);
+        Eigen::Vector3d VecX = tfPoint(transform_to_camera, x_axis);
+        
+        if (VecX[0] < 0)
+        {
+            buff_trajectory.x_axis = -buff_trajectory.x_axis;
+        }
+        if (VecY[1] < 0)
+        {
+            buff_trajectory.y_axis = -buff_trajectory.y_axis;
+        }
+        return buff_trajectory;
     }
 
     void Fitting::clearData()
@@ -36,32 +247,94 @@ namespace RuneDetector
         cout << "Clear Fitting Data!" << endl;
         fitting_data.clear();
         armor_buffer.clear();
+        for(int i=0; i<360; i++)
+        {
+            watched_points[i].is_get = false;
+        }
         judge.resetJudge();
         is_direction_inited = false;
     }
 
-    cv::Point2f Fitting::calNextPosition(cv::Point2f point, cv::Point2f org, float rotate_angle)
+    // cv::Point2f Fitting::calNextPosition(cv::Point2f point, cv::Point2f org, float rotate_angle)
+    // {
+    //     double radius = calDistance(point, org);
+    //     cv::Point2f relative_point = point - org;                                         // 相对坐标
+    //     double relative_angle = atan2(relative_point.y, relative_point.x);                // 与圆心所成角度
+    //     double next_angle;
+        
+    //     if (is_clockwise) // 顺时针运动
+    //     {
+    //         next_angle = relative_angle + rotate_angle;
+    //         if (next_angle > CV_PI)
+    //             next_angle -= 2.0 * CV_PI;
+    //     }
+    //     else
+    //     {
+    //         next_angle = relative_angle - rotate_angle;
+    //         if (next_angle < - CV_PI)
+    //             next_angle += 2.0 * CV_PI;
+    //     }
+
+    //     std::vector<Eigen::Vector3d> armor_pose_points;
+    //     for(int i=0;i < rune_armors.size(); i++)
+    //     {
+    //         cv::Mat tVec;
+    //         cv::Mat rVec;
+    //         vector<Point2f> PoiVec;
+    //         for(int p=0;p<4;p++)
+    //         {
+    //             PoiVec.push_back(rune_armors[i].points[p]);
+    //         }
+    //         bool is_solve = this -> pnp_solver_ ->solveRuneArmorPose(PoiVec,this->camera_matrix_,this->dist_coeffs_,tVec,rVec);
+
+    //         if(!is_solve)
+    //         {
+    //             cout<<"camera1 param empty"<<endl;
+    //         }
+    //         Eigen::Vector3d armor_pose_point(tVec.at<double>(0, 0), tVec.at<double>(1, 0),tVec.at<double>(2, 0));
+    //         // rune_armors[i].target.x = tVec.at<double>(0, 0)/1000;
+    //         // rune_armors[i].target.y = tVec.at<double>(1, 0)/1000;
+    //         // rune_armors[i].target.z = tVec.at<double>(2, 0)/1000;//相机坐标系下，扇叶中心的坐标
+    //         armor_pose_points.push_back(armor_pose_point);
+    //     }
+        
+    //     buff_trajectory = fitCircle(armor_pose_points);//改到这里啦
+    //                                  //目前完成到了将所有点传入拟合函数（fitCircle函数），下一步可以开始修改拟合部分了
+
+    //     //vector<Point2f> = ShowCircle(buff_trajectory);
+    //     //vector<cv::Point2f> DataToReturn = 
+    //     return vector<cv::Point2f>{cv::Point2f(cos(next_angle) * radius, sin(next_angle) * radius) + org } ;
+    // }
+    /*思考了一点东西。
+        已经不能再通过求得旋转角度来使其在二维平面旋转得到击打的目标点了，因为这是三维圆。
+        不如直接用我们的得到的在二维平面上的投影点来打。（这样会有一个重投影的误差）
+
+        其实无需重投影，直接根据三维圆的三维坐标得到位移向量即可。
+
+
+        华科的拟合方案是自己拟合了半径，但实际上我们已知了半径。
+        我们可以根据已知的半径，拟合一个圆进而得到两个同心圆。
+    */
+/*    void Fitting::ShowCircle(BuffTrajectory buff_trajectory)
     {
-        double radius = calDistance(point, org);
-        cv::Point2f relative_point = point - org;                                         // 相对坐标
-        double relative_angle = atan2(relative_point.y, relative_point.x);                // 与圆心所成角度
-        double next_angle;
-
-        if (is_clockwise) // 顺时针运动
+        vector<Eigen::Vector3d> PointsIn3D;//三维圆上的点在三维坐标系下的坐标
+        vector<Eigen::Vector2d> PointsIn2D;//三维圆上的点投影到像素坐标系后的坐标
+        double theta;
+        Eigen::Vector3d point;
+        cv::Vec3d vec(0,0,0);
+        for(int i=0;i<=359;i++)
         {
-            next_angle = relative_angle + rotate_angle;
-            if (next_angle > CV_PI)
-                next_angle -= 2.0 * CV_PI;
+            theta = i/2*CV_PI;
+            point = buff_trajectory.center+(buff_trajectory.radius*buff_trajectory.x_axis*cos(theta)+buff_trajectory.radius * buff_trajectory.y_axis*sin(theta));
+            PointsIn3D.push_back(point);
         }
-        else
-        {
-            next_angle = relative_angle - rotate_angle;
-            if (next_angle < - CV_PI)
-                next_angle += 2.0 * CV_PI;
-        }
-
-        return cv::Point2f(cos(next_angle) * radius, sin(next_angle) * radius) + org;
+        projectPoints(PointsIn3D,vec,vec, this->camera_matrix_, this->dist_coeffs_ ,PointsIn2D);
+        //对于可视化，目前感觉最佳方案就是把三维圆得到的投影点和目标点都传出到basic_detector节点。
+        //并在image上画出来。
+        //这样避免传入image，image太大了;也避免了违背“把算法都写在Algorithm”里的初衷
     }
+*/
+
 
     bool Fitting::processDataState(RuneArmor armor_1, TrackState armor_state)
     {
@@ -96,9 +369,7 @@ namespace RuneDetector
             break;
 
         case TrackState::LOST:
-            armor_buffer.clear();
-            fitting_data.clear();
-            judge.resetJudge();
+            clearData();
             return false;
             break;
             
@@ -112,6 +383,91 @@ namespace RuneDetector
         return true;
     }
 
+    void Fitting::getTrajData(vector<RuneArmor> armor_buffer, Mat camera_matrix, Mat dist_coeffs, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera)
+    {
+        static float k = 0.85; //低通滤波参数
+        int degree;
+        for (int i=0; i < armor_buffer.size();i++)
+        {   
+            degree = armor_buffer[i].angle/M_PI*180;
+            if(watched_points[degree].is_get == false)
+            {
+
+                watched_points[degree].is_get = true;
+
+                cv::Mat tVec;
+                cv::Mat rVec;
+                vector<Point2f> PoiVec;
+                for(int p=0;p<4;p++)
+                {
+                    PoiVec.push_back(armor_buffer[i].points[p]);
+                    
+                }
+                
+                bool is_solve = this -> pnp_solver_ ->solveRuneArmorPose(PoiVec,camera_matrix,dist_coeffs,tVec,rVec);
+                
+                if(!is_solve)
+                {
+                    cout<<"camera2 param empty"<<endl;
+                }
+                armor_buffer[i].target = cv::Point3f(tVec.at<double>(0, 0), tVec.at<double>(1, 0),tVec.at<double>(2, 0));
+                
+                Eigen::Vector3d target_point_in_camera = Eigen::Vector3d(armor_buffer[i].target.x,armor_buffer[i].target.y,armor_buffer[i].target.z);
+                Eigen::Vector3d target_point_in_world = tfPoint(transform_to_world, target_point_in_camera);
+                watched_points[degree].point =  target_point_in_world;
+            }
+            else if (watched_points[degree].is_get == true)
+            {
+                cv::Mat tVec;
+                cv::Mat rVec;
+                vector<Point2f> PoiVec;
+                for(int p=0;p<4;p++)
+                {
+                    PoiVec.push_back(armor_buffer[i].points[p]);
+                }
+                bool is_solve = this -> pnp_solver_ ->solveRuneArmorPose(PoiVec,camera_matrix,dist_coeffs,tVec,rVec);
+
+                if(!is_solve)
+                {
+                    cout<<"camera3 param empty"<<endl;
+                }
+                armor_buffer[i].target = cv::Point3f(tVec.at<double>(0, 0), tVec.at<double>(1, 0),tVec.at<double>(2, 0));
+                Eigen::Vector3d target_point_in_camera = Eigen::Vector3d(armor_buffer[i].target.x,armor_buffer[i].target.y,armor_buffer[i].target.z);
+                Eigen::Vector3d target_point_in_world = tfPoint(transform_to_world, target_point_in_camera);
+                watched_points[degree].point = watched_points[degree].point * k + (1 - k) *  target_point_in_world;
+            }
+            // std::cout<<"watched_points[degree].point ="<<watched_points[degree].point<<std::endl;
+            std::cout<<"degree="<<degree<<std::endl;
+            std::cout<<"watched_points[degree].point ="<<tfPoint(transform_to_camera, watched_points[degree].point)<<std::endl;
+        }
+        
+    }
+
+    Eigen::Vector3d Fitting::tfPoint(geometry_msgs::msg::TransformStamped transform_to, Eigen::Vector3d Vec)
+    {
+        Eigen::Vector3d translation(
+            transform_to.transform.translation.x,
+            transform_to.transform.translation.y,
+            transform_to.transform.translation.z
+        );
+
+        // 提取旋转分量
+        Eigen::Quaterniond rotation(
+            transform_to.transform.rotation.w,
+            transform_to.transform.rotation.x,
+            transform_to.transform.rotation.y,
+            transform_to.transform.rotation.z
+        );
+
+        // 将旋转分量转换为旋转矩阵
+        Eigen::Matrix3d rotation_matrix = rotation.toRotationMatrix();
+
+        // 计算转换后的向量
+        Eigen::Vector3d target_transformed = rotation_matrix * Vec + translation;
+
+        // 现在Vec_world包含了转换后的Eigen::Vector3d
+        return target_transformed;
+    }
     void Fitting::pushFittingData(SpeedTime new_data)
     {
         if (fitting_data.empty())
@@ -178,7 +534,7 @@ namespace RuneDetector
         double time_diff = (double)(armor_1.timestamp - armor_2.timestamp);
 
         if(time_diff < 0.005)
-            time_diff += 0.005;
+            time_diff += 0.005;//防止时间差过小导致除完之后速度过大
 
         double angle_diff = armor_1.angle - armor_2.angle;
         if (armor_1.angle < -CV_PI / 2.0 && armor_2.angle > CV_PI / 2.0)

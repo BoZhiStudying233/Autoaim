@@ -51,7 +51,7 @@ namespace RuneDetector
     
         int id = 0;                                     // 扇叶识别次序
         RuneParam param;
-        base::Color enemy_color_{base::BLUE};
+        base::Color enemy_color_{base::RED};
 
         /**
          *  @brief  构造函数,初始化yolov7模型与RuneParam内的参数
@@ -71,7 +71,7 @@ namespace RuneDetector
          *  @param  image  从相机节点接收的图片
          *  @param  target_rune_armor  识别得到的当前待击打扇叶详细数据
          */
-        bool DlRuneDetect(Mat& image,base::RuneArmor& target_rune_armor);   
+        bool DlRuneDetect(Mat& image,base::RuneArmor& target_rune_armor, vector<base::RuneArmor>& rune_armors);   
 
     protected:
         /*YOLO constructer*/
@@ -118,7 +118,7 @@ namespace RuneDetector
          * @brief  对网络结果分类，并判断是否有待击打扇叶
          * @param output 网络返回结果 
         */
-        bool classifer(std::vector<DetectResult> output);
+        bool classifer(std::vector<DetectResult> output, vector<base::RuneArmor>& rune_armors);
 
         /**
          * @brief 图像预处理
