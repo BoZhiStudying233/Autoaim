@@ -32,6 +32,16 @@ typedef struct SpeedTime
     }
 } SpeedTime;
 
+struct BuffTrajPoint
+    {
+        bool is_get;
+        Eigen::Vector3d point;
+        BuffTrajPoint()
+        {
+            is_get = false;
+        }
+    };
+
 class Judgement{
 public:
     Judgement(){};
@@ -79,7 +89,7 @@ private:
     void solveBadData();
 };
 
-class Fit
+class Fit//用于拟合
 {
 public:
     Fit();

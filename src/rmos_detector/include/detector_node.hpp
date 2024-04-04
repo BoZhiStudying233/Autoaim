@@ -71,7 +71,7 @@ namespace rmos_detector
                     this, "/image_raw", std::bind(&BasicDetectorNode::imageCallBack, this, std::placeholders::_1),
                     "raw",
                     rmw_qos_profile_default));
-            this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/daheng_camera_info", rclcpp::SensorDataQoS(),
+            this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/camera_info", rclcpp::SensorDataQoS(),
                                                                                              [this](sensor_msgs::msg::CameraInfo::ConstSharedPtr camera_info_msg)
                                                                                              {
                                                                                                  RCLCPP_INFO(this->get_logger(), "Receive camera infomation");

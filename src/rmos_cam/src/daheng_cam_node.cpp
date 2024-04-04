@@ -94,7 +94,7 @@ namespace rmos_cam
                     this->mode = (*mode_msg).mode;
                     setMode(mode);
                 });
-        camera_info_pub_ = create_publisher<sensor_msgs::msg::CameraInfo>("/daheng_camera_info", 10);
+        camera_info_pub_ = create_publisher<sensor_msgs::msg::CameraInfo>("/camera_info", 10);
 
         capture_thread_ = std::thread{[this]() -> void
                                       {

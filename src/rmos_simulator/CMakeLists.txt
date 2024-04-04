@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
-project(rmos_processer)
+project(rmos_simulator)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(NOT CMAKE_BUILD_TYPE)
 set(CMAKE_BUILD_TYPE Release)
@@ -14,9 +14,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 set(INCLUDES ${INCLUDES} $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 set(INCLUDES ${INCLUDES} $<INSTALL_INTERFACE:/include>)
-SET(CMAKE_BUILD_TYPE "Debug") 
 set(3RDPARTY_LIB "/home/bozhi/Desktop/Autoaim/3rdparty/lib/")
-
 include_directories(include/${PROJECT_NAME})
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
@@ -56,8 +54,8 @@ install(
 
 
 rclcpp_components_register_node(${PROJECT_NAME}
-        PLUGIN rmos_processer::ProcesserNode
-        EXECUTABLE processer
+        PLUGIN rmos_simulator::SimulatorNode
+        EXECUTABLE simulator
         )
 
 

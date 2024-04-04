@@ -6,28 +6,46 @@
 #define FITTING_H
 
 # include "../Fitting/Fittool.h"
+#include "../../../include/Dectector/solver/pnp_solver/pnp_solver.hpp"
 
+#include <rclcpp/rclcpp.hpp>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+// #include <geometry_msgs/msg/transform_stamped.hpp>
+#include <geometry_msgs/msg/pose_stamped.h>
+#include <geometry_msgs/msg/quaternion_stamped.hpp>
 namespace RuneDetector{
 
 using namespace std;
 using namespace cv;
 using namespace base;
 
-
+ struct BuffTrajectory//用于保存三维圆
+    {
+        // point = center + r * x_axis * cos(theta) + r * y_axis * sin(theta)
+        float radius;
+        Eigen::Vector3d center;
+        Eigen::Vector3d x_axis;
+        Eigen::Vector3d y_axis;
+        bool is_get = false;
+    };
 class Fitting
 {
 public:
-    vector<RuneArmor> armor_buffer;     // 存储一段时间内的未激活扇叶集合,用来计算速度
+    vector<RuneArmor> armor_buffer;     // 存储一段时间内的未激活扇叶集合,用来计算速度和拟合三维圆 
     vector<SpeedTime> fitting_data;     // 拟合数据集
 
+
+    BuffTrajPoint watched_points[360];  //用于拟合三维圆。将角度分为360度  日后在合适的地方清空此变量
+    int get_angle_num = 0;
 private:
 
     Judgement judge;
     Fit fit;
 
     // double DT = 0.01;                // 采样时间间隔，单位：秒
-    int N = 160;                         // 角速度采样数
-    int N_min = 20;                     // 角速度最小采样数
+    int N = 160;                        // 角速度采样数
+    int N_min = 20;                         // 角速度最小采样数
 
     int DN = 1;                         // 逐差法测速度间距
 
@@ -40,6 +58,10 @@ private:
     double call_speed_threshold = 0.005;          // 阈值，armor_buffer首末数据之差，若超过该阈值则计算角速度
     double clear_data_threshold = 0.8;            // 阈值，新来数据时间与上一时刻存入的时间之差，若超过该阈值则重置所有数据(进入clearData)
 
+    BuffTrajectory buff_trajectory;
+
+    std::vector<Eigen::Vector3d> armor_pose_points;
+    std::vector<float> angle_points;
 public:
     /**
      * @brief 初始化参数
@@ -51,7 +73,9 @@ public:
     /**
      *  @brief  封装API
      */
-    bool run(RuneArmor armor_1, vector<cv::Point2f> &nextPosition, TrackState armor_state, Mode rune_mode=Mode::RUNE);
+    bool run(base::RuneArmor armor_1,Eigen::Vector3d &tVector, TrackState armor_state, base::Mode rune_mode, vector<base::RuneArmor>& rune_armors, Mat camera_matrix, Mat dist_coeffs, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera);
+    
+     void getTrajData(vector<RuneArmor> armor_buffer, Mat camera_matrix, Mat dist_coeffs, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera);//得到点
 
 protected:
     /**
@@ -65,7 +89,7 @@ protected:
      *  @param  org     原点
      *  @param  angle   旋转角度
      */
-    cv::Point2f calNextPosition(cv::Point2f point, cv::Point2f org, float angle);
+
 
     /**
      *  @brief  根据状态处理数据
@@ -106,7 +130,30 @@ protected:
         return sqrt(pow(dis.x,2)+pow(dis.y,2));
     };
 
+    Eigen::Vector3d tfPoint(geometry_msgs::msg::TransformStamped transform, Eigen::Vector3d Vec);
+
+    /**
+     * @brief 拟合三维圆
+    */
+    const BuffTrajectory &fitCircle(const std::vector<Eigen::Vector3d> &armor_points, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera);
+
+    void correctAxis(BuffTrajectory &buff_traj, const std::vector<Eigen::Vector3d> &armor_points, const std::vector<float> &angle_points);
+    void correctPoints(std::vector<Eigen::Vector3d> &armor_points);
+
+
+    double radians_to_degrees(double radians);
+
+    std::shared_ptr<detector::PnpSolver> pnp_solver_ = std::make_shared<detector::PnpSolver>();
+
+
+    /**
+     * @brief 把拟合出的三维圆在图像上画出来
+    */
+    void ShowCircle(BuffTrajectory buff_trajectory);
+
+
 };
+
 
 }
 #endif
