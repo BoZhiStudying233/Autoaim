@@ -219,7 +219,7 @@ namespace rmos_processer {
                     cv::Point3f p_y_t = controler_->ballistic_solver_.getAngleTime(aiming_point*1000, armors_msg->is_rune);
                     float new_pitch = p_y_t.x;
                     float new_yaw = p_y_t.y;
-
+                    
                     rmos_interfaces::msg::QuaternionTime gimble_pose = quaternion_buf_.back();
                     tf2::Quaternion tf_gimble_q;
                     tf2::fromMsg(gimble_pose.quaternion_stamped.quaternion, tf_gimble_q);
