@@ -13,7 +13,7 @@
 - 二阶段识别节点：mix_detector 启动命令： `ros2 run rmos_detector mix_detector`
 - 能量机关识别节点：rune_detector 启动命令： `ros2 run rmos_detector rune_detector`
 - 解算节点：processer              启动命令：`ros2 run rmos_processer processer`
-- 通信节点 ： can_comm            启动命令：`ros2 run rmos_transporter can_comm`
+- 通信节点 ： usb_comm            启动命令：`ros2 run rmos_transporter usb_comm`
 
   
 ## 如何启动程序
