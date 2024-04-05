@@ -13,26 +13,6 @@ namespace rmos_transporter
     UsbCommNode::UsbCommNode(const rclcpp::NodeOptions &options) : CommNode("usb_comm", options)
     {
 
-        std::map<std::string, int> transporter_params {
-            {"interface_usb_vid", 0x0483},
-            {"interface_usb_pid", 0x5470},
-            {"interface_usb_read_endpoint", 0x81},
-            {"interface_usb_write_endpoint", 0x01},
-            {"interface_usb_read_timeout", 1},
-            {"interface_usb_write_timeout", 1},
-        };
-
-        this->declare_parameters("", transporter_params);
-        // transporter parameter
-        this->get_parameter<int>("interface_usb_vid", interface_usb_vid_);
-        this->get_parameter<int>("interface_usb_pid", interface_usb_pid_);
-        this->get_parameter<int>("interface_usb_read_endpoint", interface_usb_read_endpoint_);
-        this->get_parameter<int>("interface_usb_write_endpoint", interface_usb_write_endpoint_);
-        this->get_parameter<int>("interface_usb_read_timeout", interface_usb_read_timeout_);
-        this->get_parameter<int>("interface_usb_write_timeout", interface_usb_write_timeout_);
-
-        //To fix : 读不到参数
-
         // create callback group
         this->receive_callback_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
         this->target_sub_callback_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -103,9 +83,12 @@ namespace rmos_transporter
         send_package_._EOF = 0xFF;
         send_package_.ID = RMOS_SEND_ID;
         this->target2state(target, &(send_package_.AimbotState));
-        send_package_.PitchRelativeAngle = (int16_t)(target->gun_pitch * 32768.0 / 180.0);
-        send_package_.YawRelativeAngle = (int16_t)(target->gun_yaw * 32768.0 / 180.0);
+        send_package_.PitchRelativeAngle = (float)(target->gun_pitch );//* 32768.0 / 180.0
+        send_package_.YawRelativeAngle = (float)(target->gun_yaw );
         send_package_.SystemTimer = (int16_t)(target->timestamp_recv);
+        send_package_.AimbotTarget = 0;
+        send_package_.TargetYawSpeed = 0;
+        send_package_.TargetPitchSpeed = 0;
         transporter_->write((unsigned char *)&send_package_, sizeof(transporter::RMOSSendPackage));
     }
 
@@ -193,11 +176,11 @@ namespace rmos_transporter
         switch (receive_package[1])
         {
             
-            case RMOS_REFEREE_RECEIVE_ID:
+            case RMOS_RECEIVE_ID:
             {
-                transporter::RMOSRefereeReceivePackage package;
+                transporter::RMOSReceivePackage package;
                 memcpy(&package, receive_package, 
-                    sizeof(transporter::RMOSRefereeReceivePackage));
+                    sizeof(transporter::RMOSReceivePackage));
 
                 // color
                 if (package.robot_id < 10) {
@@ -220,15 +203,7 @@ namespace rmos_transporter
                     mode_msg_.mode = (int) base::Mode::NORMAL_RUNE;
                 }
                 tellMode(mode_msg_);
-                this->mode_pub_->publish(mode_msg_);                
-
-                break;
-            }
-            case RMOS_IMU_0_RECEIVE_ID:
-            {
-                transporter::RMOSIMUReceivePackage package;
-                memcpy(&package, receive_package, 
-                    sizeof(transporter::RMOSIMUReceivePackage));
+                this->mode_pub_->publish(mode_msg_);    
                 int time_offset = 0;
                 quaternion_time_msg_.quaternion_stamped.header.stamp = this->now() + rclcpp::Duration(0,time_offset);
                 quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)package.q0;
@@ -246,35 +221,11 @@ namespace rmos_transporter
                 t.transform.rotation.w = quaternion_time_msg_.quaternion_stamped.quaternion.w;
                 tf_publisher_->sendTransform(t);
                 memcpy(&quaternion_time_msg_.timestamp_recv, &package.TimeStamp, 4);
-                    this->quaternion_pub_->publish(quaternion_time_msg_);
+                    this->quaternion_pub_->publish(quaternion_time_msg_);            
+
                 break;
             }
-            // case RMOS_IMU_1_RECEIVE_ID:
-            // {
-            //     transporter::RMOSIMUReceivePackage package;
-            //     memcpy(&package, receive_package, 
-            //         sizeof(transporter::RMOSIMUReceivePackage));
-            //     int time_offset = 0;
-            //     quaternion_time_msg_.quaternion_stamped.header.stamp = this->now() + rclcpp::Duration(0,time_offset);
-            //     quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)package.q0;
-            //     quaternion_time_msg_.quaternion_stamped.quaternion.x = (double)package.q1;
-            //     quaternion_time_msg_.quaternion_stamped.quaternion.y = (double)package.q2;
-            //     quaternion_time_msg_.quaternion_stamped.quaternion.z = (double)package.q3;
-                        
-            //     geometry_msgs::msg::TransformStamped t;
-            //     t.header.stamp =  quaternion_time_msg_.quaternion_stamped.header.stamp;
-            //     t.header.frame_id = "world"; //注意坐标系
-            //     t.child_frame_id = "IMU";
-            //     t.transform.rotation.x = quaternion_time_msg_.quaternion_stamped.quaternion.x;
-            //     t.transform.rotation.y = quaternion_time_msg_.quaternion_stamped.quaternion.y;
-            //     t.transform.rotation.z = quaternion_time_msg_.quaternion_stamped.quaternion.z;
-            //     t.transform.rotation.w = quaternion_time_msg_.quaternion_stamped.quaternion.w;
-            //     tf_publisher_->sendTransform(t);
-            //     memcpy(&quaternion_time_msg_.timestamp_recv, &package.TimeStamp, 4);
-            //         this->quaternion_pub_->publish(quaternion_time_msg_);
-            //     break;
-            // }
-        
+            
         }
     }
 
