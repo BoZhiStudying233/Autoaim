@@ -73,7 +73,7 @@ public:
     /**
      *  @brief  封装API
      */
-    bool run(base::RuneArmor armor_1,Eigen::Vector3d &tVector, TrackState armor_state, base::Mode rune_mode, vector<base::RuneArmor>& rune_armors, Mat camera_matrix, Mat dist_coeffs, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera);
+    bool run(base::RuneArmor armor_1,vector<cv::Point2f> &nextPosition,Eigen::Vector3d &tVector, TrackState armor_state, base::Mode rune_mode, vector<base::RuneArmor>& rune_armors, Mat camera_matrix, Mat dist_coeffs, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera);
     
      void getTrajData(vector<RuneArmor> armor_buffer, Mat camera_matrix, Mat dist_coeffs, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera);//得到点
 
@@ -84,12 +84,12 @@ protected:
     void clearData();
 
     /**
-     *  @brief  根据旋转角度和半径计算下一点(装甲板四个角点)的像素位置
+     *  @brief  二维圆。根据旋转角度和半径计算下一点(装甲板四个角点)的像素位置
      *  @param  point   动点
      *  @param  org     原点
      *  @param  angle   旋转角度
      */
-
+    cv::Point2f calNextPosition(cv::Point2f point, cv::Point2f org, float angle);
 
     /**
      *  @brief  根据状态处理数据

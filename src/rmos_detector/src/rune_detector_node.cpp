@@ -97,7 +97,7 @@ namespace rune_detector
             target_rune_armor.timestamp = timestamp;
             // std::cout << "timestamp:" << timestamp<< std::endl;
             Eigen::Vector3d tVec;
-                
+            std::vector<cv::Point2f> rune_next_pos;
             geometry_msgs::msg::TransformStamped transform_to_world, transform_to_camera;
             try
                 {//实车记得改坐标系名称！ remeber to change
@@ -109,11 +109,41 @@ namespace rune_detector
                     RCLCPP_ERROR(this->get_logger(), "Could not get the transformation!!");
                     }
                     
-            if(fitting_->run(target_rune_armor, tVec, rune_detector_->state, this->mode_, rune_armors, this->camera_matrix_, this->dist_coeffs_, transform_to_world, transform_to_camera))
+            if(fitting_->run(target_rune_armor, rune_next_pos, tVec, rune_detector_->state, this->mode_, rune_armors, this->camera_matrix_, this->dist_coeffs_, transform_to_world, transform_to_camera))
             {
                 // 若预测后的点在图片上才可画图，否则程序会异常终止
-                bool can_draw = true;
+                if(rune_next_pos.size() == 4)
+                {
+                    bool can_draw = true;
+                    for(int i = 0; i < 4; i++)
+                    {
+                        
+                        if(rune_next_pos[i].x < 0 || rune_next_pos[i].y < 0 || rune_next_pos[i].x > image.cols || rune_next_pos[i].y > image.rows)
+                            can_draw = false;
+                    }
+                    
+                    if(can_draw)
+                    {
+                        for(int i = 0; i < 4; i++)
+                        {
+                            cv::circle(image, rune_next_pos[i], 6, cv::Scalar(255,0,255), -1);
+                            cv::line(image, rune_next_pos[i], rune_next_pos[(i+1)%4], cv::Scalar(50, 100, 50));
+                        }
+                    }
 
+                    //pnp solve
+                    cv::Mat tvec;
+                    cv::Mat rvec;
+                    bool is_solve;
+                    is_solve = this->pnp_solver_->solveRuneArmorPose(rune_next_pos,this->camera_matrix_,this->dist_coeffs_,tvec,rvec);
+                    if(!is_solve)
+                    {
+                        RCLCPP_WARN(this->get_logger(), "camera param empty");
+                    }
+                    tVec.x() = tvec.at<double>(0, 0);
+                    tVec.y() = tvec.at<double>(1, 0);
+                    tVec.z() = tvec.at<double>(2, 0);
+                }
                 armor_msg.pose.position.x = tVec.x()/1000;
                 armor_msg.pose.position.y = tVec.y()/1000;
                 armor_msg.pose.position.z = tVec.z()/1000;//相机坐标系下，目标符中心的坐标  
@@ -130,7 +160,7 @@ namespace rune_detector
                 
                     // rvec to 3x3 rotation matrix
                     cv::Mat rotation_matrix;
-
+                
                 rVec.at<double>(0) = 0.1;//胡乱赋一个值
 
                 cv::Rodrigues(rVec, rotation_matrix);
