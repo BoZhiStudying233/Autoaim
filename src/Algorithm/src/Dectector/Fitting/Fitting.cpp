@@ -17,7 +17,16 @@ namespace RuneDetector
 {
 
     /*-----------Fitting-----------*/
-    Fitting::Fitting(){}
+    Fitting::Fitting()
+    {
+        cv::FileStorage fs("./src/Algorithm/configure/Detector/detector/rune_detector/Rune.xml", cv::FileStorage::READ);
+        if(!fs.isOpened())
+        {
+            std::cout<<"open rune detect param fail"<<std::endl;
+        }
+        fs["points_num"] >> Points_num;
+        fs.release();
+    }
 
     bool Fitting::run(base::RuneArmor armor_1,vector<cv::Point2f> &nextPosition, Eigen::Vector3d &tVector, TrackState armor_state, base::Mode rune_mode, vector<base::RuneArmor>& rune_armors, Mat camera_matrix, Mat dist_coeffs, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera)
     {
@@ -150,7 +159,7 @@ namespace RuneDetector
     {
         const int CURVE_FIT_SIZE = armor_points.size();//remeber to change it
         buff_trajectory.is_get = false;
-        if (armor_points.size() <= 990)
+        if (armor_points.size() <= this->Points_num)
         {
             cout<<"armor_points.size()="<<armor_points.size()<<"   点数过少，无法拟合三维圆"<<std::endl;
             return buff_trajectory;

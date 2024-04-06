@@ -20,7 +20,7 @@ namespace rmos_processer {
 
                                                                                              for (int i = 0; i < 9; i++)
                                                                                              {
-                                                                                                 this->camera_matrix_.at<double>(i / 3, i % 3) = camera_info_msg->k[i];
+                                                                                                this->camera_matrix_.at<double>(i / 3, i % 3) = camera_info_msg->k[i];
                                                                                              }
                                                                                              this->camera_info_sub_.reset();
 

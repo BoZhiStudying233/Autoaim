@@ -33,7 +33,7 @@ namespace rune_detector
 {
     void RuneDetectorNode::imageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr &image_msg)
     {
-        this->mode_ = base::Mode::NORMAL_RUNE;
+        // this->mode_ = base::Mode::RUNE;
         if(this->mode_ == base::Mode::RUNE||this->mode_ == base::Mode::NORMAL_RUNE)
         {
             //发布相机到陀螺仪的静态tf
@@ -82,106 +82,106 @@ namespace rune_detector
             rmos_interfaces::msg::Armors armors_msg;
             rmos_interfaces::msg::Armor armor_msg;
             armors_msg.header = image_msg->header;
-        if(this->mode_ == base::Mode::RUNE || this->mode_ == base::Mode::NORMAL_RUNE)
-        {
-            base::RuneArmor target_rune_armor;
-            std::vector<base::RuneArmor> rune_armors;
-        
-            this->rune_detector_->DlRuneDetect(image,target_rune_armor, rune_armors);
-
-            armor_msg.num_id = rune_detector_->id;
-            std::string text = "id:" + std::to_string(rune_detector_->id);
-            cv::putText(image, text, (cv::Point2i(0, 20), cv::Point2i(20, 20)), cv::FONT_HERSHEY_SIMPLEX, 1,
-                        cv::Scalar(0, 255, 0), 0.5);
-
-            target_rune_armor.timestamp = timestamp;
-            // std::cout << "timestamp:" << timestamp<< std::endl;
-            Eigen::Vector3d tVec;
-            std::vector<cv::Point2f> rune_next_pos;
-            geometry_msgs::msg::TransformStamped transform_to_world, transform_to_camera;
-            try
-                {//实车记得改坐标系名称！ remeber to change
-                    transform_to_world = tf_buffer->lookupTransform("world", "camera", tf2::TimePointZero);
-                    transform_to_camera = tf_buffer->lookupTransform("camera", "world", tf2::TimePointZero);
-                }
-            catch (tf2::TransformException & ex)
-                {
-                    RCLCPP_ERROR(this->get_logger(), "Could not get the transformation!!");
-                    }
-                    
-            if(fitting_->run(target_rune_armor, rune_next_pos, tVec, rune_detector_->state, this->mode_, rune_armors, this->camera_matrix_, this->dist_coeffs_, transform_to_world, transform_to_camera))
+            if(this->mode_ == base::Mode::RUNE || this->mode_ == base::Mode::NORMAL_RUNE)
             {
-                // 若预测后的点在图片上才可画图，否则程序会异常终止
-                if(rune_next_pos.size() == 4)
-                {
-                    bool can_draw = true;
-                    for(int i = 0; i < 4; i++)
-                    {
-                        
-                        if(rune_next_pos[i].x < 0 || rune_next_pos[i].y < 0 || rune_next_pos[i].x > image.cols || rune_next_pos[i].y > image.rows)
-                            can_draw = false;
+                base::RuneArmor target_rune_armor;
+                std::vector<base::RuneArmor> rune_armors;
+            
+                this->rune_detector_->DlRuneDetect(image,target_rune_armor, rune_armors);
+
+                armor_msg.num_id = rune_detector_->id;
+                std::string text = "id:" + std::to_string(rune_detector_->id);
+                cv::putText(image, text, (cv::Point2i(0, 20), cv::Point2i(20, 20)), cv::FONT_HERSHEY_SIMPLEX, 1,
+                            cv::Scalar(0, 255, 0), 0.5);
+
+                target_rune_armor.timestamp = timestamp;
+                // std::cout << "timestamp:" << timestamp<< std::endl;
+                Eigen::Vector3d tVec;
+                std::vector<cv::Point2f> rune_next_pos;
+                geometry_msgs::msg::TransformStamped transform_to_world, transform_to_camera;
+                try
+                    {//实车记得改坐标系名称！ remeber to change
+                        transform_to_world = tf_buffer->lookupTransform("world", "camera", tf2::TimePointZero);
+                        transform_to_camera = tf_buffer->lookupTransform("camera", "world", tf2::TimePointZero);
                     }
-                    
-                    if(can_draw)
+                catch (tf2::TransformException & ex)
                     {
+                        RCLCPP_ERROR(this->get_logger(), "Could not get the transformation!!");
+                        }
+                        
+                if(fitting_->run(target_rune_armor, rune_next_pos, tVec, rune_detector_->state, this->mode_, rune_armors, this->camera_matrix_, this->dist_coeffs_, transform_to_world, transform_to_camera))
+                {
+                    // 若预测后的点在图片上才可画图，否则程序会异常终止
+                    if(rune_next_pos.size() == 4)
+                    {
+                        bool can_draw = true;
                         for(int i = 0; i < 4; i++)
                         {
-                            cv::circle(image, rune_next_pos[i], 6, cv::Scalar(255,0,255), -1);
-                            cv::line(image, rune_next_pos[i], rune_next_pos[(i+1)%4], cv::Scalar(50, 100, 50));
+                            
+                            if(rune_next_pos[i].x < 0 || rune_next_pos[i].y < 0 || rune_next_pos[i].x > image.cols || rune_next_pos[i].y > image.rows)
+                                can_draw = false;
                         }
-                    }
+                        
+                        if(can_draw)
+                        {
+                            for(int i = 0; i < 4; i++)
+                            {
+                                cv::circle(image, rune_next_pos[i], 6, cv::Scalar(255,0,255), -1);
+                                cv::line(image, rune_next_pos[i], rune_next_pos[(i+1)%4], cv::Scalar(50, 100, 50));
+                            }
+                        }
 
-                    //pnp solve
-                    cv::Mat tvec;
-                    cv::Mat rvec;
-                    bool is_solve;
-                    is_solve = this->pnp_solver_->solveRuneArmorPose(rune_next_pos,this->camera_matrix_,this->dist_coeffs_,tvec,rvec);
-                    if(!is_solve)
-                    {
-                        RCLCPP_WARN(this->get_logger(), "camera param empty");
+                        //pnp solve
+                        cv::Mat tvec;
+                        cv::Mat rvec;
+                        bool is_solve;
+                        is_solve = this->pnp_solver_->solveRuneArmorPose(rune_next_pos,this->camera_matrix_,this->dist_coeffs_,tvec,rvec);
+                        if(!is_solve)
+                        {
+                            RCLCPP_WARN(this->get_logger(), "camera param empty");
+                        }
+                        tVec.x() = tvec.at<double>(0, 0);
+                        tVec.y() = tvec.at<double>(1, 0);
+                        tVec.z() = tvec.at<double>(2, 0);
                     }
-                    tVec.x() = tvec.at<double>(0, 0);
-                    tVec.y() = tvec.at<double>(1, 0);
-                    tVec.z() = tvec.at<double>(2, 0);
+                    armor_msg.pose.position.x = tVec.x()/1000;
+                    armor_msg.pose.position.y = tVec.y()/1000;
+                    armor_msg.pose.position.z = tVec.z()/1000;//相机坐标系下，目标符中心的坐标  
+                    
+                    Eigen::Vector3d CamaraVector = Eigen::Vector3d(0,0,1);
+                    cv::Mat rVec = cv::Mat::zeros(3, 1, CV_64F);
+
+                    //tVec = Eigen::Vector3d(tVec.x()/tVec.norm(),tVec.y()/tVec.norm(),tVec.z()/tVec.norm());//获取单位向量
+                    //cv::eigen2cv(CamaraVector.cross(tVec), rVec);
+
+                    //double VectorTheta = acos(CamaraVector.dot(tVec)/(CamaraVector.norm()*tVec.norm()));
+                    
+                    // rVec = rVec/rVec.norm() * VectorTheta;
+                    
+                        // rvec to 3x3 rotation matrix
+                        cv::Mat rotation_matrix;
+                    
+                    rVec.at<double>(0) = 0.1;//胡乱赋一个值
+
+                    cv::Rodrigues(rVec, rotation_matrix);
+                    // rotation matrix to quaternion
+                    tf2::Matrix3x3 tf2_rotation_matrix(
+                            rotation_matrix.at<double>(0, 0), rotation_matrix.at<double>(0, 1),
+                            rotation_matrix.at<double>(0, 2), rotation_matrix.at<double>(1, 0),
+                            rotation_matrix.at<double>(1, 1), rotation_matrix.at<double>(1, 2),
+                            rotation_matrix.at<double>(2, 0), rotation_matrix.at<double>(2, 1),
+                        rotation_matrix.at<double>(2, 2));//旋转矩阵
+                    tf2::Quaternion tf2_quaternion;
+                    tf2_rotation_matrix.getRotation(tf2_quaternion);
+                    armor_msg.pose.orientation.x = tf2_quaternion.x();
+                    armor_msg.pose.orientation.y = tf2_quaternion.y();
+                    armor_msg.pose.orientation.z = tf2_quaternion.z();
+                    armor_msg.pose.orientation.w = tf2_quaternion.w();//四元数
+
+                    armors_msg.armors.push_back(armor_msg);
                 }
-                armor_msg.pose.position.x = tVec.x()/1000;
-                armor_msg.pose.position.y = tVec.y()/1000;
-                armor_msg.pose.position.z = tVec.z()/1000;//相机坐标系下，目标符中心的坐标  
-                
-                Eigen::Vector3d CamaraVector = Eigen::Vector3d(0,0,1);
-                cv::Mat rVec = cv::Mat::zeros(3, 1, CV_64F);
-
-                //tVec = Eigen::Vector3d(tVec.x()/tVec.norm(),tVec.y()/tVec.norm(),tVec.z()/tVec.norm());//获取单位向量
-                //cv::eigen2cv(CamaraVector.cross(tVec), rVec);
-
-                //double VectorTheta = acos(CamaraVector.dot(tVec)/(CamaraVector.norm()*tVec.norm()));
-                
-                // rVec = rVec/rVec.norm() * VectorTheta;
-                
-                    // rvec to 3x3 rotation matrix
-                    cv::Mat rotation_matrix;
-                
-                rVec.at<double>(0) = 0.1;//胡乱赋一个值
-
-                cv::Rodrigues(rVec, rotation_matrix);
-                // rotation matrix to quaternion
-                tf2::Matrix3x3 tf2_rotation_matrix(
-                        rotation_matrix.at<double>(0, 0), rotation_matrix.at<double>(0, 1),
-                        rotation_matrix.at<double>(0, 2), rotation_matrix.at<double>(1, 0),
-                        rotation_matrix.at<double>(1, 1), rotation_matrix.at<double>(1, 2),
-                        rotation_matrix.at<double>(2, 0), rotation_matrix.at<double>(2, 1),
-                    rotation_matrix.at<double>(2, 2));//旋转矩阵
-                tf2::Quaternion tf2_quaternion;
-                tf2_rotation_matrix.getRotation(tf2_quaternion);
-                armor_msg.pose.orientation.x = tf2_quaternion.x();
-                armor_msg.pose.orientation.y = tf2_quaternion.y();
-                armor_msg.pose.orientation.z = tf2_quaternion.z();
-                armor_msg.pose.orientation.w = tf2_quaternion.w();//四元数
-
-                armors_msg.armors.push_back(armor_msg);
+                armors_msg.is_rune = true;
             }
-            armors_msg.is_rune = true;
-        }
             auto time2 = steady_clock_.now();
 
             std::string text = "Exposure:" + std::to_string(this->Exposure);

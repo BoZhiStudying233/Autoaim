@@ -21,8 +21,9 @@
 
     <!--拟合参数-->
     <!-- <delay_time>0.45</delay_time> -->
+    <points_num> 390 </points_num>
     <delay_time>0.3</delay_time>
-    <save_txt>0</save_txt>  
-    <print_result>0</print_result>
-    <force_mode>2</force_mode><!--强制设置模式，0为不强制，1为自瞄，2为小符，3为大符-->
+    <save_txt>1</save_txt>  
+    <print_result>1</print_result>
+    <force_mode>3</force_mode><!--强制设置模式，0为不强制，1为自瞄，2为小符，3为大符-->
 </opencv_storage>
