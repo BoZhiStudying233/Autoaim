@@ -150,7 +150,7 @@ namespace RuneDetector
     {
         const int CURVE_FIT_SIZE = armor_points.size();//remeber to change it
         buff_trajectory.is_get = false;
-        if (armor_points.size() <= 999)
+        if (armor_points.size() <= 990)
         {
             cout<<"armor_points.size()="<<armor_points.size()<<"   点数过少，无法拟合三维圆"<<std::endl;
             return buff_trajectory;

@@ -117,7 +117,7 @@ namespace rune_detector
             this->mode_sub_ = this->create_subscription<rmos_interfaces::msg::Mode>
                 ("/mode_info", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Mode::ConstSharedPtr mode_msg)
                 {
-                    RCLCPP_INFO(this->get_logger(), "mode is %d", (*mode_msg).mode);
+                    //RCLCPP_INFO(this->get_logger(), "mode is %d", (*mode_msg).mode);
                     int mode = (*mode_msg).mode;
                     setMode(mode);
                     
@@ -126,7 +126,7 @@ namespace rune_detector
                 ("/exp_info", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Exp::ConstSharedPtr exp_msg)
                 {
                     
-                    RCLCPP_INFO(this->get_logger(), "exp is %d", (*exp_msg).exp);
+                    //RCLCPP_INFO(this->get_logger(), "exp is %d", (*exp_msg).exp);
                     this->Exposure = (*exp_msg).exp;
                 });
 

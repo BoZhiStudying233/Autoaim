@@ -9,7 +9,7 @@
     <gain>9</gain>
     <fps>100</fps>
 
-    <rune_exposure>400</rune_exposure>
+    <rune_exposure>600</rune_exposure>
     <rune_gain>12</rune_gain>
 
     <auto_exp_change>0</auto_exp_change>
