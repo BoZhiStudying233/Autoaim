@@ -5,6 +5,13 @@ namespace RuneDetector
     bool Judgement::Judge(double& judge_speed, bool is_direction_inited, bool is_clockwise)
     {
         // 速度初筛选
+        
+        if(speedJudge.size() < 15)
+        {
+            speedJudge.push_back(judge_speed);
+            judge_clear_num = 0;
+            return true;
+        }//应该是改好了，待测试 
 
         // 方向未初始化
         if(!is_direction_inited)
@@ -45,12 +52,12 @@ namespace RuneDetector
 
         // 3o筛选
         
-        if(speedJudge.size() < 15)
-        {
-            speedJudge.push_back(judge_speed);
-            judge_clear_num = 0;
-            return true;
-        }
+        // if(speedJudge.size() < 15)
+        // {
+        //     speedJudge.push_back(judge_speed);
+        //     judge_clear_num = 0;
+        //     return true;
+        // }
 
         getN();
         getMean();

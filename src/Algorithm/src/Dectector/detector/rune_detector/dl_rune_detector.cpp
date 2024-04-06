@@ -71,7 +71,7 @@ namespace RuneDetector
 
         image.copyTo(src);
         DlPreDeal(image);
-
+                
         drawDlMessage(image, output);
 
         FilterDetectResult(output);
