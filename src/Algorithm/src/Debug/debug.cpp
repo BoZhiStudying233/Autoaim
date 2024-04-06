@@ -21,6 +21,10 @@ namespace debug
             
             switch (option)
             {
+            case base::DebugOption::SAVE_IMAGE:
+                fs["save_image"]>>result;
+                fs.release();
+                return result;
             case base::DebugOption::SHOW_ARMOR:
                 fs["show_armor"]>>result;
                 fs.release();

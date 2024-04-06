@@ -39,7 +39,7 @@ public:
     BuffTrajPoint watched_points[360];  //用于拟合三维圆。将角度分为360度  日后在合适的地方清空此变量
     int get_angle_num = 0;
 private:
-
+    
     Judgement judge;
     Fit fit;
 
@@ -47,7 +47,9 @@ private:
     int N = 160;                        // 角速度采样数
     int N_min = 20;                         // 角速度最小采样数
 
-    int DN = 1;                         // 逐差法测速度间距
+    int Points_num;                 //三维圆开始拟合的最小点数
+
+    int DN = 4;                         // 逐差法测速度间距
 
     double start_time;                  // 拟合数据集中的第一个时间戳
     bool is_Inited = false;             // 大符拟合是否初始化
@@ -57,7 +59,7 @@ private:
     double armor_buffer_erase_threshold = 0.2;    // 阈值，armor_buffer首末数据之差，若超过该阈值则清除armor_buffer首数据
     double call_speed_threshold = 0.005;          // 阈值，armor_buffer首末数据之差，若超过该阈值则计算角速度
     double clear_data_threshold = 0.8;            // 阈值，新来数据时间与上一时刻存入的时间之差，若超过该阈值则重置所有数据(进入clearData)
-
+    
     BuffTrajectory buff_trajectory;
 
     std::vector<Eigen::Vector3d> armor_pose_points;

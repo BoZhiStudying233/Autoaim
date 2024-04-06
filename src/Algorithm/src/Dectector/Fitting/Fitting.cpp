@@ -17,7 +17,16 @@ namespace RuneDetector
 {
 
     /*-----------Fitting-----------*/
-    Fitting::Fitting(){}
+    Fitting::Fitting()
+    {
+        cv::FileStorage fs("./src/Algorithm/configure/Detector/detector/rune_detector/Rune.xml", cv::FileStorage::READ);
+        if(!fs.isOpened())
+        {
+            std::cout<<"open rune detect param fail"<<std::endl;
+        }
+        fs["points_num"] >> Points_num;
+        fs.release();
+    }
 
     bool Fitting::run(base::RuneArmor armor_1,vector<cv::Point2f> &nextPosition, Eigen::Vector3d &tVector, TrackState armor_state, base::Mode rune_mode, vector<base::RuneArmor>& rune_armors, Mat camera_matrix, Mat dist_coeffs, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera)
     {
@@ -150,7 +159,7 @@ namespace RuneDetector
     {
         const int CURVE_FIT_SIZE = armor_points.size();//remeber to change it
         buff_trajectory.is_get = false;
-        if (armor_points.size() <= 999)
+        if (armor_points.size() <= this->Points_num)
         {
             cout<<"armor_points.size()="<<armor_points.size()<<"   点数过少，无法拟合三维圆"<<std::endl;
             return buff_trajectory;
@@ -321,7 +330,7 @@ namespace RuneDetector
         }
         while (fitting_data.size() > N)
             fitting_data.erase(fitting_data.begin());
-        
+            
         return true;
     }
 
@@ -379,8 +388,8 @@ namespace RuneDetector
                 watched_points[degree].point = watched_points[degree].point * k + (1 - k) *  target_point_in_world;
             }
             // std::cout<<"watched_points[degree].point ="<<watched_points[degree].point<<std::endl;
-            std::cout<<"degree="<<degree<<std::endl;
-            std::cout<<"watched_points[degree].point ="<<tfPoint(transform_to_camera, watched_points[degree].point)<<std::endl;
+            // std::cout<<"degree="<<degree<<std::endl;
+            // std::cout<<"watched_points[degree].point ="<<tfPoint(transform_to_camera, watched_points[degree].point)<<std::endl;
         }
         
     }
@@ -455,14 +464,15 @@ namespace RuneDetector
         int clock = 0, clock_inv = 0;
         for (int i = 0; i < fitting_data.size(); i++)
         {
-            if (fitting_data[i].angle_speed > 0)
+            //std::cout<<"fitting_data["<<i<<"].angle_speed="<<fitting_data[i].angle_speed<<std::endl;
+            if (fitting_data[i].angle_speed > 0)         
                 clock++;
             else
                 clock_inv++;
         }
         is_direction_inited = true;
         is_clockwise = clock > clock_inv;
-
+        
     }
 
     void Fitting::clearArmorBuffer()
