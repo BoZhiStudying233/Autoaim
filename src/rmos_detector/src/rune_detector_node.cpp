@@ -33,7 +33,7 @@ namespace rune_detector
 {
     void RuneDetectorNode::imageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr &image_msg)
     {
-        // this->mode_ = base::Mode::RUNE;
+        this->mode_ = base::Mode::RUNE;
         if(this->mode_ == base::Mode::RUNE||this->mode_ == base::Mode::NORMAL_RUNE)
         {
             //发布相机到陀螺仪的静态tf
@@ -111,9 +111,10 @@ namespace rune_detector
                         
                 if(fitting_->run(target_rune_armor, rune_next_pos, tVec, rune_detector_->state, this->mode_, rune_armors, this->camera_matrix_, this->dist_coeffs_, transform_to_world, transform_to_camera))
                 {
-                    // 若预测后的点在图片上才可画图，否则程序会异常终止
-                    if(rune_next_pos.size() == 4)
+                    
+                    if(rune_next_pos.size() == 4)//二维圆的情况
                     {
+                        // 若预测后的点在图片上才可画图，否则程序会异常终止
                         bool can_draw = true;
                         for(int i = 0; i < 4; i++)
                         {
@@ -143,6 +144,24 @@ namespace rune_detector
                         tVec.x() = tvec.at<double>(0, 0);
                         tVec.y() = tvec.at<double>(1, 0);
                         tVec.z() = tvec.at<double>(2, 0);
+                    }
+                    else//三维圆的情况
+                    {
+                        // cv::Point2d point2D;
+                        std::vector<cv::Point3f> objectPoints;
+                        std::vector<cv::Point2f> imagePoints;
+
+                        tVec.x() = tVec.x()/tVec.z();
+                        tVec.y() = tVec.y()/tVec.z();
+                        tVec.z() = 1;
+
+                        objectPoints.emplace_back(tVec.x(), tVec.y(), tVec.z());
+
+                        cv::Mat tvec = (cv::Mat_<float>(1, 3) << 0, 0, 0);
+                        cv::projectPoints(objectPoints, cv::Mat::zeros(1, 3, CV_64F), tvec, this->camera_matrix_, this->dist_coeffs_, imagePoints);
+                        cv::Point2d point2D = imagePoints[0];
+                        if (point2D.x > 0 && point2D.y > 0 && point2D.x < image.cols && point2D.y < image.rows)
+                            cv::circle(image, point2D, 6, cv::Scalar(255,0,255), -1);
                     }
                     armor_msg.pose.position.x = tVec.x()/1000;
                     armor_msg.pose.position.y = tVec.y()/1000;

@@ -21,7 +21,7 @@
 
     <!--拟合参数-->
     <!-- <delay_time>0.45</delay_time> -->
-    <points_num> 390 </points_num>
+    <points_num> 50 </points_num>
     <delay_time>0.3</delay_time>
     <save_txt>1</save_txt>  
     <print_result>1</print_result>
