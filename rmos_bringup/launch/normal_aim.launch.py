@@ -43,11 +43,21 @@ def generate_launch_description():
 
     # )
 
+    # communicate_node_ = Node(
+    #     package='rmos_transporter',
+    #     namespace= 'rmos_transporter',
+    #     executable='can_comm',
+    #     name='can_comm',
+    #     output='screen',
+    # )
+
     communicate_node_ = Node(
         package='rmos_transporter',
         namespace= 'rmos_transporter',
-        executable='can_comm',
-        name='can_comm',
+        executable='usb_comm',
+        name='usb_comm',
+        parameters=[os.path.join(get_package_share_directory('rmos_bringup'), 
+                   'config', 'hardware_settings.yaml')],
         output='screen',
     )
     processer_node = Node(

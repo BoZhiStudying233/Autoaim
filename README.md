@@ -5,17 +5,15 @@
     -ros2-foxy
     -opencv4.4.0
     -Eigen
-## CmakeList.txt
-    -需要更改每个CmakeList.txt中的3rdparty路径。
-     可以运行replace_3rdparty_path.sh一键替换
-     若运行失败，可能是需要赋权。
-    -3rdparty路径不可包含中文！
+    -openvino
 ## 运行节点
 
 - 相机节点： daheng_cam  启动命令：`ros2 run rmos_cam daheng_camera`
-- 识别节点：rune_detector 启动命令： `ros2 run rmos_detector rune_detector`
+- 传统识别节点：basic_detector 启动命令： `ros2 run rmos_detector basic_detector`
+- 二阶段识别节点：mix_detector 启动命令： `ros2 run rmos_detector mix_detector`
+- 能量机关识别节点：rune_detector 启动命令： `ros2 run rmos_detector rune_detector`
 - 解算节点：processer              启动命令：`ros2 run rmos_processer processer`
-- 通信节点 ： can_comm            启动命令：`ros2 run rmos_transporter can_comm`
+- 通信节点 ： usb_comm            启动命令：`ros2 run rmos_transporter usb_comm`
 
   
 ## 如何启动程序
@@ -49,9 +47,9 @@
 
 ### 如果launch不起来
 
+- 整车重启
 - 拔插相机线
 - 看是否有IMU数据，拔插
-- 整车重启
 - 每个节点分开run
 - 如果出现file too short错误，请删除build，log，install三个文件夹之后重新编译
 - 看是否有僵尸话题，参考文章：https://answers.ros.org/question/377224/how-do-you-kill-the-zombie-node-in-ros2-on-local/
