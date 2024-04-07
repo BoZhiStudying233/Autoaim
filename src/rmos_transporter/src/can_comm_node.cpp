@@ -228,7 +228,7 @@ namespace rmos_transporter
                         mode_msg.mode = (int)base::Mode::NORMAL;
                     }
                     //ForceSetMode(mode_msg);//比赛模式时记得注释掉！
-                    tellMode(mode_msg);
+                    //tellMode(mode_msg);
                     this->mode_pub_->publish(mode_msg);
                     
                     if((buf[6] & 0x02) == 0x02)

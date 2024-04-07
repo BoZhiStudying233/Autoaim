@@ -103,19 +103,21 @@ namespace rune_detector
                                                                                                  this->camera_info_sub_.reset();
 
                                                                                              });
+            tf_buffer = std::make_unique<tf2_ros::Buffer>(this->get_clock());
+            tf_listener = std::make_shared<tf2_ros::TransformListener>(*tf_buffer);
 
             this->color_sub_ = this->create_subscription<rmos_interfaces::msg::Color>
                     ("/color_info", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Color::ConstSharedPtr color_msg)
                     {
                         int enemy_color = (*color_msg).color;
-                        this->mix_detector_->setEnemyColor(enemy_color);
+                        this->mix_detector_->setEnemyColor(enemy_color);//有两个？(ˇˍˇ)
                         this->rune_detector_->setEnemyColor(enemy_color);
                     });
  
             this->mode_sub_ = this->create_subscription<rmos_interfaces::msg::Mode>
                 ("/mode_info", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Mode::ConstSharedPtr mode_msg)
                 {
-                    RCLCPP_INFO(this->get_logger(), "mode is %d", (*mode_msg).mode);
+                    //RCLCPP_INFO(this->get_logger(), "mode is %d", (*mode_msg).mode);
                     int mode = (*mode_msg).mode;
                     setMode(mode);
                     
@@ -124,7 +126,7 @@ namespace rune_detector
                 ("/exp_info", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Exp::ConstSharedPtr exp_msg)
                 {
                     
-                    RCLCPP_INFO(this->get_logger(), "exp is %d", (*exp_msg).exp);
+                    //RCLCPP_INFO(this->get_logger(), "exp is %d", (*exp_msg).exp);
                     this->Exposure = (*exp_msg).exp;
                 });
 
@@ -207,8 +209,9 @@ namespace rune_detector
         //camera param
         sensor_msgs::msg::CameraInfo camera_info_msg_;
 
-
+        std::shared_ptr<tf2_ros::TransformListener> tf_listener{nullptr};
+        std::unique_ptr<tf2_ros::Buffer> tf_buffer;
     };
 }
 
-#endif //Rune_DETECTOR_NODE_HPP
+#endif //RUNE_DETECTOR_NODE_HPP
