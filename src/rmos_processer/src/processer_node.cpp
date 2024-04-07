@@ -228,11 +228,8 @@ namespace rmos_processer {
                     float pitch = gimble_pitch * 180.0 / 3.1415926535;
                     float yaw = gimble_yaw * 180.0 / 3.1415926535;
 
-                    float delta_pitch = -new_pitch - pitch;
-                    float delta_yaw = new_yaw - yaw;
-
-                    float gun_pitch = delta_pitch + controler_->rune_gun_pitch_offset_;
-                    float gun_yaw = delta_yaw + controler_->rune_gun_yaw_offset_;
+                    float gun_pitch = -new_pitch + controler_->rune_gun_pitch_offset_;
+                    float gun_yaw = new_yaw + controler_->rune_gun_yaw_offset_;
 
                     target_msg.id = 20;
                     target_msg.track_state = base::TRACKING;
@@ -278,7 +275,7 @@ namespace rmos_processer {
 
             }
 
-            else
+            else if(!armors_msg->is_rune) // 自瞄模式
             {
 
                     int move_state = controler_->getAimingPoint(new_armors,aiming_point, timestamp);
@@ -295,12 +292,9 @@ namespace rmos_processer {
                         float pitch = gimble_pitch * 180.0 / 3.1415926535;
                         float yaw = gimble_yaw * 180.0 / 3.1415926535;
 
-
-                        float delta_pitch = -new_pitch - pitch;
-                        float delta_yaw = new_yaw - yaw;
-                        
-                        float gun_pitch = delta_pitch+controler_->gun_pitch_offset_;
-                        float gun_yaw = delta_yaw+controler_->gun_yaw_offset_;
+                        // 绝对角
+                        float gun_pitch = -new_pitch+controler_->gun_pitch_offset_;
+                        float gun_yaw = new_yaw+controler_->gun_yaw_offset_;
 
                         target_msg.id = this->controler_->tracker_.tracked_id;
                         target_msg.track_state = this->controler_->tracker_.tracker_state;
@@ -342,17 +336,16 @@ namespace rmos_processer {
 
                         bool is_fire = this->controler_->judgeFire(aiming_point_camera,this->controler_->tracker_.target_state(7));
                         target_msg.suggest_fire = is_fire;
+                        
                         if(move_state==1)
                         {
-                        
                             target_msg.gun_pitch = gun_pitch;
                             target_msg.gun_yaw = gun_yaw;
-
                         }
                         else
                         {
-                            target_msg.gun_pitch = 0;
-                            target_msg.gun_yaw = 0;
+                            target_msg.gun_pitch = pitch;
+                            target_msg.gun_yaw = yaw;
                         }
                     }
                     else
