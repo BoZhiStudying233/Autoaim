@@ -202,8 +202,8 @@ namespace rmos_transporter
                 if (package.mode == 8){
                     mode_msg_.mode = (int) base::Mode::NORMAL_RUNE;
                 }
-                ForceSetMode(mode_msg_);//bi sai zhu shi diao
-                //tellMode(mode_msg_);
+                // ForceSetMode(mode_msg_); // bi sai zhu shi diao
+                // tellMode(mode_msg_);
                 this->mode_pub_->publish(mode_msg_);    
                 int time_offset = 0;
                 quaternion_time_msg_.quaternion_stamped.header.stamp = this->now() + rclcpp::Duration(0,time_offset);
