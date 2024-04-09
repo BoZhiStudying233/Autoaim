@@ -139,8 +139,8 @@ protected:
     */
     const BuffTrajectory &fitCircle(const std::vector<Eigen::Vector3d> &armor_points, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera);
 
-    void correctAxis(BuffTrajectory &buff_traj, const std::vector<Eigen::Vector3d> &armor_points, const std::vector<float> &angle_points);
-    void correctPoints(std::vector<Eigen::Vector3d> &armor_points);
+    void correctPoints(std::vector<Eigen::Vector3d> &armor_points, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera);
+    
 
 
     double radians_to_degrees(double radians);

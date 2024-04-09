@@ -67,7 +67,7 @@ namespace RuneDetector
             }
         }
         cout<<"点数为"<<armor_pose_points.size()<<std::endl;
-        // correctPoints(armor_pose_points)     此函数内的深度考虑改为[2]后测试
+        correctPoints(armor_pose_points, transform_to_world, transform_to_camera);    
         buff_trajectory = fitCircle(armor_pose_points, transform_to_world, transform_to_camera);
         //tVector = watched_points[round(armor_1.angle+delta)].point.x,watched_points[round(armor_1.angle+delta)].point.y,watched_points[round(armor_1.angle+delta)].point.z
         if(buff_trajectory.is_get)
@@ -92,7 +92,7 @@ namespace RuneDetector
         
         return true;         
     }
-        void Fitting::correctPoints(std::vector<Eigen::Vector3d> &armor_points)
+        void Fitting::correctPoints(std::vector<Eigen::Vector3d> &armor_points, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera)
     {
         if (armor_points.size() <= 0)
         {
@@ -100,21 +100,22 @@ namespace RuneDetector
         }
         float depth_aver = 0.0f;
         std::for_each(armor_points.begin(), armor_points.end(), [&](const Eigen::Vector3d &d)
-                      { depth_aver += d[1]; });
+                      { depth_aver += tfPoint(transform_to_camera, d)[2]; });
         depth_aver /= armor_points.size();
 
         float depth_std = 0.0;
 
         std::for_each(armor_points.begin(), armor_points.end(), [&](const Eigen::Vector3d &d)
-                      { depth_std += pow((d[1] - depth_aver), 2); });
+                      { depth_std += pow((tfPoint(transform_to_camera, d)[2] - depth_aver), 2); });
         depth_std = sqrt(depth_std / armor_points.size());
 
         std::for_each(
             armor_points.begin(), armor_points.end(), [&](Eigen::Vector3d &armor_point)
             {
-                if (armor_point[1] < depth_aver - 0.5 * depth_std || armor_point[1] > depth_aver + 0.5 * depth_std)
+                if (tfPoint(transform_to_camera, armor_point)[2] < depth_aver - 0.5 * depth_std || tfPoint(transform_to_camera, armor_point)[2] > depth_aver + 0.5 * depth_std)
                 {
-                    armor_point = armor_point / armor_point[1] * depth_aver;
+                    armor_point = (tfPoint(transform_to_camera, armor_point) / tfPoint(transform_to_camera, armor_point)[2]) * depth_aver;
+                    armor_point = (transform_to_world, tfPoint(transform_to_world, armor_point));
                 }
             });
     }
