@@ -118,8 +118,171 @@ namespace processer
         p0.setIdentity();
         tracker_.ekf = tool::ExtendedKalmanFilter{f, h, j_f, j_h, u_q, u_r, p0};
     }
-
+    
     int Controler::getAimingPoint(std::vector<base::Armor> armors,cv::Point3f& aiming_point,double timestamp)
+    {
+        double time = timestamp;
+        bool is_tracking = false;
+        if (tracker_.tracker_state == base::LOST)
+        {
+            is_tracking = false;
+            tracker_.init(armors);
+        }
+        else
+        {
+
+            dt_ = time - last_time_;
+            if(tracker_.tracked_id == 7 )
+            {
+                tracker_.lost_thres = static_cast<int>(lost_time_thres_ / dt_)*5;
+            }
+            else if (tracker_.tracked_id==11||tracker_.tracked_id==12||tracker_.tracked_id==13)
+            {
+                tracker_.lost_thres = static_cast<int>(lost_time_thres_ / dt_)*2;
+            }
+            tracker_.update(armors);
+
+            if (tracker_.tracker_state == base::DETECTING) {
+                is_tracking = false;
+            } else if (
+                    tracker_.tracker_state == base::TRACKING ||
+                    tracker_.tracker_state == base::TEMP_LOST) {
+                is_tracking = true;
+            }
+        }
+        last_time_ = time;
+
+        if(is_tracking)
+        {
+
+            //get car state
+            const auto & state = tracker_.target_state;
+            double yaw = state[6], r1 = state[8], r2 =  tracker_.another_r;
+            double xc =  state[0], yc = state[2], za = state[4];
+            double vx = state[1], vy = state[3], vz = state[5];
+            double dz =   tracker_.dz;double v_yaw =  state[7];
+
+
+            //predict
+            cv::Point3d p_center = cv::Point3d(xc, yc, za + dz/ 2);
+            cv::Point3d velocity_linear = cv::Point3d(vx, vy, vz);
+            double all_time = ballistic_solver_.getAngleTime(p_center * 1000, false).z + delay_;
+
+            cv::Point3d linear_change = cv::Point3d(velocity_linear.x * (all_time+0.05),
+                                                    velocity_linear.y * (all_time+0.05),
+                                                    velocity_linear.z * (all_time+0.05));
+            cv::Point3d p_predict_center = p_center + linear_change; //预测中心点
+            double yaw_predict = yaw + v_yaw * all_time;  //预测yaw
+
+
+            // get armors num
+            int armors_num = 4;
+            if(this->tracker_.tracked_id == 11 || this->tracker_.tracked_id == 12 || this->tracker_.tracked_id == 13 )
+            {
+                armors_num = 2;
+            }
+            else if(this->tracker_.tracked_id == 7)
+            {
+                armors_num = 3;
+            }
+
+
+            cv::Point3d p[armors_num];
+            cv::Point2d p_predict_center_2d(p_predict_center.x, p_predict_center.y);
+            double angle_to_center[armors_num];
+
+            bool is_current_pair = true;
+            double r = 0;
+            int min_dis_point_index = 0;
+            double min_dis = DBL_MAX;
+            //整车模型建立
+            for (int i = 0; i < armors_num; i++)
+            {
+                double tmp_yaw = yaw_predict +i * (2.0 * M_PI / armors_num);
+                if(armors_num == 4)
+                {
+                    r = is_current_pair ? r1 : r2;
+                    p[i].z = za + (is_current_pair ? 0 : dz);
+                    is_current_pair = !is_current_pair;
+                }
+                else
+                {
+                    r = r1;
+                    p[i].z = za;
+                }
+                p[i].x = (p_predict_center.x - r * cos(tmp_yaw));
+                p[i].y = (p_predict_center.y - r * sin(tmp_yaw));
+                double dis = sqrt(pow(p[i].x, 2) + pow(p[i].y, 2) + pow(p[i].z, 2));
+                if(dis < min_dis)
+                {
+                    if(abs(dis-min_dis)>0.2)
+                    {
+                        min_dis = dis;
+                        min_dis_point_index = i;        
+                    }
+
+                    
+                }
+
+
+
+                cv::Point2d p_2d(p[i].x - p_predict_center_2d.x, p[i].y - p_predict_center_2d.y);
+                angle_to_center[i] = (p_2d.x * p_predict_center_2d.x +
+                                      p_2d.y * p_predict_center_2d.y) /
+                                     (sqrt(p_2d.x * p_2d.x + p_2d.y * p_2d.y) *
+                                      sqrt(p_predict_center_2d.x * p_predict_center_2d.x +
+                                           p_predict_center_2d.y * p_predict_center_2d.y));  //圆心和原点连线，圆心与装甲板连线，两者夹角的余弦值
+
+            }
+
+            //求解最优点
+            double limit_area = 0.6 + abs(v_yaw)*0.04;
+            if(limit_area>0.99)
+            {
+                limit_area = 0.99;
+            }
+            if(this->tracker_.tracked_id == 7)
+            {
+                limit_area = 0.98;
+            }
+
+            if(angle_to_center[min_dis_point_index] < -limit_area)
+            {
+                aiming_point = p[min_dis_point_index];
+                return 1;
+            }
+            else
+            {
+                int next_index_1 = (min_dis_point_index+1)%armors_num;
+                int next_index_2 = min_dis_point_index - 1;
+                if(min_dis_point_index == 0)
+                {
+                    next_index_2 = armors_num - 1;
+                }
+                cv::Point3f next_point_1 = p[next_index_1];
+                cv::Point3f next_point_2 = p[next_index_2];
+                cv::Point3f next_point = next_point_1;
+
+                if(v_yaw < 0)
+                {
+                    next_point = next_point_1;
+                }
+                else
+                {
+                    next_point = next_point_2;
+                }
+                aiming_point = next_point;
+                return 2;
+            }
+        }
+        else
+        {
+            aiming_point = cv::Point3f(0,0,0);
+            return 3;
+        }
+    }
+
+    int Controler::getCenterAimingPoint(std::vector<base::Armor> armors,cv::Point3f& aiming_point,double timestamp)
     {
         double time = timestamp;
         bool is_tracking = false;
@@ -156,7 +319,6 @@ namespace processer
         double xc =  state[0], yc = state[2], za = state[4];
         double vx = state[1], vy = state[3], vz = state[5];
         double dz =   tracker_.dz;double v_yaw =  state[7];
-
 
         //predict
         cv::Point3d p_center = cv::Point3d(xc, yc, za + dz/ 2);
@@ -221,8 +383,8 @@ namespace processer
 
     }
 
-      bool Controler::judgeRuneFire(int num_id, uint32_t timestamp)
-      {
+        bool Controler::judgeRuneFire(int num_id, uint32_t timestamp)
+        {
         // 开火决策
         // 1.判断扇叶切换
         if(num_id != last_id_)
@@ -245,5 +407,10 @@ namespace processer
             return false;
         }
 
-      }
+        }
+
+        Controler::~Controler()
+        {
+        return;
+        }
 }

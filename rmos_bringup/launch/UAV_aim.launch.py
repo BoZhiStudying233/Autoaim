@@ -58,14 +58,12 @@ def generate_launch_description():
         output='screen',
     )
     processer_node = Node(
-        package='rmos_processer',
-        namespace= 'rmos_processer',
-        executable='processer',
-        name='processer',
+        package='rmos_UAV_processer',
+        namespace= 'rmos_UAV_processer',
+        executable='UAV_processer',
+        name='UAV_processer',
         output='screen',
     )
-
-
 
     # Done
     return LaunchDescription([

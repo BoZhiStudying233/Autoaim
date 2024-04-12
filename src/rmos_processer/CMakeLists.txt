@@ -58,6 +58,11 @@ rclcpp_components_register_node(${PROJECT_NAME}
         EXECUTABLE processer
         )
 
+rclcpp_components_register_node(${PROJECT_NAME}
+PLUGIN rmos_UAV_processer::ProcesserNode
+EXECUTABLE UAV_processer
+)
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

@@ -14,9 +14,6 @@ from launch.conditions import IfCondition
 import yaml
 
 def generate_launch_description():
-
-    Id = LaunchDescription()
-
     # add node
     daheng_node_ = Node(
         package='rmos_cam',
@@ -25,32 +22,6 @@ def generate_launch_description():
         name='daheng_camera',
         output='screen',
     )
-    # basic_armor_detector_node_ = Node(
-    #     package='rmos_detector',
-    #     namespace= 'rmos_detector',
-    #     executable='basic_detector',
-    #     name='basic_detector',
-    #     output='screen',
-    # )
-
-    
-    # dl_armor_detector_node_ = Node(
-    #     package='rmos_detector',
-    #     namespace= 'rmos_detector',
-    #     executable='dl_detector',
-    #     name='dl_detector',
-    #     output='screen',
-
-    # )
-
-    # communicate_node_ = Node(
-    #     package='rmos_transporter',
-    #     namespace= 'rmos_transporter',
-    #     executable='can_comm',
-    #     name='can_comm',
-    #     output='screen',
-    # )
-
 
     communicate_node_ = Node(
         package='rmos_transporter',
@@ -70,8 +41,6 @@ def generate_launch_description():
         output='screen',
     )
 
-
-
     rune_detector_node = Node(
         package='rmos_detector',
         namespace= 'rmos_detector',
@@ -79,15 +48,6 @@ def generate_launch_description():
         name='rune_detector',
         output='screen',
     )
-
-    # Done
-
-    # Id.add_action(mix_detector_node)
-    # Id.add_action(rune_detector_node)
-    # Id.add_action(processer_node)
-    # Id.add_action(communicate_node_)
-    # Id.add_action(basic_armor_detector_node_)
-    # Id.add_action(daheng_node_)
 
     return LaunchDescription([
 

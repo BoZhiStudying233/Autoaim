@@ -29,7 +29,6 @@ find_package(OpenCV 4 REQUIRED)
 find_package(InferenceEngine)
 find_package(ngraph REQUIRED)
 
-
 include_directories(
   ${EIGEN3_INCLUDE_DIR}
   ${3RDPARTY_LIB}
@@ -49,18 +48,10 @@ add_subdirectory(
    AIOF
 )
 
-# target_link_libraries(${PROJECT_NAME} Ceres::ceres ${OpenCV_LIBS})
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${3RDPARTY_LIB}libonnxruntime.so  ${3RDPARTY_LIB}libonnxruntime.so.1.14.1
                       ${InferenceEngine_LIBRARIES}
                       ${NGRAPH_LIBRARIES}
                       aiof)
-
-# target_link_libraries(${PROJECT_NAME} 
-# ${InferenceEngine_LIBRARIES}
-# ${NGRAPH_LIBRARIES}
-# aiof)
-
-
 
 install(TARGETS algorithm
         DESTINATION lib/${PROJECT_NAME})
