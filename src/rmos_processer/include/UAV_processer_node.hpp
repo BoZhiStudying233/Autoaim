@@ -44,7 +44,7 @@
 #include "../../Algorithm/include/Debug/debug.hpp"
 
 
-namespace rmos_processer
+namespace rmos_UAV_processer
 {
     using tf2_filter = tf2_ros::MessageFilter<rmos_interfaces::msg::Armors>;
     using namespace message_filters;
@@ -79,13 +79,7 @@ namespace rmos_processer
          * @brief  RVIZ可视化
          */
         void publishMarkers(const rmos_interfaces::msg::Target &target_msg);
-        /**
-         *  @brief 设置模式
-        */
-        // void setMode(int mode);
-        // base::Mode mode_ = base::Mode::NORMAL;
-        // base::Mode last_mode_ = base::Mode::NORMAL; 
-        
+
         int mode__=0;//调节弹速系数时用于判断是打符模式还是自瞄模式
         int last_mode__=0;
         

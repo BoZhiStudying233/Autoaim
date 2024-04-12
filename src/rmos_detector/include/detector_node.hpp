@@ -51,12 +51,6 @@ namespace rmos_detector
         std::shared_ptr<image_transport::Subscriber> image_sub_;
         rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_sub_;
         rclcpp::Subscription<rmos_interfaces::msg::Color>::SharedPtr color_sub_;
-
-
-
-
-
-
     };
 
     class BasicDetectorNode : public BaseDetectorNode
@@ -107,20 +101,14 @@ namespace rmos_detector
             debug_img_pub_ = image_transport::create_camera_publisher(this, "/debug_image", rmw_qos_profile_default);
             debug_bin_img_pub_ = image_transport::create_camera_publisher(this, "/debug_bin_image", rmw_qos_profile_default);
 
-
             //cj_detector_ = std::make_shared<detector::CjDetector>();
             detector_ = std::make_shared<detector::Detector>();
             //cj_classifier_ = std::make_shared<detector::CjClassifier>();
             pnp_solver_ = std::make_shared<detector::PnpSolver>();
             onnx_classifier_ =  std::make_shared<detector::OnnxClassifier>();
 
-
             /*publish static TF*/
             this->tf_publisher_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
-
-            
-
-
         }
 
     protected:
@@ -129,7 +117,7 @@ namespace rmos_detector
         //std::shared_ptr<detector::CjDetector> cj_detector_;
         std::shared_ptr<detector::Detector> detector_;
 
-       // std::shared_ptr<detector::CjClassifier> cj_classifier_;
+        // std::shared_ptr<detector::CjClassifier> cj_classifier_;
         std::shared_ptr<detector::OnnxClassifier> onnx_classifier_;
 
         std::shared_ptr<detector::PnpSolver> pnp_solver_;

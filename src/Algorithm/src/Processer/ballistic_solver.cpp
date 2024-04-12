@@ -43,6 +43,8 @@ namespace processer
         fs2.release();
     }
 
+    BallisticSolver::~BallisticSolver() { return; }
+
     cv::Point3f BallisticSolver::getAngleTime(cv::Point3f position,bool is_rune)
     {
 

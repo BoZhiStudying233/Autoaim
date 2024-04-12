@@ -46,7 +46,6 @@
 
 namespace rune_detector
 {
-    
     class BaseDetectorNode : public rclcpp::Node
     {
     public:

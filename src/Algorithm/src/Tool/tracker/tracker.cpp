@@ -30,9 +30,9 @@ namespace tool
         fs["lost_thres"] >> lost_thres;
 
         fs.release();
-
-
     }
+
+    Tracker::~Tracker() {return;}
 
 
     void Tracker::init(std::vector<base::Armor> armors)

@@ -24,6 +24,8 @@ namespace processer
 
         int getAimingPoint(std::vector<base::Armor> armors,cv::Point3f& aimming_point,double timestamp);// 1:move 2:slow_move 3:stop
 
+        int getCenterAimingPoint(std::vector<base::Armor> armors,cv::Point3f& aiming_point,double timestamp);
+
         bool judgeFire(cv::Point3f aimming_point_camera, double v_yaw);
 
         bool judgeRuneFire(int num_id,uint32_t timestamp);
@@ -43,8 +45,6 @@ namespace processer
         double dt_{0};
         double lost_time_thres_;
         cv::Mat  camera_matrix_;
-
-
 
         double s2qxyz_{0};
         double s2qyaw_{0};

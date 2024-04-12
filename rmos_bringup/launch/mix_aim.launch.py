@@ -13,10 +13,7 @@ from launch.substitutions import PythonExpression, LaunchConfiguration
 from launch.conditions import IfCondition
 import yaml
 
-def generate_launch_description():
-
-    
-    
+def generate_launch_description():    
     # add node
     daheng_node_ = Node(
         package='rmos_cam',
@@ -39,7 +36,6 @@ def generate_launch_description():
         executable='dl_detector',
         name='dl_detector',
         output='screen',
-
     )
 
     communicate_node_ = Node(
