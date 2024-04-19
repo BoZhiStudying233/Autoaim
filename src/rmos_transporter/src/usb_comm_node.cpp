@@ -204,8 +204,7 @@ namespace rmos_transporter
                 }
                 // ForceSetMode(mode_msg_); // bi sai zhu shi diao
                 // tellMode(mode_msg_);
-                this->mode_pub_->publish(mode_msg_);    
-                // int time_offset = 0;
+                this->mode_pub_->publish(mode_msg_);
                 cv::FileStorage fs("./src/Algorithm/configure/Transporter/usb/param.xml", cv::FileStorage::READ);
                 if(!fs.isOpened())
                 {
