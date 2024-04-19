@@ -12,9 +12,6 @@ namespace rmos_transporter
 {
     UsbCommNode::UsbCommNode(const rclcpp::NodeOptions &options) : CommNode("usb_comm", options)
     {
-        cv::FileStorage fs("./src/Algorithm/configure/Transporter/usb/param.xml", cv::FileStorage::READ);
-
-        fs["time_offset"] >> time_offset;
 
         // create callback group
         this->receive_callback_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -209,6 +206,13 @@ namespace rmos_transporter
                 // tellMode(mode_msg_);
                 this->mode_pub_->publish(mode_msg_);    
                 // int time_offset = 0;
+                cv::FileStorage fs("./src/Algorithm/configure/Transporter/usb/param.xml", cv::FileStorage::READ);
+                if(!fs.isOpened())
+                {
+                    std::cout<<"Transporter xml is not opened!"<<std::endl;
+                }
+                int time_offset;
+                fs["time_offset"] >> time_offset;
                 quaternion_time_msg_.quaternion_stamped.header.stamp = this->now() + rclcpp::Duration(0,time_offset);
                 quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)package.q0;
                 quaternion_time_msg_.quaternion_stamped.quaternion.x = (double)package.q1;
