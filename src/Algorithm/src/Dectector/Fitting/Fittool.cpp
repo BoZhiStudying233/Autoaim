@@ -19,7 +19,7 @@ namespace RuneDetector
             if(fabs(judge_speed) > 2.7)
             {
                 cout<<"bad data for no direction, or data is so big"<<endl;
-                solveBadData();
+                solveBadData(is_direction_inited);
                 return false;
             }
         }
@@ -33,7 +33,7 @@ namespace RuneDetector
                 {
                     //cout<<"judge_speed="<<judge_speed<<endl;
                     cout<<"bad data for clockwise"<<endl;
-                    solveBadData();
+                    solveBadData(is_direction_inited);
                     return false;
                 }
             }
@@ -44,7 +44,7 @@ namespace RuneDetector
                 if(judge_speed < -2.7 || judge_speed > 0.4) 
                 {
                     cout<<"bad data for inv_clockwise"<<endl;
-                    solveBadData();
+                    solveBadData(is_direction_inited);
                     return false;
                 }
             }
@@ -65,7 +65,7 @@ namespace RuneDetector
 
         if(judge_speed > mean + 3*standard_deviation || judge_speed < mean - 3*standard_deviation)
         {
-            solveBadData();
+            solveBadData(is_direction_inited);
             return false;
         }
         
@@ -115,13 +115,14 @@ namespace RuneDetector
         this->standard_deviation = pow(this->variance, 0.5);
     }
 
-    void Judgement::solveBadData()
+    void Judgement::solveBadData(bool &is_direction_inited)
     {
         judge_clear_num++;
         if(judge_clear_num > 3)
         {
             judge_clear_num = 0;
             speedJudge.clear();
+            is_direction_inited = false;
         }    
     }
 

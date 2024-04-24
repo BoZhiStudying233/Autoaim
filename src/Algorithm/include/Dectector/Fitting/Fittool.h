@@ -86,7 +86,7 @@ private:
     /**
      * @brief 处理坏值
     */
-    void solveBadData();
+    void solveBadData(bool &is_direction_inited);
 };
 
 class Fit//用于拟合
