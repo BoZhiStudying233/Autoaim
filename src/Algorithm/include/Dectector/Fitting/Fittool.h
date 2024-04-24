@@ -131,6 +131,14 @@ private:
     int fileCount = 0;
     ofstream txt;
 
+    std::vector<double> w_storage;
+
+    /**
+     * @brief 自适应调节w
+    */
+    void solve_w();
+    int compare_w(std::vector<double> vec);
+
     /**
      * @brief 拟合主函数
      * @param Fittingdata 传来的数据
