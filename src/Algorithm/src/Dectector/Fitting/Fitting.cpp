@@ -60,38 +60,38 @@ namespace RuneDetector
         
         //圆拟合
         
-        // getTrajData(armor_buffer, camera_matrix, dist_coeffs, transform_to_world, transform_to_camera);
+        getTrajData(armor_buffer, camera_matrix, dist_coeffs, transform_to_world, transform_to_camera);
         
-        // this->armor_pose_points.clear();
-        // this->angle_points.clear();
+        this->armor_pose_points.clear();
+        this->angle_points.clear();
 
 
-        // for(int i=0;i<360;i++)
-        // {
-        //     if(watched_points[i].is_get==true)
-        //     {
-        //         this->armor_pose_points.push_back(watched_points[i].point);
-        //         angle_points.push_back(i);
-        //     }
-        // }
-        // cout<<"点数为"<<armor_pose_points.size()<<std::endl;
-        // // correctPoints(armor_pose_points)     此函数内的深度考虑改为[2]后测试
-        // buff_trajectory = fitCircle(armor_pose_points, transform_to_world, transform_to_camera);
-        // //tVector = watched_points[round(armor_1.angle+delta)].point.x,watched_points[round(armor_1.angle+delta)].point.y,watched_points[round(armor_1.angle+delta)].point.z
-        // if(buff_trajectory.is_get)
-        // {
-        //     // correctAxis(buff_trajectory, armor_pose_points, angle_points);   应该不再需要correct了
-        //     // std::cout<<"buff_trajectory.x_axis="<<buff_trajectory.x_axis<<std::endl;
-        //     // std::cout<<"buff_trajectory.radius="<<buff_trajectory.radius<<std::endl;
-        //     // Eigen::Vector3d Vec1 = tfPoint(transform_to_world, buff_trajectory.x_axis);
-        //     // std::cout<<"1="<<Vec1<<std::endl;
-        //     // std::cout<<"2="<<tfPoint(transform_to_camera, Vec1)<<std::endl;
-        //     //std::cout<<"buff_trajectory.y_axis * sin(armor_1.angle+delta)="<<buff_trajectory.radius * buff_trajectory.y_axis * sin(armor_1.angle+delta)+buff_trajectory.center<<std::endl;
-        //     tVector = buff_trajectory.radius * buff_trajectory.x_axis * cos(armor_1.angle+delta) + buff_trajectory.radius * buff_trajectory.y_axis * sin(armor_1.angle+delta) + buff_trajectory.center;
-        //     tVector = tfPoint(transform_to_camera, tVector);
-        //     std::cout<<"tVector="<<tVector<<std::endl;
-        // }
-        // else 
+        for(int i=0;i<360;i++)
+        {
+            if(watched_points[i].is_get==true)
+            {
+                this->armor_pose_points.push_back(watched_points[i].point);
+                angle_points.push_back(i);
+            }
+        }
+        cout<<"点数为"<<armor_pose_points.size()<<std::endl;
+        // correctPoints(armor_pose_points)     此函数内的深度考虑改为[2]后测试
+        buff_trajectory = fitCircle(armor_pose_points, transform_to_world, transform_to_camera);
+        //tVector = watched_points[round(armor_1.angle+delta)].point.x,watched_points[round(armor_1.angle+delta)].point.y,watched_points[round(armor_1.angle+delta)].point.z
+        if(buff_trajectory.is_get)
+        {
+            // correctAxis(buff_trajectory, armor_pose_points, angle_points);   应该不再需要correct了
+            // std::cout<<"buff_trajectory.x_axis="<<buff_trajectory.x_axis<<std::endl;
+            // std::cout<<"buff_trajectory.radius="<<buff_trajectory.radius<<std::endl;
+            // Eigen::Vector3d Vec1 = tfPoint(transform_to_world, buff_trajectory.x_axis);
+            // std::cout<<"1="<<Vec1<<std::endl;
+            // std::cout<<"2="<<tfPoint(transform_to_camera, Vec1)<<std::endl;
+            //std::cout<<"buff_trajectory.y_axis * sin(armor_1.angle+delta)="<<buff_trajectory.radius * buff_trajectory.y_axis * sin(armor_1.angle+delta)+buff_trajectory.center<<std::endl;
+            tVector = buff_trajectory.radius * buff_trajectory.x_axis * cos(armor_1.angle+delta) + buff_trajectory.radius * buff_trajectory.y_axis * sin(armor_1.angle+delta) + buff_trajectory.center;
+            tVector = tfPoint(transform_to_camera, tVector);
+            std::cout<<"tVector="<<tVector<<std::endl;
+        }
+        else 
             for (int i = 0; i < 4; i++)
                 nextPosition.push_back(calNextPosition(pts[i], armor_1.circle_center, delta));
 
