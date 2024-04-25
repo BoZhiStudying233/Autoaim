@@ -33,6 +33,7 @@ namespace rune_detector
 {
     void RuneDetectorNode::imageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr &image_msg)
     {
+        this->mode_ = base::Mode::RUNE;
         if(this->mode_ == base::Mode::RUNE||this->mode_ == base::Mode::NORMAL_RUNE)
         {
             //发布相机到陀螺仪的静态tf
@@ -130,7 +131,15 @@ namespace rune_detector
                                 cv::line(image, rune_next_pos[i], rune_next_pos[(i+1)%4], cv::Scalar(50, 100, 50));
                             }
                         }
-
+                        if(debug::get_debug_option(base::SHOW_ARMOR))
+                        {
+                            debug_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
+                            debug_img_pub_.publish(*debug_image_msg_,camera_info_msg_);
+                            cv::imshow("image", image);
+                            cv::waitKey(1);
+                            //std::cout<<"debug_image_running!!"<<std::endl;
+                        }
+                        return ;
                         //pnp solve
                         cv::Mat tvec;
                         cv::Mat rvec;

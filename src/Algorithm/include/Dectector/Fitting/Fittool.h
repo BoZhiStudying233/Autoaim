@@ -123,7 +123,7 @@ private:
     double start_time = -1.0;          // 角度变化的初值,不为拟合SpeedTime的初始时间;成功拟合的情况下才改变
 
     // txt文件保存数据
-    string path = "./src/Algorithm/configure/Detector/Fitting/buff_state/";
+    string path = "./src/Algorithm/configure/Detector/Fitting/speed_state/";
     string filename;
     bool have_file_count = false;
     bool have_first_time =false;
