@@ -34,6 +34,11 @@ namespace processer
         float level_second;
         float level_third;
         float level_fourth;
+
+        float height_first;
+        float height_second;
+        float height_third;
+        // float height_fourth;
     };
     
     class BallisticSolver :  BallisticSolverInterface
