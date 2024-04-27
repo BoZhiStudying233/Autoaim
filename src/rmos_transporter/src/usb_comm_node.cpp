@@ -193,13 +193,22 @@ namespace rmos_transporter
                 this->color_pub_->publish(color_msg_);
 
                 //mode 
-                if (package.mode == 2){
+                if (package.mode & (0x01)){
+                    autoaim_state_msg_.autoaim_state = 1; // 操作手进入自瞄模式
+                    autoaim_state_pub_->publish(autoaim_state_msg_);
+                }
+                else
+                {
+                    autoaim_state_msg_.autoaim_state = 0; // 操作手未进入自瞄模式
+                    autoaim_state_pub_->publish(autoaim_state_msg_);
+                }
+                if (package.mode & (0x02)){
                     mode_msg_.mode = (int) base::Mode::NORMAL;
                 }
-                if (package.mode == 4){
+                if (package.mode & (0x04)){
                     mode_msg_.mode = (int) base::Mode::RUNE;
                 }
-                if (package.mode == 8){
+                if (package.mode & (0x08)){
                     mode_msg_.mode = (int) base::Mode::NORMAL_RUNE;
                 }
                 // ForceSetMode(mode_msg_); // bi sai zhu shi diao
