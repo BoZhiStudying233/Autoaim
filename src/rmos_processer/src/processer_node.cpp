@@ -178,6 +178,7 @@ namespace rmos_processer {
                 new_armor.position.x = armor.pose.position.x;
                 new_armor.position.y = armor.pose.position.y;
                 new_armor.position.z = armor.pose.position.z;
+                new_armor.distance_to_image_center = armor.distance_to_image_center;
 
                 // Get armor yaw
                 tf2::Quaternion tf_armor_q;
@@ -401,7 +402,7 @@ namespace rmos_processer {
     {
         if(this->autoaim_state_buf_.size()>0)
         {
-            if(autoaim_state_buf_.back().autoaim_state == 1 &&(*autoaim_state_msg).autoaim_state==0 )
+            if(autoaim_state_buf_.back().autoaim_state == 0 &&(*autoaim_state_msg).autoaim_state == 1)
             {
                 this->controler_->tracker_.reset();
             }
