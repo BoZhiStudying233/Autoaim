@@ -479,9 +479,6 @@ namespace rmos_UAV_processer
         process_marker_array_.markers.emplace_back(aiming_marker_);
 
         process_marker_pub_->publish(process_marker_array_);
-
-
-
     }
 
 

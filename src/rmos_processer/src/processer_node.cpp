@@ -132,8 +132,6 @@ namespace rmos_processer {
                 this->create_publisher<visualization_msgs::msg::MarkerArray>("/detect/marker", 10);
         this->process_marker_pub_ =
                 this->create_publisher<visualization_msgs::msg::MarkerArray>("/process/marker", 10);
-
-
     }
 
 
@@ -277,7 +275,6 @@ namespace rmos_processer {
 
             else if(!armors_msg->is_rune) // 自瞄模式
             {
-
                     int move_state = controler_->getAimingPoint(new_armors,aiming_point, timestamp);
                     if (move_state != 3) {
                         cv::Point3f p_y_t = controler_->ballistic_solver_.getAngleTime(aiming_point*1000, armors_msg->is_rune);
@@ -412,7 +409,6 @@ namespace rmos_processer {
         {
             this->autoaim_state_buf_.pop();
         }
-
     }
 
     void ProcesserNode::publishMarkers(const rmos_interfaces::msg::Target &target_msg)

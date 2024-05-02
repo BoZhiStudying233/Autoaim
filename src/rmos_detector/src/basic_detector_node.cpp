@@ -66,8 +66,6 @@ namespace rmos_detector
         t.transform.translation.z = 0;
         this->tf_publisher_->sendTransform(t) ;
 
-
-
         rclcpp::Clock steady_clock_{RCL_STEADY_TIME};
         auto time1 = steady_clock_.now();
         auto image = cv_bridge::toCvShare(image_msg, "bgr8")->image;
@@ -155,13 +153,7 @@ namespace rmos_detector
         }
 
         armors_pub_->publish(armors_msg);
-
     }
-
-
-
-
-
 }
 
 

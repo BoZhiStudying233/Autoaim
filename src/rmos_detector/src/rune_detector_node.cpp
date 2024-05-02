@@ -227,7 +227,7 @@ namespace rune_detector
                 if(this->mode_ == base::Mode::NORMAL_RUNE || this->mode_ == base::Mode::RUNE)
                     debug_bin_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", this->rune_detector_->bin).toImageMsg();
                 else
-                    debug_bin_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", this->mix_detector_->debug_binary_).toImageMsg();
+                    debug_bin_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", this->detector_->debug_binary_).toImageMsg();
 
                 debug_bin_img_pub_.publish(*debug_bin_image_msg_,camera_info_msg_);
             }
@@ -238,7 +238,6 @@ namespace rune_detector
         }
         else if (this->mode_ == base::Mode::NORMAL)
         {
-
             cv::Scalar colors[4] = {cv::Scalar(255, 255, 0),
                         cv::Scalar(0, 255, 0),
                         cv::Scalar(255, 255, 0),
@@ -271,81 +270,17 @@ namespace rune_detector
             t.transform.translation.y = 0;
             t.transform.translation.z = 0;
             this->tf_publisher_->sendTransform(t) ;
-
-
-
+    
             rclcpp::Clock steady_clock_{RCL_STEADY_TIME};
             auto time1 = steady_clock_.now();
             auto image = cv_bridge::toCvShare(image_msg, "bgr8")->image;
             std::vector<base::Armor> armors;
-            std::vector<cv::Mat> inputs;
-            std::vector<DetectResultList> outputs;
-            armors.clear();
-            outputs.clear();
-            inputs.clear();
-            inputs.push_back(image);
-    
-            mix_detector_->rt.run(inputs, outputs);
-            for (auto out_box : outputs.at(0))
-            {
-                // int id = out_box.id % 9;
-                int id=1;
-                int color = out_box.id ; //0---blue,  1--red
-
-                if (mix_detector_->enemy_color_ == base::Color::RED && color == 0)
-                {
-                    continue;
-                }
-                if (mix_detector_->enemy_color_ == base::Color::BLUE && color == 1)
-                {
-                    continue;
-                }
-                cv::Rect2d target = out_box.bbox;
-                target.x = int(target.x - target.width / 5);
-                target.y = int(target.y - target.height / 5);
-                target.width = int(target.width * 1.4);
-                target.height = int(target.height * 1.4);
-                target = target & cv::Rect2d(0, 0, image.cols, image.rows);
-
-                MixDetect::Armor out = MixDetect::Armor(target, id, color, out_box.points);
-
-
-                bool if_found=mix_detector_->detect(image, out);
-                if (if_found)
-                {
-                    MixDetect::Armor output;
-                    mix_detector_->getResult(output);
-
-                    base::Armor armor;
-                    armor.num_id = output._color;  //0---blue,  1--red
-                    armor.points = output._points;
-                    armor.left.up = armor.points[1];
-                    armor.left.down = armor.points[0];
-                    armor.right.up = armor.points[2];
-                    armor.right.down = armor.points[3];
-                    armor.rect = output._bbox;
-                    armor.center_point = (armor.points[0]+armor.points[1]+armor.points[2]+armor.points[3])/4.0;
-                    armors.push_back(armor);
-                }
-                
-
-                // std::cout<< "points____" << armor.points << std::endl;
-
-                // if(if_found){
-                //     cv::putText(image, std::to_string(color), output._bbox.tl(), 2, 1, colors[2]);
-                //     for (size_t i = 0; i < output._points.size(); i++)
-                //     {
-                //         line(image, output._points[i], output._points[(i + 1) % 4], colors[int(output._if_stable)], 2, 8, 0);
-                //     }
-                // }
-            }
-
+            detector_->detectArmors(image,armors);
             onnx_classifier_->classifyArmors(image,armors);
 
             rmos_interfaces::msg::Armors armors_msg;
             rmos_interfaces::msg::Armor armor_msg;
             armors_msg.header = image_msg->header;
-
 
             for(auto &armor : armors)
             {
@@ -420,7 +355,7 @@ namespace rune_detector
             }
             if(debug::get_debug_option(base::SHOW_BIN))
             {
-                debug_bin_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", this->mix_detector_->debug_binary_).toImageMsg();
+                debug_bin_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", this->detector_->debug_binary_).toImageMsg();
                 debug_bin_img_pub_.publish(*debug_bin_image_msg_,camera_info_msg_);
             }
 

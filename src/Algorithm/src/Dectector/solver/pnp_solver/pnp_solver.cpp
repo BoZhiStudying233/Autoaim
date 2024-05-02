@@ -15,13 +15,13 @@ namespace detector
         switch (armor.type)
         {
             case base::ArmorType::SMALL:
-                cv::solvePnP(small_armor, point2D, camera_matrix, dist_coeffs, rVec, tVec, false, cv::SOLVEPNP_IPPE);
+                cv::solvePnP(small_armor, point2D, camera_matrix, dist_coeffs, rVec, tVec, false, cv::SOLVEPNP_ITERATIVE);
                 break;
             case base::ArmorType::BIG:
-                cv::solvePnP(big_armor, point2D, camera_matrix, dist_coeffs, rVec, tVec, false, cv::SOLVEPNP_IPPE);
+                cv::solvePnP(big_armor, point2D, camera_matrix, dist_coeffs, rVec, tVec, false, cv::SOLVEPNP_ITERATIVE);
                 break;
             default:
-                cv::solvePnP(big_armor, point2D, camera_matrix, dist_coeffs, rVec, tVec, false, cv::SOLVEPNP_IPPE);
+                cv::solvePnP(big_armor, point2D, camera_matrix, dist_coeffs, rVec, tVec, false, cv::SOLVEPNP_ITERATIVE);
                 break;
         }
 

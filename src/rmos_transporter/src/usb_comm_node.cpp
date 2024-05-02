@@ -180,7 +180,7 @@ namespace rmos_transporter
             {
                 transporter::RMOSReceivePackage package;
                 memcpy(&package, receive_package, 
-                    sizeof(transporter::RMOSReceivePackage));
+                sizeof(transporter::RMOSReceivePackage));
 
                 // color
                 if (package.robot_id < 10) {
@@ -223,7 +223,6 @@ namespace rmos_transporter
                 tf_publisher_->sendTransform(t);
                 memcpy(&quaternion_time_msg_.timestamp_recv, &package.TimeStamp, 4);
                     this->quaternion_pub_->publish(quaternion_time_msg_);            
-
                 break;
             }
             
