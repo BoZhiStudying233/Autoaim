@@ -161,6 +161,8 @@ namespace rmos_processer {
                 geometry_msgs::msg::PoseStamped ps;
                 ps.header = armors_msg->header;
                 ps.pose = armor.pose;
+                // std::cout<<"InCamera:\n"<<"armor.pose.x:"<<armor.pose.position.x<<" armor.pose.y:"<<armor.pose.position.y<<" armor.pose.z:"<<armor.pose.position.z<<std::endl;
+
                 try {
                     armor.pose = tf2_buffer_->transform(ps, target_frame_).pose;
                 }
@@ -172,7 +174,7 @@ namespace rmos_processer {
                     RCLCPP_ERROR(get_logger(), "Error while transforming %s", ex.what());
                     return;
                 }
-
+                // std::cout<<"InWorld:\n"<<"armor.pose.x:"<<armor.pose.position.x<<" armor.pose.y"<<armor.pose.position.y<<" armor.pose.z:"<<armor.pose.position.z<<std::endl;
                 base::Armor new_armor;
                 new_armor.num_id = armor.num_id;
                 new_armor.position.x = armor.pose.position.x;

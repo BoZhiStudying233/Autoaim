@@ -33,6 +33,7 @@ namespace rune_detector
 {
     void RuneDetectorNode::imageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr &image_msg)
     {
+
         if(this->mode_ == base::Mode::RUNE||this->mode_ == base::Mode::NORMAL_RUNE)
         {
             //发布相机到陀螺仪的静态tf
@@ -110,7 +111,6 @@ namespace rune_detector
                         
                 if(fitting_->run(target_rune_armor, rune_next_pos, tVec, rune_detector_->state, this->mode_, rune_armors, this->camera_matrix_, this->dist_coeffs_, transform_to_world, transform_to_camera))
                 {
-                    
                     if(rune_next_pos.size() == 4)//二维圆的情况
                     {
                         // 若预测后的点在图片上才可画图，否则程序会异常终止
@@ -138,19 +138,21 @@ namespace rune_detector
                             cv::waitKey(1);
                             //std::cout<<"debug_image_running!!"<<std::endl;
                         }
-                        return ;
                         //pnp solve
                         cv::Mat tvec;
                         cv::Mat rvec;
                         bool is_solve;
                         is_solve = this->pnp_solver_->solveRuneArmorPose(rune_next_pos,this->camera_matrix_,this->dist_coeffs_,tvec,rvec);
+                        
                         if(!is_solve)
                         {
                             RCLCPP_WARN(this->get_logger(), "camera param empty");
                         }
+                        
                         tVec.x() = tvec.at<double>(0, 0);
                         tVec.y() = tvec.at<double>(1, 0);
                         tVec.z() = tvec.at<double>(2, 0);
+                        // std::cout<<"tVector_in_camera="<<tVec<<std::endl;
                     }
                     else//三维圆的情况
                     {
@@ -158,22 +160,23 @@ namespace rune_detector
                         std::vector<cv::Point3f> objectPoints;
                         std::vector<cv::Point2f> imagePoints;
 
-                        tVec.x() = tVec.x()/tVec.z();
-                        tVec.y() = tVec.y()/tVec.z();
-                        tVec.z() = 1;
+                        // tVec.x() = tVec.x()/tVec.z();
+                        // tVec.y() = tVec.y()/tVec.z();
+                        // tVec.z() = 1;
 
-                        objectPoints.emplace_back(tVec.x(), tVec.y(), tVec.z());
+                        objectPoints.emplace_back(tVec.x()/tVec.z(), tVec.y()/tVec.z(), 1);
 
                         cv::Mat tvec = (cv::Mat_<float>(1, 3) << 0, 0, 0);
                         cv::projectPoints(objectPoints, cv::Mat::zeros(1, 3, CV_64F), tvec, this->camera_matrix_, this->dist_coeffs_, imagePoints);
                         cv::Point2d point2D = imagePoints[0];
                         if (point2D.x > 0 && point2D.y > 0 && point2D.x < image.cols && point2D.y < image.rows)
                             cv::circle(image, point2D, 6, cv::Scalar(255,0,255), -1);
+                        // std::cout<<"233"<<std::endl;
                     }
                     armor_msg.pose.position.x = tVec.x()/1000;
                     armor_msg.pose.position.y = tVec.y()/1000;
                     armor_msg.pose.position.z = tVec.z()/1000;//相机坐标系下，目标符中心的坐标  
-                    
+                    // std::cout<<"armor_msg.pose.position.x:"<<armor_msg.pose.position.x<<" armor_msg.pose.position.y:"<<armor_msg.pose.position.y<<" armor_msg.pose.position.z:"<<armor_msg.pose.position.z<<std::endl;
                     Eigen::Vector3d CamaraVector = Eigen::Vector3d(0,0,1);
                     cv::Mat rVec = cv::Mat::zeros(3, 1, CV_64F);
 

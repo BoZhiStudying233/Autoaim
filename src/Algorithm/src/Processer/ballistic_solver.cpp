@@ -121,6 +121,8 @@ namespace processer
         }
         if(is_rune == true)//打符模式下弹速系数的调节
         {
+                std::cout<<"position.z:"<<position.z<<std::endl;
+                
                  bs_coeff = rune_ballistic_param_.level_first;
                 if (position.z >= rune_ballistic_param_.height_first && position.z < rune_ballistic_param_.height_second)
                     bs_coeff = rune_ballistic_param_.level_second;
@@ -128,6 +130,7 @@ namespace processer
                     bs_coeff = rune_ballistic_param_.level_third;
                 else if (position.z >= rune_ballistic_param_.height_third)
                     bs_coeff = rune_ballistic_param_.level_fourth;
+                std::cout<<"bs_coeff:"<<bs_coeff<<std::endl;
                 
 
         }
