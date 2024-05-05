@@ -22,7 +22,7 @@
     <rune_gun_yaw_offset> 0.4 </rune_gun_yaw_offset>
 
     <!--打符开火决策-->
-    <bs_fly_time> 350 </bs_fly_time>
-    <ready_time> 350 </ready_time>        
-
+    <!-- <bs_fly_time> 350 </bs_fly_time> -->
+    <ready_time> 100 </ready_time><!--符进入开火阈值后，云台等待时间-->        
+    <rune_fire_area>120</rune_fire_area> <!--打符开火阈值-->
 </opencv_storage>

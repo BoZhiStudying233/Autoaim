@@ -245,7 +245,7 @@ namespace rmos_processer {
                     //                                 target_msg.position.z*target_msg.position.z)<<std::endl;
 
                     // std::cout<<"timestamp:"<<timestamp<<std::endl;
-                    bool is_fire = this->controler_->judgeRuneFire(target_rune_armor.num_id,timestamp_recv);
+                    bool is_fire = this->controler_->judgeRuneFire(target_rune_armor.num_id, timestamp_recv, aiming_point);
                     target_msg.suggest_fire = is_fire;
 
                     target_msg.gun_pitch = gun_pitch;

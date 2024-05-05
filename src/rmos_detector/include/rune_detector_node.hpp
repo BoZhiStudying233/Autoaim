@@ -104,7 +104,7 @@ namespace rune_detector
                                                                                              });
             tf_buffer = std::make_unique<tf2_ros::Buffer>(this->get_clock());
             tf_listener = std::make_shared<tf2_ros::TransformListener>(*tf_buffer);
-
+            
             this->color_sub_ = this->create_subscription<rmos_interfaces::msg::Color>
                     ("/color_info", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Color::ConstSharedPtr color_msg)
                     {

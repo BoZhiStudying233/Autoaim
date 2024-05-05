@@ -175,7 +175,7 @@ namespace rune_detector
                     }
                     armor_msg.pose.position.x = tVec.x()/1000;
                     armor_msg.pose.position.y = tVec.y()/1000;
-                    armor_msg.pose.position.z = tVec.z()/1000;//相机坐标系下，目标符中心的坐标  
+                    armor_msg.pose.position.z = tVec.z()/1000;//相机坐标系下，目标符中心的坐标
                     // std::cout<<"armor_msg.pose.position.x:"<<armor_msg.pose.position.x<<" armor_msg.pose.position.y:"<<armor_msg.pose.position.y<<" armor_msg.pose.position.z:"<<armor_msg.pose.position.z<<std::endl;
                     Eigen::Vector3d CamaraVector = Eigen::Vector3d(0,0,1);
                     cv::Mat rVec = cv::Mat::zeros(3, 1, CV_64F);

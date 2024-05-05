@@ -31,6 +31,8 @@ namespace processer
 
         fs["bs_fly_time"] >> bs_fly_time_;
         fs["ready_time"] >> ready_time_;
+
+        fs["rune_fire_area"] >> rune_fire_area_;
         fs.release();
 
         // EKF
@@ -329,41 +331,42 @@ namespace processer
 
     bool Controler::judgeFire(cv::Point3f aiming_point_camera , double v_yaw)
     {
-        cv::Point2f aim_point_2d;
-        cv::Mat a;
-        a = (cv::Mat_<double>(3, 1) << aiming_point_camera.x,aiming_point_camera.y,aiming_point_camera.z);
-        cv::Mat b = camera_matrix_*a;
-        cv::Point3d b_new(b);
-        b_new = b_new/b_new.z;
-        aim_point_2d.x = std::ceil(b_new.x);
-        aim_point_2d.y = std::ceil(b_new.y);
+            cv::Point2f aim_point_2d;
+            cv::Mat a;
+            a = (cv::Mat_<double>(3, 1) << aiming_point_camera.x,aiming_point_camera.y,aiming_point_camera.z);
+            cv::Mat b = camera_matrix_*a;
+            cv::Point3d b_new(b);
+            b_new = b_new/b_new.z;
+            aim_point_2d.x = std::ceil(b_new.x);
+            aim_point_2d.y = std::ceil(b_new.y);
 
-        double x = aim_point_2d.x;
-        double delta_x = abs(x-this->true_x_);
-        // std::cout<<"x  is"<<x<<std::endl;
+            double x = aim_point_2d.x;
+            double delta_x = abs(x-this->true_x_);
+            // std::cout<<"x  is"<<x<<std::endl;
 
-    
+        
 
-        double fire_area = abs(78.5/v_yaw);
-        //std::cout<<"v_yaw is"<<v_yaw<<std::endl;
-        //std::cout<<"fire_area is"<<fire_area<<std::endl;
-        if(fire_area<12){
-            fire_area=12;
-        }
-        if(fire_area>200)
-        {
-            fire_area = 200;
-        }
-        // std::cout<<"delta_x is"<<delta_x<<std::endl;
+            double fire_area = abs(78.5/v_yaw);
+            //std::cout<<"v_yaw is"<<v_yaw<<std::endl;
+            //std::cout<<"fire_area is"<<fire_area<<std::endl;
+            if(fire_area<12){
+                fire_area=12;
+            }
+            if(fire_area>200)
+            {
+                fire_area = 200;
+            }
+            // std::cout<<"delta_x is"<<delta_x<<std::endl;
 
-        if(delta_x<fire_area)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+            if(delta_x<fire_area)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
 
     }
 
@@ -383,33 +386,57 @@ namespace processer
 
     }
 
-        bool Controler::judgeRuneFire(int num_id, uint32_t timestamp)
+    bool Controler::judgeRuneFire(int num_id, uint32_t timestamp, cv::Point3f aiming_point_camera)
+    {
+        cv::Point2f aim_point_2d;
+        cv::Mat a;
+        a = (cv::Mat_<double>(3, 1) << aiming_point_camera.x,aiming_point_camera.y,aiming_point_camera.z);
+        cv::Mat b = camera_matrix_*a;
+        cv::Point3d b_new(b);
+        b_new = b_new/b_new.z;
+        aim_point_2d.x = std::ceil(b_new.x);
+        aim_point_2d.y = std::ceil(b_new.y);
+
+        double x = aim_point_2d.x;
+        double delta_x = abs(x - this->true_x_);
+        // std::cout<<"x  is"<<x<<std::endl;
+
+    
+
+        double fire_area = this->rune_fire_area_;
+        //std::cout<<"v_yaw is"<<v_yaw<<std::endl;
+        //std::cout<<"fire_area is"<<fire_area<<std::endl;
+
+        if(delta_x > fire_area)
         {
+            return false;
+        }
+        
         // 开火决策
         // 1.判断扇叶切换
+        
         if(num_id != last_id_)
         {
             this->vane_change_timestamp_ = timestamp;
             last_id_ = num_id;
         }
-        // 2.时间差判断是否给予开火权,注意陀螺仪时间戳单位为ms;2500ms后切换扇叶
+        // 2.时间差判断是否给予开火权,注意陀螺仪时间戳单位为ms;
         uint32_t delta_vane_change_timestamp = timestamp - this->vane_change_timestamp_;
-        uint32_t delta_fire_timestamp = timestamp - this->last_fire_timestamp_;
+        // uint32_t delta_fire_timestamp = timestamp - this->last_fire_timestamp_;
 
-        if(delta_vane_change_timestamp > ready_time_ && delta_fire_timestamp > bs_fly_time_)//&& delta_fire_timestamp > bs_fly_time_
+        if(delta_vane_change_timestamp > ready_time_)//只要云台准备好了就ok            && delta_fire_timestamp > bs_fly_time_
         {
-            last_fire_timestamp_ = timestamp;
+            // last_fire_timestamp_ = timestamp;
             return true;
         }
         else
         {
             return false;
         }
+    }
 
-        }
-
-        Controler::~Controler()
-        {
-        return;
-        }
+    Controler::~Controler()
+    {
+    return;
+    }
 }

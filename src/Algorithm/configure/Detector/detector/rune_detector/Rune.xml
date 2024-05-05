@@ -32,5 +32,6 @@
     <w_adapt_threshold>10</w_adapt_threshold><!--当w达到临界值的数量超过此阈值时，开始调节w   -->   
     <delta_adapt>0</delta_adapt><!--对角度的调整幅度，目前此参数实际影响的是时间延迟-->
 
+    
 
 </opencv_storage>

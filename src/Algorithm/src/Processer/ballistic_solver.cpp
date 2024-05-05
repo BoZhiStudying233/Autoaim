@@ -59,7 +59,7 @@ namespace processer
         double t_actual = 0.0;
         double y_temp = position.z / 1000.0;
         double y = y_temp;
-        double x = sqrt(position.x * position.x + position.y * position.y) / 1000.0;
+        double x = sqrt(position.x * position.x + position.y * position.y) / 1000.0;//水平距离 
 
         bullet_speed_ = 30.0;
 
