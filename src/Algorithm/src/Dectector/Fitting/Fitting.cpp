@@ -50,14 +50,16 @@ namespace RuneDetector
 
         double delta = fit.run(fitting_data, N, rune_mode);            // 旋转角度
         //delta = 0;
-        double now_angle = armor_1.angle;
-        double now_time = armor_1.timestamp;
-        double predict_angle = now_angle + delta;
+        if (this->save_txt == 1 && rune_mode == base::Mode::RUNE)
+        {
+            double now_angle = armor_1.angle;
+            double now_time = armor_1.timestamp;
+            double predict_angle = now_angle + delta;
 
-        double predict_time = now_time + fit.delay_time;
-        
-        if (this->save_txt == 1)
+            double predict_time = now_time + fit.delay_time;
+
             drawAngle(now_angle, now_time, predict_angle, predict_time);
+        }
         
         //圆拟合
         
@@ -96,10 +98,7 @@ namespace RuneDetector
         // else 
             for (int i = 0; i < 4; i++)
                 nextPosition.push_back(calNextPosition(pts[i], armor_1.circle_center, delta));
-
-        
-        
-        
+                
         return true;         
     }
 
