@@ -307,7 +307,6 @@ namespace rmos_processer {
                             target_msg.outpost_direction = -1;
                         }
 
-
                         //将瞄准点投影回2d平面，通过像素距离判断，判断开火
                         geometry_msgs::msg::PoseStamped px;
                         px.header = target_msg.header;
@@ -334,16 +333,8 @@ namespace rmos_processer {
                         bool is_fire = this->controler_->judgeFire(aiming_point_camera,this->controler_->tracker_.target_state(7));
                         target_msg.suggest_fire = is_fire;
                         
-                        if(move_state==1)
-                        {
-                            target_msg.gun_pitch = gun_pitch;
-                            target_msg.gun_yaw = gun_yaw;
-                        }
-                        else
-                        {
-                            target_msg.gun_pitch = pitch;
-                            target_msg.gun_yaw = yaw;
-                        }
+                        target_msg.gun_pitch = gun_pitch;
+                        target_msg.gun_yaw = gun_yaw;
                     }
                     else
                     {
