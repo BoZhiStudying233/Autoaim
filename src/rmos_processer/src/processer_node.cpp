@@ -132,8 +132,6 @@ namespace rmos_processer {
                 this->create_publisher<visualization_msgs::msg::MarkerArray>("/detect/marker", 10);
         this->process_marker_pub_ =
                 this->create_publisher<visualization_msgs::msg::MarkerArray>("/process/marker", 10);
-
-
     }
 
 
@@ -278,7 +276,6 @@ namespace rmos_processer {
 
             else if(!armors_msg->is_rune) // 自瞄模式
             {
-
                     int move_state = controler_->getAimingPoint(new_armors,aiming_point, timestamp);
                     rmos_interfaces::msg::QuaternionTime gimble_pose = quaternion_buf_.back();
                     tf2::Quaternion tf_gimble_q;
@@ -310,7 +307,6 @@ namespace rmos_processer {
                             target_msg.outpost_direction = -1;
                         }
 
-
                         //将瞄准点投影回2d平面，通过像素距离判断，判断开火
                         geometry_msgs::msg::PoseStamped px;
                         px.header = target_msg.header;
@@ -337,16 +333,8 @@ namespace rmos_processer {
                         bool is_fire = this->controler_->judgeFire(aiming_point_camera,this->controler_->tracker_.target_state(7));
                         target_msg.suggest_fire = is_fire;
                         
-                        if(move_state==1)
-                        {
-                            target_msg.gun_pitch = gun_pitch;
-                            target_msg.gun_yaw = gun_yaw;
-                        }
-                        else
-                        {
-                            target_msg.gun_pitch = pitch;
-                            target_msg.gun_yaw = yaw;
-                        }
+                        target_msg.gun_pitch = gun_pitch;
+                        target_msg.gun_yaw = gun_yaw;
                     }
                     else
                     {
@@ -412,7 +400,6 @@ namespace rmos_processer {
         {
             this->autoaim_state_buf_.pop();
         }
-
     }
 
     void ProcesserNode::publishMarkers(const rmos_interfaces::msg::Target &target_msg)

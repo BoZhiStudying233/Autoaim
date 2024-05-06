@@ -109,7 +109,7 @@ namespace rune_detector
                     ("/color_info", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Color::ConstSharedPtr color_msg)
                     {
                         int enemy_color = (*color_msg).color;
-                        this->mix_detector_->setEnemyColor(enemy_color);//有两个？(ˇˍˇ)
+                        this->detector_->setEnemyColor(enemy_color);//有两个？(ˇˍˇ)
                         this->rune_detector_->setEnemyColor(enemy_color);
                     });
  
@@ -138,13 +138,13 @@ namespace rune_detector
 
 
             //cj_detector_ = std::make_shared<detector::CjDetector>();
-            // detector_ = std::make_shared<detector::Detector>();
+            detector_ = std::make_shared<detector::Detector>();
             rune_detector_ = std::make_shared<RuneDetector::DlRuneDetector>();
             fitting_ = std::make_shared<RuneDetector::Fitting>();
             //cj_classifier_ = std::make_shared<detector::CjClassifier>();
             pnp_solver_ = std::make_shared<detector::PnpSolver>();
             onnx_classifier_ =  std::make_shared<detector::OnnxClassifier>();
-            mix_detector_ = std::make_shared<MixDetect::ArmorDetector>();
+            // mix_detector_ = std::make_shared<MixDetect::ArmorDetector>();
 
             /*publish static TF*/
             this->tf_publisher_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
@@ -180,7 +180,7 @@ namespace rune_detector
         int countFilesInDirectory(std::string path); 
 
         //std::shared_ptr<detector::CjDetector> cj_detector_;
-        //std::shared_ptr<detector::Detector> detector_;
+        std::shared_ptr<detector::Detector> detector_;
         std::shared_ptr<RuneDetector::DlRuneDetector> rune_detector_;
 
         std::shared_ptr<RuneDetector::Fitting> fitting_;
@@ -188,7 +188,7 @@ namespace rune_detector
         // std::shared_ptr<detector::CjClassifier> cj_classifier_;
         std::shared_ptr<detector::OnnxClassifier> onnx_classifier_;
 
-        std::shared_ptr<MixDetect::ArmorDetector> mix_detector_;
+        // std::shared_ptr<MixDetect::ArmorDetector> mix_detector_;
 
         std::shared_ptr<detector::PnpSolver> pnp_solver_;
 
