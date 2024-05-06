@@ -119,7 +119,7 @@ namespace processer
         tracker_.ekf = tool::ExtendedKalmanFilter{f, h, j_f, j_h, u_q, u_r, p0};
     }
     
-    int Controler::getAimingPoint(std::vector<base::Armor> armors,cv::Point3f& aiming_point,double timestamp)
+    int Controler::getAimingPoint(std::vector<base::Armor> armors,cv::Point3f& aiming_point,double timestamp, cv::Point3f& gun_aim_point)
     {
         double time = timestamp;
         bool is_tracking = false;
@@ -174,6 +174,7 @@ namespace processer
             cv::Point3d p_predict_center = p_center + linear_change; //预测中心点
             double yaw_predict = yaw + v_yaw * all_time;  //预测yaw
 
+            gun_aim_point = p_predict_center;
 
             // get armors num
             int armors_num = 4;

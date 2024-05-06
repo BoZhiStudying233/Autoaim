@@ -246,8 +246,6 @@ namespace rmos_processer {
 
                     target_msg.gun_pitch = gun_pitch;
                     target_msg.gun_yaw = gun_yaw;
-                    
-
                 }
                 
                 else
@@ -259,7 +257,6 @@ namespace rmos_processer {
                     target_msg.position.z = 0;
                     target_msg.gun_pitch = 0;
                     target_msg.gun_yaw = 0;
-                   
                 }
                 
                 if(debug::get_debug_option(base::SHOW_RVIZ))
@@ -269,94 +266,107 @@ namespace rmos_processer {
                     detect_marker_array_.markers.emplace_back(armor_marker_);
                     detect_marker_pub_->publish(detect_marker_array_);
                 }
-                
-
-
             }
 
             else if(!armors_msg->is_rune) // 自瞄模式
             {
-                    int move_state = controler_->getAimingPoint(new_armors,aiming_point, timestamp);
-                    rmos_interfaces::msg::QuaternionTime gimble_pose = quaternion_buf_.back();
-                    tf2::Quaternion tf_gimble_q;
-                    tf2::fromMsg(gimble_pose.quaternion_stamped.quaternion, tf_gimble_q);
-                    double gimble_roll, gimble_pitch, gimble_yaw;
-                    tf2::Matrix3x3(tf_gimble_q).getRPY(gimble_roll, gimble_pitch, gimble_yaw);
-                    float pitch = gimble_pitch * 180.0 / 3.1415926535;
-                    float yaw = gimble_yaw * 180.0 / 3.1415926535;
-                    if (move_state != 3) {
-                        cv::Point3f p_y_t = controler_->ballistic_solver_.getAngleTime(aiming_point*1000, armors_msg->is_rune);
-                        float new_pitch = p_y_t.x;
-                        float new_yaw = p_y_t.y;
-
-                        // 绝对角
-                        float gun_pitch = -new_pitch+controler_->gun_pitch_offset_;
-                        float gun_yaw = new_yaw+controler_->gun_yaw_offset_;
-
-                        target_msg.id = this->controler_->tracker_.tracked_id;
-                        target_msg.track_state = this->controler_->tracker_.tracker_state;
-                        target_msg.position.x = aiming_point.x;
-                        target_msg.position.y = aiming_point.y;
-                        target_msg.position.z = aiming_point.z;
-                        if(controler_->tracker_.target_state(7)>0)
-                        {
-                            target_msg.outpost_direction = 1;
-                        }
-                        else
-                        {
-                            target_msg.outpost_direction = -1;
-                        }
-
-                        //将瞄准点投影回2d平面，通过像素距离判断，判断开火
-                        geometry_msgs::msg::PoseStamped px;
-                        px.header = target_msg.header;
-                        px.pose.position.x = aiming_point.x*1000;
-                        px.pose.position.y = aiming_point.y*1000;
-                        px.pose.position.z = aiming_point.z*1000;
-                        std::string oral_frame = "camera";
-                        try
-                        {
-                            px.pose = tf2_buffer_->transform(px, oral_frame).pose;
-                        }
-                        catch (const tf2::LookupException &ex)
-                        {
-                            RCLCPP_ERROR(get_logger(), "Error while transforming %s", ex.what());
-                            return;
-                        }
-                        catch (const tf2::ExtrapolationException &ex)
-                        {
-                            RCLCPP_ERROR(get_logger(), "Error while transforming %s", ex.what());
-                            return;
-                        }
-                        cv::Point3f aiming_point_camera(px.pose.position.x,px.pose.position.y,px.pose.position.z);
-
-                        bool is_fire = this->controler_->judgeFire(aiming_point_camera,this->controler_->tracker_.target_state(7));
-                        target_msg.suggest_fire = is_fire;
-                        
-                        target_msg.gun_pitch = gun_pitch;
-                        target_msg.gun_yaw = gun_yaw;
+                cv::Point3f center_point;
+                int move_state = controler_->getAimingPoint(new_armors,aiming_point, timestamp, center_point);
+                rmos_interfaces::msg::QuaternionTime gimble_pose = quaternion_buf_.back();
+                tf2::Quaternion tf_gimble_q;
+                tf2::fromMsg(gimble_pose.quaternion_stamped.quaternion, tf_gimble_q);
+                double gimble_roll, gimble_pitch, gimble_yaw;
+                tf2::Matrix3x3(tf_gimble_q).getRPY(gimble_roll, gimble_pitch, gimble_yaw);
+                float pitch = gimble_pitch * 180.0 / 3.1415926535;
+                float yaw = gimble_yaw * 180.0 / 3.1415926535;
+                if (move_state != 3) {
+                    float new_pitch, new_yaw;
+                    // 击打点
+                    cv::Point3f p_y_t = controler_->ballistic_solver_.getAngleTime(aiming_point*1000, armors_msg->is_rune);
+                    // 中心点
+                    cv::Point3f c_y_t = controler_->ballistic_solver_.getAngleTime(center_point*1000, armors_msg->is_rune);
+                    // v_yaw 大于一定值即瞄中心点
+                    if(abs(controler_->tracker_.target_state(7))>2)
+                    {
+                        new_pitch= c_y_t.x;
+                        new_yaw  = p_y_t.y;  // yaw 指中心点
                     }
                     else
                     {
-                        target_msg.id = -1;
-                        target_msg.track_state = this->controler_->tracker_.tracker_state;
-                        target_msg.position.x = 0;
-                        target_msg.position.y = 0;
-                        target_msg.position.z = 0;
-                        target_msg.gun_pitch = pitch;
-                        target_msg.gun_yaw = yaw;
+                        new_pitch = p_y_t.x;
+                        new_yaw = p_y_t.y;
                     }
-                    
-                    if(debug::get_debug_option(base::SHOW_RVIZ))
+
+                    // 绝对角
+                    float gun_pitch = -new_pitch+controler_->gun_pitch_offset_;
+                    float gun_yaw = new_yaw+controler_->gun_yaw_offset_;
+
+                    target_msg.position.x = aiming_point.x;
+                    target_msg.position.y = aiming_point.y;
+                    target_msg.position.z = aiming_point.z;
+
+                    target_msg.id = this->controler_->tracker_.tracked_id;
+                    target_msg.track_state = this->controler_->tracker_.tracker_state;
+
+                    if(controler_->tracker_.target_state(7)>0)
                     {
-                        using Marker = visualization_msgs::msg::Marker;
-                        armor_marker_.action = (armors_msg->armors).empty() ? Marker::DELETE : Marker::ADD;
-                        detect_marker_array_.markers.emplace_back(armor_marker_);
-                        publishMarkers(target_msg);
+                        target_msg.outpost_direction = 1;
                     }
-                    detect_marker_pub_->publish(detect_marker_array_);
+                    else
+                    {
+                        target_msg.outpost_direction = -1;
+                    }
+
+                    //将瞄准点投影回2d平面，通过像素距离判断，判断开火
+                    geometry_msgs::msg::PoseStamped px;
+                    px.header = target_msg.header;
+                    px.pose.position.x = aiming_point.x*1000;
+                    px.pose.position.y = aiming_point.y*1000;
+                    px.pose.position.z = aiming_point.z*1000;
+                    std::string oral_frame = "camera";
+                    try
+                    {
+                        px.pose = tf2_buffer_->transform(px, oral_frame).pose;
+                    }
+                    catch (const tf2::LookupException &ex)
+                    {
+                        RCLCPP_ERROR(get_logger(), "Error while transforming %s", ex.what());
+                        return;
+                    }
+                    catch (const tf2::ExtrapolationException &ex)
+                    {
+                        RCLCPP_ERROR(get_logger(), "Error while transforming %s", ex.what());
+                        return;
+                    }
+                    cv::Point3f aiming_point_camera(px.pose.position.x,px.pose.position.y,px.pose.position.z);
+
+                    bool is_fire = this->controler_->judgeFire(aiming_point_camera,this->controler_->tracker_.target_state(7));
+                    target_msg.suggest_fire = is_fire;
+                    
+                    target_msg.gun_pitch = gun_pitch;
+                    target_msg.gun_yaw = gun_yaw;
                 }
-                target_pub_->publish(target_msg);
+                else
+                {
+                    target_msg.id = -1;
+                    target_msg.track_state = this->controler_->tracker_.tracker_state;
+                    target_msg.position.x = 0;
+                    target_msg.position.y = 0;
+                    target_msg.position.z = 0;
+                    target_msg.gun_pitch = pitch;
+                    target_msg.gun_yaw = yaw;
+                }
+                
+                if(debug::get_debug_option(base::SHOW_RVIZ))
+                {
+                    using Marker = visualization_msgs::msg::Marker;
+                    armor_marker_.action = (armors_msg->armors).empty() ? Marker::DELETE : Marker::ADD;
+                    detect_marker_array_.markers.emplace_back(armor_marker_);
+                    publishMarkers(target_msg);
+                }
+                detect_marker_pub_->publish(detect_marker_array_);
+            }
+            target_pub_->publish(target_msg);
         }
         else
         {
@@ -368,7 +378,6 @@ namespace rmos_processer {
             }
             return;
         }
-
     }
 
     void ProcesserNode::quaternionCallBack(const rmos_interfaces::msg::QuaternionTime::SharedPtr quaternion_msg)

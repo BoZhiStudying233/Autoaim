@@ -65,7 +65,6 @@ namespace rmos_transporter
     {
         // if (recevie_thread_.joinable())
         //     recevie_thread_.join();
-        return true;
     }
 
     void UsbCommNode::targetCallBack(const rmos_interfaces::msg::Target::SharedPtr target)

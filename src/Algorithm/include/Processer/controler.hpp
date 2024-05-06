@@ -22,7 +22,7 @@ namespace processer
         Controler();
         ~Controler();
 
-        int getAimingPoint(std::vector<base::Armor> armors,cv::Point3f& aimming_point,double timestamp);// 1:move 2:slow_move 3:stop
+        int getAimingPoint(std::vector<base::Armor> armors,cv::Point3f& aimming_point,double timestamp, cv::Point3f& gun_aim_point);// 1:move 2:slow_move 3:stop
 
         int getCenterAimingPoint(std::vector<base::Armor> armors,cv::Point3f& aiming_point,double timestamp);
 
