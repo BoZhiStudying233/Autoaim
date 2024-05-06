@@ -176,6 +176,14 @@ namespace processer
 
             gun_aim_point = p_predict_center;
 
+            if(std::sqrt(p_predict_center.x * p_predict_center.x +
+                                 p_predict_center.y * p_predict_center.y +
+                                 p_predict_center.z * p_predict_center.z) < 0.8)
+            {
+                aiming_point = cv::Point3f(0,0,0);
+                return 3;
+            }
+
             // get armors num
             int armors_num = 4;
             if(this->tracker_.tracked_id == 11 || this->tracker_.tracked_id == 12 || this->tracker_.tracked_id == 13 )
