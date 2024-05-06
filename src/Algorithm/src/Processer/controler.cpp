@@ -154,13 +154,12 @@ namespace processer
 
         if(is_tracking)
         {
-
             //get car state
             const auto & state = tracker_.target_state;
             double yaw = state[6], r1 = state[8], r2 =  tracker_.another_r;
             double xc =  state[0], yc = state[2], za = state[4];
             double vx = state[1], vy = state[3], vz = state[5];
-            double dz =   tracker_.dz;double v_yaw =  state[7];
+            double dz =  tracker_.dz;double v_yaw =  state[7];
 
 
             //predict
@@ -172,17 +171,16 @@ namespace processer
                                                     velocity_linear.y * (all_time+0.05),
                                                     velocity_linear.z * (all_time+0.05));
             cv::Point3d p_predict_center = p_center + linear_change; //预测中心点
+            if(std::sqrt(p_predict_center.x * p_predict_center.x +
+                p_predict_center.y * p_predict_center.y +
+                p_predict_center.z * p_predict_center.z) < 0.8)
+            {
+                linear_change = cv::Point3d(0, 0, 0);
+                p_predict_center = p_center + linear_change;
+            }
             double yaw_predict = yaw + v_yaw * all_time;  //预测yaw
 
             gun_aim_point = p_predict_center;
-
-            if(std::sqrt(p_predict_center.x * p_predict_center.x +
-                                 p_predict_center.y * p_predict_center.y +
-                                 p_predict_center.z * p_predict_center.z) < 0.8)
-            {
-                aiming_point = cv::Point3f(0,0,0);
-                return 3;
-            }
 
             // get armors num
             int armors_num = 4;
@@ -229,8 +227,6 @@ namespace processer
                         min_dis = dis;
                         min_dis_point_index = i;        
                     }
-
-                    
                 }
 
 
@@ -351,13 +347,11 @@ namespace processer
         double delta_x = abs(x-this->true_x_);
         // std::cout<<"x  is"<<x<<std::endl;
 
-    
-
-        double fire_area = abs(78.5/v_yaw);
+        double fire_area = abs(120/v_yaw);
         //std::cout<<"v_yaw is"<<v_yaw<<std::endl;
         //std::cout<<"fire_area is"<<fire_area<<std::endl;
-        if(fire_area<12){
-            fire_area=12;
+        if(fire_area<20){
+            fire_area=20;
         }
         if(fire_area>200)
         {

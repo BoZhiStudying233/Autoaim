@@ -227,7 +227,6 @@ namespace rune_detector
                 debug_img_pub_.publish(*debug_image_msg_,camera_info_msg_);
                 cv::imshow("image", image);
                 cv::waitKey(1);
-                //std::cout<<"debug_image_running!!"<<std::endl;
             }
 
             if(debug::get_debug_option(base::SHOW_BIN))
