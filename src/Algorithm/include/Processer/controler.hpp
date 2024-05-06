@@ -22,10 +22,24 @@ namespace processer
         Controler();
         ~Controler();
 
-        int getAimingPoint(std::vector<base::Armor> armors,cv::Point3f& aimming_point,double timestamp, cv::Point3f& gun_aim_point);// 1:move 2:slow_move 3:stop
+        /**
+         * @brief   得到最优瞄准点
+         * @param[in]   armors detector得到的装甲板序列
+         * @param[in out]   aiming_point 目标击打点
+         * @param[in]   timestamp imu的时间戳
+         * @param[in out] gun_aim_point 目标车辆中心点
+         * @return  待击打目标状态
+        **/
+        int getAimingPoint(std::vector<base::Armor> armors,cv::Point3f& aiming_point,double timestamp, cv::Point3f& gun_aim_point);// 1:move 2:slow_move 3:stop
 
         int getCenterAimingPoint(std::vector<base::Armor> armors,cv::Point3f& aiming_point,double timestamp);
 
+        /**
+         * @brief   重投影回图像坐标系判断是否开火
+         * @param[in]   aimming_point_camera 在2d图像系下待击打点坐标
+         * @param[in]   v_yaw 目标角速度
+         * @return  是否开火
+        **/
         bool judgeFire(cv::Point3f aimming_point_camera, double v_yaw);
 
         bool judgeRuneFire(int num_id,uint32_t timestamp);
@@ -59,7 +73,7 @@ namespace processer
         float gun_pitch_offset ;
         float gun_yaw_offset ;
 
-       //大符开火决策参数
+        //大符开火决策参数
         int last_id_{-1};
         double bs_fly_time_{0};
         double ready_time_{0};
