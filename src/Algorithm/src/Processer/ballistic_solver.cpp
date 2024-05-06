@@ -40,6 +40,12 @@ namespace processer
         fs2["level_third"] >> rune_ballistic_param_.level_third;
         fs2["level_fourth"] >> rune_ballistic_param_.level_fourth;
 
+        fs2["height_first"] >> rune_ballistic_param_.height_first;
+        fs2["height_second"] >> rune_ballistic_param_.height_second;
+        fs2["height_third"] >> rune_ballistic_param_.height_third;
+        // fs2["height_fourth"] >> rune_ballistic_param_.height_fourth;
+
+
         fs2.release();
     }
 
@@ -116,11 +122,11 @@ namespace processer
         if(is_rune == true)//打符模式下弹速系数的调节
         {
                  bs_coeff = rune_ballistic_param_.level_first;
-                if (position.z >= 400 && position.z < 900)
+                if (position.z >= rune_ballistic_param_.height_first && position.z < rune_ballistic_param_.height_second)
                     bs_coeff = rune_ballistic_param_.level_second;
-                else if(position.z >= 900 && position.z < 1200)
+                else if(position.z >= rune_ballistic_param_.height_second && position.z < rune_ballistic_param_.height_third)
                     bs_coeff = rune_ballistic_param_.level_third;
-                else if (position.z >= 1200)
+                else if (position.z >= rune_ballistic_param_.height_third)
                     bs_coeff = rune_ballistic_param_.level_fourth;
                 
 

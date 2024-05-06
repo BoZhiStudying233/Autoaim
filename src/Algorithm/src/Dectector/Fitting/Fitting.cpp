@@ -25,6 +25,7 @@ namespace RuneDetector
             std::cout<<"open rune detect param fail"<<std::endl;
         }
         fs["points_num"] >> Points_num;
+        fs["save_txt"] >> save_txt;
         fs.release();
     }
 
@@ -49,7 +50,14 @@ namespace RuneDetector
 
         double delta = fit.run(fitting_data, N, rune_mode);            // 旋转角度
         //delta = 0;
+        double now_angle = armor_1.angle;
+        double now_time = armor_1.timestamp;
+        double predict_angle = now_angle + delta;
 
+        double predict_time = now_time + fit.delay_time;
+        if (this->save_txt == 1)
+            drawAngle(now_angle, now_time, predict_angle, predict_time);
+        
         //圆拟合
         
         getTrajData(armor_buffer, camera_matrix, dist_coeffs, transform_to_world, transform_to_camera);
@@ -92,7 +100,9 @@ namespace RuneDetector
         
         return true;         
     }
-        void Fitting::correctPoints(std::vector<Eigen::Vector3d> &armor_points)
+
+
+    void Fitting::correctPoints(std::vector<Eigen::Vector3d> &armor_points)
     {
         if (armor_points.size() <= 0)
         {
@@ -119,7 +129,43 @@ namespace RuneDetector
             });
     }
 
+    void Fitting::drawAngle(double now_angle, double now_time, double predict_angle, double predict_time)
+    {
+         if(!have_file_count)
+        {
+            countFilesInDirectory();
+            have_file_count = true;
+        }
 
+        if(!have_first_time)
+        {
+            first_time = min(now_time, predict_time);
+            have_first_time = true;
+        }
+
+        txt.open(filename, ios::app);
+        if (txt.is_open()) 
+        {
+            txt << predict_angle << " " << predict_time - first_time << " " << now_angle<< " " << now_time - first_time<< endl;
+            txt.close();
+        }
+        else
+        {
+            std::cerr << "Unable to open the file!";
+        }        
+    }
+    void Fitting::countFilesInDirectory()
+    {
+        this->fileCount = 0;
+        for (const auto& entry : std::filesystem::directory_iterator(path)) 
+        {
+            if (entry.is_regular_file() || entry.is_directory()) {
+                this->fileCount++;
+            }
+        }
+        // 创建文件
+        this->filename = path + to_string(fileCount) + ".txt";
+    }
     // void Fitting::correctAxis(BuffTrajectory &buff_traj, const std::vector<Eigen::Vector3d> &armor_points, const std::vector<float> &angle_points)
     // {
 

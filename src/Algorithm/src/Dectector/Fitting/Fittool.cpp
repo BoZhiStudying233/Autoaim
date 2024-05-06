@@ -6,12 +6,12 @@ namespace RuneDetector
     {
         // 速度初筛选
         
-        if(speedJudge.size() < 15)
-        {
-            speedJudge.push_back(judge_speed);
-            judge_clear_num = 0;
-            return true;
-        }//应该是改好了，待测试 
+        // if(speedJudge.size() < 15)
+        // {
+        //     speedJudge.push_back(judge_speed);
+        //     judge_clear_num = 0;
+        //     return true;
+        // }//应该是改好了，待测试 
 
         // 方向未初始化
         if(!is_direction_inited)
@@ -19,7 +19,7 @@ namespace RuneDetector
             if(fabs(judge_speed) > 2.7)
             {
                 cout<<"bad data for no direction, or data is so big"<<endl;
-                solveBadData();
+                solveBadData(is_direction_inited);
                 return false;
             }
         }
@@ -33,7 +33,7 @@ namespace RuneDetector
                 {
                     //cout<<"judge_speed="<<judge_speed<<endl;
                     cout<<"bad data for clockwise"<<endl;
-                    solveBadData();
+                    solveBadData(is_direction_inited);
                     return false;
                 }
             }
@@ -44,7 +44,7 @@ namespace RuneDetector
                 if(judge_speed < -2.7 || judge_speed > 0.4) 
                 {
                     cout<<"bad data for inv_clockwise"<<endl;
-                    solveBadData();
+                    solveBadData(is_direction_inited);
                     return false;
                 }
             }
@@ -52,12 +52,12 @@ namespace RuneDetector
 
         // 3o筛选
         
-        // if(speedJudge.size() < 15)
-        // {
-        //     speedJudge.push_back(judge_speed);
-        //     judge_clear_num = 0;
-        //     return true;
-        // }
+        if(speedJudge.size() < 15)
+        {
+            speedJudge.push_back(judge_speed);
+            judge_clear_num = 0;
+            return true;
+        }
 
         getN();
         getMean();
@@ -65,7 +65,7 @@ namespace RuneDetector
 
         if(judge_speed > mean + 3*standard_deviation || judge_speed < mean - 3*standard_deviation)
         {
-            solveBadData();
+            solveBadData(is_direction_inited);
             return false;
         }
         
@@ -115,13 +115,14 @@ namespace RuneDetector
         this->standard_deviation = pow(this->variance, 0.5);
     }
 
-    void Judgement::solveBadData()
+    void Judgement::solveBadData(bool &is_direction_inited)
     {
         judge_clear_num++;
         if(judge_clear_num > 3)
         {
             judge_clear_num = 0;
             speedJudge.clear();
+            is_direction_inited = false;
         }    
     }
 
@@ -186,7 +187,10 @@ namespace RuneDetector
         double t = Fittingdata[Fittingdata.size() - 1].time - start_time;
         
         if(this->print_result)
-            cout<< "w:" << w << "\tmin_error:"<< min_error<< endl;   
+            cout<< "w:" << w
+             << "\tmin_error:"<< min_error<<"\tw_max:"<<this->w_max<<"\t"<<w_min<< endl;   
+        
+        solve_w();
 
         if(this->save_txt)
         {
@@ -197,6 +201,36 @@ namespace RuneDetector
         return getRotateAngle(t);
     }
 
+    void Fit::solve_w()
+    {
+        this->w_storage.push_back(w);
+        if(this->w_storage.size()>100)
+            this->w_storage.erase( this->w_storage.begin() );
+        if(compare_w(this->w_storage) == 1)
+        {
+            this->w_max += 0.05;
+            this->w_min += 0.05;
+        }
+        else if(compare_w(this->w_storage) == -1)
+        {
+            this->w_max -= 0.05;
+            this->w_min -= 0.05;            
+        }
+        
+    }
+    int Fit::compare_w(std::vector<double> vec)//返回值为是否上调or下调
+    {
+        if(80 > vec.size()) return 0;
+        for(int i = vec.size()-1;i>=vec.size() - 80;i--)
+        {
+            if (vec[i-1] != vec[i]) return 0;
+        }
+        if (vec.back() == this->w_max)
+            return 1;
+        else if (vec.back() == this->w_min)
+            return -1;
+        else return 0;
+    }
     bool Fit::fitting(vector<SpeedTime> Fittingdata, double w, Eigen::Vector3d &output, double &error)
     {
         if(Fittingdata.empty())

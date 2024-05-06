@@ -14,6 +14,8 @@
 // #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <geometry_msgs/msg/pose_stamped.h>
 #include <geometry_msgs/msg/quaternion_stamped.hpp>
+
+#include <filesystem>
 namespace RuneDetector{
 
 using namespace std;
@@ -48,8 +50,9 @@ private:
     int N_min = 20;                         // 角速度最小采样数
 
     int Points_num;                 //三维圆开始拟合的最小点数
+    int save_txt;
 
-    int DN = 4;                         // 逐差法测速度间距
+    int DN = 1;                         // 逐差法测速度间距
 
     double start_time;                  // 拟合数据集中的第一个时间戳
     bool is_Inited = false;             // 大符拟合是否初始化
@@ -64,6 +67,16 @@ private:
 
     std::vector<Eigen::Vector3d> armor_pose_points;
     std::vector<float> angle_points;
+
+    // txt文件保存数据
+    string path = "./src/Algorithm/configure/Detector/Fitting/angle_state/";
+    string filename;
+    bool have_file_count = false;
+    bool have_first_time =false;
+    double first_time;
+    int fileCount = 0;
+    ofstream txt;
+
 public:
     /**
      * @brief 初始化参数
@@ -79,6 +92,8 @@ public:
     
      void getTrajData(vector<RuneArmor> armor_buffer, Mat camera_matrix, Mat dist_coeffs, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera);//得到点
 
+    void countFilesInDirectory();
+    void drawAngle(double now_angle, double now_time, double predict_angle, double predict_time);
 protected:
     /**
      *  @brief  清空数据
@@ -151,7 +166,7 @@ protected:
     /**
      * @brief 把拟合出的三维圆在图像上画出来
     */
-    void ShowCircle(BuffTrajectory buff_trajectory);
+    // void ShowCircle(BuffTrajectory buff_trajectory);
 
 
 };

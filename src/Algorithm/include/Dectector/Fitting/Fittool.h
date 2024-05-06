@@ -86,7 +86,7 @@ private:
     /**
      * @brief 处理坏值
     */
-    void solveBadData();
+    void solveBadData(bool &is_direction_inited);
 };
 
 class Fit//用于拟合
@@ -123,13 +123,21 @@ private:
     double start_time = -1.0;          // 角度变化的初值,不为拟合SpeedTime的初始时间;成功拟合的情况下才改变
 
     // txt文件保存数据
-    string path = "./src/Algorithm/configure/Detector/Fitting/buff_state/";
+    string path = "./src/Algorithm/configure/Detector/Fitting/speed_state/";
     string filename;
     bool have_file_count = false;
     bool have_first_time =false;
     double first_time;
     int fileCount = 0;
     ofstream txt;
+
+    std::vector<double> w_storage;
+
+    /**
+     * @brief 自适应调节w
+    */
+    void solve_w();
+    int compare_w(std::vector<double> vec);
 
     /**
      * @brief 拟合主函数

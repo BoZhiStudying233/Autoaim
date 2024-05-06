@@ -176,6 +176,7 @@ namespace rmos_processer {
                 new_armor.position.x = armor.pose.position.x;
                 new_armor.position.y = armor.pose.position.y;
                 new_armor.position.z = armor.pose.position.z;
+                new_armor.distance_to_image_center = armor.distance_to_image_center;
 
                 // Get armor yaw
                 tf2::Quaternion tf_armor_q;
@@ -276,18 +277,17 @@ namespace rmos_processer {
             else if(!armors_msg->is_rune) // 自瞄模式
             {
                     int move_state = controler_->getAimingPoint(new_armors,aiming_point, timestamp);
+                    rmos_interfaces::msg::QuaternionTime gimble_pose = quaternion_buf_.back();
+                    tf2::Quaternion tf_gimble_q;
+                    tf2::fromMsg(gimble_pose.quaternion_stamped.quaternion, tf_gimble_q);
+                    double gimble_roll, gimble_pitch, gimble_yaw;
+                    tf2::Matrix3x3(tf_gimble_q).getRPY(gimble_roll, gimble_pitch, gimble_yaw);
+                    float pitch = gimble_pitch * 180.0 / 3.1415926535;
+                    float yaw = gimble_yaw * 180.0 / 3.1415926535;
                     if (move_state != 3) {
                         cv::Point3f p_y_t = controler_->ballistic_solver_.getAngleTime(aiming_point*1000, armors_msg->is_rune);
                         float new_pitch = p_y_t.x;
                         float new_yaw = p_y_t.y;
-
-                        rmos_interfaces::msg::QuaternionTime gimble_pose = quaternion_buf_.back();
-                        tf2::Quaternion tf_gimble_q;
-                        tf2::fromMsg(gimble_pose.quaternion_stamped.quaternion, tf_gimble_q);
-                        double gimble_roll, gimble_pitch, gimble_yaw;
-                        tf2::Matrix3x3(tf_gimble_q).getRPY(gimble_roll, gimble_pitch, gimble_yaw);
-                        float pitch = gimble_pitch * 180.0 / 3.1415926535;
-                        float yaw = gimble_yaw * 180.0 / 3.1415926535;
 
                         // 绝对角
                         float gun_pitch = -new_pitch+controler_->gun_pitch_offset_;
@@ -352,8 +352,8 @@ namespace rmos_processer {
                         target_msg.position.x = 0;
                         target_msg.position.y = 0;
                         target_msg.position.z = 0;
-                        target_msg.gun_pitch = 0;
-                        target_msg.gun_yaw = 0;
+                        target_msg.gun_pitch = pitch;
+                        target_msg.gun_yaw = yaw;
                     }
                     
                     if(debug::get_debug_option(base::SHOW_RVIZ))
@@ -399,7 +399,7 @@ namespace rmos_processer {
     {
         if(this->autoaim_state_buf_.size()>0)
         {
-            if(autoaim_state_buf_.back().autoaim_state == 1 &&(*autoaim_state_msg).autoaim_state==0 )
+            if(autoaim_state_buf_.back().autoaim_state == 0 &&(*autoaim_state_msg).autoaim_state == 1)
             {
                 this->controler_->tracker_.reset();
             }

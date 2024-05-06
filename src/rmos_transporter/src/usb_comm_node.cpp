@@ -65,6 +65,7 @@ namespace rmos_transporter
     {
         // if (recevie_thread_.joinable())
         //     recevie_thread_.join();
+        return true;
     }
 
     void UsbCommNode::targetCallBack(const rmos_interfaces::msg::Target::SharedPtr target)
@@ -193,19 +194,34 @@ namespace rmos_transporter
                 this->color_pub_->publish(color_msg_);
 
                 //mode 
-                if (package.mode == 2){
+                if (package.mode & (0x01)){
+                    autoaim_state_msg_.autoaim_state = 1; // 操作手进入自瞄模式
+                    autoaim_state_pub_->publish(autoaim_state_msg_);
+                }
+                else
+                {
+                    autoaim_state_msg_.autoaim_state = 0; // 操作手未进入自瞄模式
+                    autoaim_state_pub_->publish(autoaim_state_msg_);
+                }
+                if (package.mode & (0x02)){
                     mode_msg_.mode = (int) base::Mode::NORMAL;
                 }
-                if (package.mode == 4){
+                if (package.mode & (0x04)){
                     mode_msg_.mode = (int) base::Mode::RUNE;
                 }
-                if (package.mode == 8){
+                if (package.mode & (0x08)){
                     mode_msg_.mode = (int) base::Mode::NORMAL_RUNE;
                 }
                 // ForceSetMode(mode_msg_); // bi sai zhu shi diao
                 // tellMode(mode_msg_);
-                this->mode_pub_->publish(mode_msg_);    
-                int time_offset = 0;
+                this->mode_pub_->publish(mode_msg_);
+                cv::FileStorage fs("./src/Algorithm/configure/Transporter/usb/param.xml", cv::FileStorage::READ);
+                if(!fs.isOpened())
+                {
+                    std::cout<<"Transporter xml is not opened!"<<std::endl;
+                }
+                int time_offset;
+                fs["time_offset"] >> time_offset;
                 quaternion_time_msg_.quaternion_stamped.header.stamp = this->now() + rclcpp::Duration(0,time_offset);
                 quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)package.q0;
                 quaternion_time_msg_.quaternion_stamped.quaternion.x = (double)package.q1;
