@@ -287,51 +287,6 @@ namespace processer
         }
     }
 
-    int Controler::getCenterAimingPoint(std::vector<base::Armor> armors,cv::Point3f& aiming_point,double timestamp)
-    {
-        double time = timestamp;
-        bool is_tracking = false;
-        if (tracker_.tracker_state == base::LOST)
-        {
-            is_tracking = false;
-            tracker_.init(armors);
-        }
-        else
-        {
-            dt_ = time - last_time_;
-            if(tracker_.tracked_id == 7 )
-            {
-                tracker_.lost_thres = static_cast<int>(lost_time_thres_ / dt_)*5;
-            }
-            else if (tracker_.tracked_id==11||tracker_.tracked_id==12||tracker_.tracked_id==13)
-            {
-                tracker_.lost_thres = static_cast<int>(lost_time_thres_ / dt_)*2;
-            }
-            tracker_.update(armors);
-
-            if (tracker_.tracker_state == base::DETECTING) {
-                is_tracking = false;
-            } else if (
-                    tracker_.tracker_state == base::TRACKING ||
-                    tracker_.tracker_state == base::TEMP_LOST) {
-                is_tracking = true;
-            }
-        }
-        last_time_ = time;
-        //get car state
-        const auto & state = tracker_.target_state;
-        double yaw = state[6], r1 = state[8], r2 =  tracker_.another_r;
-        double xc =  state[0], yc = state[2], za = state[4];
-        double vx = state[1], vy = state[3], vz = state[5];
-        double dz =   tracker_.dz;double v_yaw =  state[7];
-
-        //predict
-        cv::Point3d p_center = cv::Point3d(xc, yc, za + dz/ 2);
-        aiming_point = p_center;
-
-        return 1;
-    }
-
     bool Controler::judgeFire(cv::Point3f aiming_point_camera , double v_yaw)
     {
         cv::Point2f aim_point_2d;
