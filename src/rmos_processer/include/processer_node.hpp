@@ -57,7 +57,8 @@ namespace rmos_processer
     protected:
 
         /**
-         *  @brief  amrors_sub_的回调函数
+         *  @brief  amrors_sub_的回调函数,对识别装甲板进行后处理，发布target目标
+         * @param[in]  armors_msg detector_node发送的所有已识别装甲板
          */
         void armorsCallBack(const rmos_interfaces::msg::Armors::SharedPtr armors_msg);
         /**

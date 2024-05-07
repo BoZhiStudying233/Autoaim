@@ -391,6 +391,7 @@ namespace rmos_processer {
 
     void ProcesserNode::bsCallBack(const rmos_interfaces::msg::BulletSpeed::SharedPtr bs_msg)
     {
+        // 电控暂时不发弹速，该回调不会运作，留置备用
         int bullet_speed = (*bs_msg).speed;
         this->controler_->ballistic_solver_.setBulletSpeed(bullet_speed);
     }
@@ -399,7 +400,7 @@ namespace rmos_processer {
     {
         if(this->autoaim_state_buf_.size()>0)
         {
-            if(autoaim_state_buf_.back().autoaim_state == 0 &&(*autoaim_state_msg).autoaim_state == 1)
+            if(autoaim_state_buf_.back().autoaim_state == 0 &&(*autoaim_state_msg).autoaim_state == 1) //操作手按下右键即重置当前追踪器
             {
                 this->controler_->tracker_.reset();
             }
