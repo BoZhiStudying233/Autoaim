@@ -288,8 +288,8 @@ namespace rmos_processer {
                     // v_yaw 大于一定值即瞄中心点
                     if(abs(controler_->tracker_.target_state(7))>2)
                     {
-                        new_pitch= c_y_t.x;
-                        new_yaw  = p_y_t.y;  // yaw 指中心点
+                        new_pitch= p_y_t.x;
+                        new_yaw  = c_y_t.y;  // yaw 指中心点
                     }
                     else
                     {
