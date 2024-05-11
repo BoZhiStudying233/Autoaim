@@ -280,7 +280,7 @@ namespace rmos_processer {
                 float pitch = gimble_pitch * 180.0 / 3.1415926535;
                 float yaw = gimble_yaw * 180.0 / 3.1415926535;
                 if (move_state != 3) {
-                    float new_pitch, new_yaw;
+                    float new_pitch, new_yaw; 
                     // 击打点
                     cv::Point3f p_y_t = controler_->ballistic_solver_.getAngleTime(aiming_point*1000, armors_msg->is_rune);
                     // 中心点
@@ -288,8 +288,8 @@ namespace rmos_processer {
                     // v_yaw 大于一定值即瞄中心点
                     if(abs(controler_->tracker_.target_state(7))>2)
                     {
-                        new_pitch= c_y_t.x;
-                        new_yaw  = p_y_t.y;  // yaw 指中心点
+                        new_pitch= p_y_t.x;
+                        new_yaw  = c_y_t.y;  // yaw 指中心点
                     }
                     else
                     {

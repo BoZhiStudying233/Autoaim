@@ -15,7 +15,12 @@ namespace processer
             exit(0);
         }
 
-        fs1["bs_coeff"] >> normal_ballistic_param_.bs_coeff_first;
+        fs1["level_first"] >> normal_ballistic_param_.bs_coeff_first;
+        fs1["level_second"] >> normal_ballistic_param_.bs_coeff_second;
+        fs1["level_third"] >> normal_ballistic_param_.bs_coeff_third;
+        fs1["distance_first"] >> normal_ballistic_param_.distance_first;
+        
+
         fs1["k"] >> normal_ballistic_param_.k;
         fs1["g"] >> normal_ballistic_param_.g;
         fs1["bullet_speed"] >> bullet_speed_;
@@ -90,8 +95,17 @@ namespace processer
             float distance = sqrt(position.x*position.x+
                                 position.y*position.y+
                                 position.z*position.z);
-
+            // std::cout<<"distance:"<<distance<<std::endl;
             this->bs_coeff_ = normal_ballistic_param_.bs_coeff_first;
+            if(distance >= normal_ballistic_param_.distance_first)
+            {
+                this->bs_coeff_ = normal_ballistic_param_.bs_coeff_second;
+            }
+            if(distance >= normal_ballistic_param_.distance_second)
+            {
+                this->bs_coeff_ = normal_ballistic_param_.bs_coeff_third;
+            }
+            // std::cout<<"bs_coeff_:"<<this->bs_coeff_<<std::endl;
         }
         if(is_rune == true) // 打符模式下弹速系数的调节
         {
@@ -102,6 +116,9 @@ namespace processer
                     bs_coeff_ = rune_ballistic_param_.level_third;
                 else if (position.z >= rune_ballistic_param_.height_third)
                     bs_coeff_ = rune_ballistic_param_.level_fourth;
+
+                // std::cout<<"bs_coeff_:"<<this->bs_coeff_<<std::endl;
+                // std::cout<<"position.z:"<<position.z<<std::endl;
         }
 
      }
