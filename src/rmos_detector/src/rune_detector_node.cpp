@@ -73,7 +73,6 @@ namespace rune_detector
             {
                 saveImage(timestamp, image);
             }
-
             if(debug::get_debug_option(base::SAVE_DRAW_IMAGE))
             {
                 saveDrawImage(timestamp, image);
