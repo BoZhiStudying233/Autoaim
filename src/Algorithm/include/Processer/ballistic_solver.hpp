@@ -14,7 +14,13 @@ namespace processer
     {
         // 补偿系数
         float bs_coeff_first;
+        float bs_coeff_second;
+        float bs_coeff_third;
+        float bs_coeff_fourth;
 
+        float distance_first;
+        float distance_second;
+        float distance_third;
         double k;   // 空气阻力系数/质量
         double g;   // 重力加速度
     };

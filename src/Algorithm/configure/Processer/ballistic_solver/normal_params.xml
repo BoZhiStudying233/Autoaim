@@ -1,6 +1,13 @@
 <?xml version="1.0"?>
 <opencv_storage>
-    <bs_coeff>1</bs_coeff>
+    <level_first>1</level_first>
+    <level_second>1</level_second>
+    <level_third>1.1</level_third>
+
+    <distance_first>0</distance_first>
+    <distance_second>3000</distance_second>
+    <distance_third>0</distance_third>
+
     <k>0.0402</k>
     <g>9.75</g>
     <bullet_speed>27</bullet_speed>

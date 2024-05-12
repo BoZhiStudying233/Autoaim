@@ -111,7 +111,7 @@ namespace rmos_cam
                                               if (cam_dev_->grab_image(image_))
                                               {
                                                   image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(),"bgr8",image_).toImageMsg();
-                                                  (*image_msg_).header.stamp = camera_info_msg_.header.stamp = this->now();
+                                                  (*image_msg_).header.stamp = camera_info_msg_.header.stamp = this->now() ;//- rclcpp::Duration(0,20000000)
                                                   (*image_msg_).header.frame_id = "camera";
                                                   camera_info_msg_.header.frame_id = (*image_msg_).header.frame_id;
 
@@ -119,11 +119,12 @@ namespace rmos_cam
                                                   camera_info_pub_->publish(camera_info_msg_);
 
                                                   if(this->auto_exp_change)
+                                                  {
                                                     autoExpChange();
-
-                                                  exp_msg.exp = cam_dev_->params_[camera::CamParamType::Exposure];
-                                                  exp_pub_->publish(exp_msg);
-                                                  img_pub_.publish(*image_msg_, camera_info_msg_);
+                                                    exp_msg.exp = cam_dev_->params_[camera::CamParamType::Exposure];
+                                                    exp_pub_->publish(exp_msg);
+                                                    img_pub_.publish(*image_msg_, camera_info_msg_);
+                                                  }
                                               }
                                               else
                                               {

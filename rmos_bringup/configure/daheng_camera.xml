@@ -2,7 +2,7 @@
 <opencv_storage>
     <width>1280</width>
     <height>720</height>
-    <exposure>5500</exposure>
+    <exposure>550</exposure><!--晚上1000   中午550不错-->
     <rgain>19.8</rgain>
     <bgain>19.8</bgain>
     <ggain>10</ggain>
