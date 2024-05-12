@@ -42,7 +42,7 @@ namespace processer
         **/
         bool judgeFire(cv::Point3f aimming_point_camera, double v_yaw);
 
-        bool judgeRuneFire(int num_id,uint32_t timestamp);
+        bool judgeRuneFire(int num_id,uint32_t timestamp, cv::Point3f aiming_point_camera);
 
         bool getParam(cv::Mat camera_matrix);
 
@@ -54,6 +54,8 @@ namespace processer
         double gun_yaw_offset_;
         double rune_gun_pitch_offset_;
         double rune_gun_yaw_offset_;
+
+        double rune_fire_area_;//打符开火区域半径
 
     private:
         double dt_{0};

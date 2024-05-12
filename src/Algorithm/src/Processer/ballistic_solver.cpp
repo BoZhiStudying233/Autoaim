@@ -59,7 +59,9 @@ namespace processer
         double t_actual = 0.0;
         double y_temp = position.z / 1000.0;
         double y = y_temp;
-        double x = sqrt(position.x * position.x + position.y * position.y) / 1000.0;
+        double x = sqrt(position.x * position.x + position.y * position.y) / 1000.0;//水平距离 
+
+        bullet_speed_ = 30.0;
 
         for (int i = 0; i < 40; i++) {
             angle = atan2(y_temp, x);
@@ -109,16 +111,18 @@ namespace processer
         }
         if(is_rune == true) // 打符模式下弹速系数的调节
         {
-                 bs_coeff_ = rune_ballistic_param_.level_first;
+                std::cout<<"position.z:"<<position.z<<std::endl;
+                
+                 bs_coeff = rune_ballistic_param_.level_first;
                 if (position.z >= rune_ballistic_param_.height_first && position.z < rune_ballistic_param_.height_second)
                     bs_coeff_ = rune_ballistic_param_.level_second;
                 else if(position.z >= rune_ballistic_param_.height_second && position.z < rune_ballistic_param_.height_third)
                     bs_coeff_ = rune_ballistic_param_.level_third;
                 else if (position.z >= rune_ballistic_param_.height_third)
-                    bs_coeff_ = rune_ballistic_param_.level_fourth;
+                    bs_coeff = rune_ballistic_param_.level_fourth;
+                std::cout<<"bs_coeff:"<<bs_coeff<<std::endl;
+                
 
-                // std::cout<<"bs_coeff_:"<<this->bs_coeff_<<std::endl;
-                // std::cout<<"position.z:"<<position.z<<std::endl;
         }
 
      }

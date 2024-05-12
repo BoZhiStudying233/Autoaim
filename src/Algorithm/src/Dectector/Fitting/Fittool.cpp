@@ -12,7 +12,7 @@ namespace RuneDetector
         //     judge_clear_num = 0;
         //     return true;
         // }//应该是改好了，待测试 
-
+        // std::cout<<"is_direction_inited:"<<is_direction_inited<<std::endl;
         // 方向未初始化
         if(!is_direction_inited)
         {
@@ -26,6 +26,7 @@ namespace RuneDetector
         
         else
         {
+
             // 顺时针情况
             if(is_clockwise)
             {
@@ -123,7 +124,9 @@ namespace RuneDetector
             judge_clear_num = 0;
             speedJudge.clear();
             is_direction_inited = false;
-        }    
+            
+        }
+        // std::cout<<"judge_clear_num:"<<judge_clear_num<<std::endl; 
     }
 
 
@@ -137,6 +140,10 @@ namespace RuneDetector
         fs["delay_time"] >> delay_time;
         fs["save_txt"] >> save_txt;
         fs["print_result"] >> print_result;
+        fs["w_adapt"] >> w_adapt;
+        fs["w_adapt_threshold"] >> w_adapt_threshold;
+        fs["delta_adapt"] >> this->delta_adapt;
+
         fs.release();
     }
 
@@ -204,27 +211,33 @@ namespace RuneDetector
     void Fit::solve_w()
     {
         this->w_storage.push_back(w);
-        if(this->w_storage.size()>100)
+        if(this->w_storage.size() > w_adapt_threshold)
             this->w_storage.erase( this->w_storage.begin() );
+        // std::cout<<"this->w_storage.size():"<<this->w_storage.size()<<std::endl;
+        // cout<<"compare_w(this->w_storage):"<<compare_w(this->w_storage)<<std::endl;
         if(compare_w(this->w_storage) == 1)
         {
-            this->w_max += 0.05;
-            this->w_min += 0.05;
+            this->w_max += w_adapt;
+            this->w_min += w_adapt;
         }
         else if(compare_w(this->w_storage) == -1)
         {
-            this->w_max -= 0.05;
-            this->w_min -= 0.05;            
+            this->w_max -= w_adapt;
+            this->w_min -= w_adapt;            
         }
         
     }
     int Fit::compare_w(std::vector<double> vec)//返回值为是否上调or下调
     {
-        if(80 > vec.size()) return 0;
-        for(int i = vec.size()-1;i>=vec.size() - 80;i--)
+        if(w_adapt_threshold > vec.size()) return 0;
+        for(int i = vec.size() - 1; i >= vec.size() - w_adapt_threshold; i--)
         {
-            if (vec[i-1] != vec[i]) return 0;
+            if (vec[i-1] != vec[i]) 
+            {   
+                return 0;
+            }
         }
+
         if (vec.back() == this->w_max)
             return 1;
         else if (vec.back() == this->w_min)
@@ -270,11 +283,29 @@ namespace RuneDetector
     }
 
     double Fit::getRotateAngle(double t)
-    {
+    {   
+        double speed_max = abs(sqrt(P1*P1 + P2*P2));
+        if(P3 > 0)
+            speed_max += P3;
+        else
+            speed_max -= P3;
+        //得到符转速的最值
+
+        double delay_time_temp = delay_time;
+        double speed_reached = abs(P1*sin(w*(t+delay_time)) + P2*cos(w*(t+delay_time)) + P3);//子弹到达目标时,符的速度
+
+        if(speed_reached > speed_max/2)
+            delay_time += this->delta_adapt;
+        if(speed_reached < speed_max/2)
+            delay_time -= this->delta_adapt;
+        //修正延迟时间
+
+
         double temp1 = -(P1/w)*(cos(w*(t+delay_time))-cos(w*t));
         double temp2 = (P2/w)*(sin(w*(t+delay_time))-sin(w*t)); 
         double temp3 = P3 * delay_time;       
         double rotate_angle = fabs(temp1 + temp2 + temp3);
+        delay_time = delay_time_temp;
         return rotate_angle;
     }
 

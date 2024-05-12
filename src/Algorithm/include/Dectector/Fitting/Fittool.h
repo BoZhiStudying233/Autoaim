@@ -98,6 +98,10 @@ public:
     double delay_time;      // 预测时间，程序耗时时间 + 云台相应时间 + 子弹飞行时间
     int save_txt;           // 保存txt文件设置
     int print_result;       // 打印设置
+    double w_adapt;         // 自适应调整w
+    int w_adapt_threshold;// 自适应调整w的阈值
+
+    double delta_adapt;     // 自适应调整delta角，此处实际影响delay_time来改变delta
 
     /**
      * @brief 返回旋转角，若为大符模式，则需要拟合；若为小符模式，直接计算旋转角度

@@ -22,12 +22,16 @@
     <!--拟合参数-->
     <!-- <delay_time>0.45</delay_time> -->
     <points_num> 50 </points_num>
-    <delay_time>0.3</delay_time>
+    <delay_time>0.57</delay_time><!--0.57-->
     <save_txt>0</save_txt>  
     <print_result>1</print_result>
     <force_mode>3</force_mode><!--强制设置模式，0为不强制，1为自瞄，2为小符，3为大符-->
 
 
-  
+    <w_adapt>0.5</w_adapt>
+    <w_adapt_threshold>10</w_adapt_threshold><!--当w达到临界值的数量超过此阈值时，开始调节w   -->   
+    <delta_adapt>0</delta_adapt><!--对角度的调整幅度，目前此参数实际影响的是时间延迟-->
+
+    
 
 </opencv_storage>
