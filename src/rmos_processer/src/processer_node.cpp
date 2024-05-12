@@ -159,6 +159,8 @@ namespace rmos_processer {
                 geometry_msgs::msg::PoseStamped ps;
                 ps.header = armors_msg->header;
                 ps.pose = armor.pose;
+                // std::cout<<"InCamera:\n"<<"armor.pose.x:"<<armor.pose.position.x<<" armor.pose.y:"<<armor.pose.position.y<<" armor.pose.z:"<<armor.pose.position.z<<std::endl;
+
                 try {
                     armor.pose = tf2_buffer_->transform(ps, target_frame_).pose;
                 }
@@ -170,7 +172,7 @@ namespace rmos_processer {
                     RCLCPP_ERROR(get_logger(), "Error while transforming %s", ex.what());
                     return;
                 }
-
+                // std::cout<<"InWorld:\n"<<"armor.pose.x:"<<armor.pose.position.x<<" armor.pose.y"<<armor.pose.position.y<<" armor.pose.z:"<<armor.pose.position.z<<std::endl;
                 base::Armor new_armor;
                 new_armor.num_id = armor.num_id;
                 new_armor.position.x = armor.pose.position.x;
@@ -241,7 +243,7 @@ namespace rmos_processer {
                     //                                 target_msg.position.z*target_msg.position.z)<<std::endl;
 
                     // std::cout<<"timestamp:"<<timestamp<<std::endl;
-                    bool is_fire = this->controler_->judgeRuneFire(target_rune_armor.num_id,timestamp_recv);
+                    bool is_fire = this->controler_->judgeRuneFire(target_rune_armor.num_id, timestamp_recv, aiming_point);
                     target_msg.suggest_fire = is_fire;
 
                     target_msg.gun_pitch = gun_pitch;

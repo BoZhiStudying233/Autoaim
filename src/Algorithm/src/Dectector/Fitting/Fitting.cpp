@@ -97,10 +97,7 @@ namespace RuneDetector
         // else 
             for (int i = 0; i < 4; i++)
                 nextPosition.push_back(calNextPosition(pts[i], armor_1.circle_center, delta));
-
-        
-        
-        
+                
         return true;         
     }
 

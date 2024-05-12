@@ -121,10 +121,10 @@ namespace rmos_cam
                                                   if(this->auto_exp_change)
                                                   {
                                                     autoExpChange();
-                                                    exp_msg.exp = cam_dev_->params_[camera::CamParamType::Exposure];
-                                                    exp_pub_->publish(exp_msg);
-                                                    img_pub_.publish(*image_msg_, camera_info_msg_);
-                                                  }
+
+                                                  exp_msg.exp = cam_dev_->params_[camera::CamParamType::Exposure];
+                                                  exp_pub_->publish(exp_msg);
+                                                  img_pub_.publish(*image_msg_, camera_info_msg_);
                                               }
                                               else
                                               {
