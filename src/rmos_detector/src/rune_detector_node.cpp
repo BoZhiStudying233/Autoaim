@@ -73,7 +73,6 @@ namespace rune_detector
             {
                 saveImage(timestamp, image);
             }
-
             if(debug::get_debug_option(base::SAVE_DRAW_IMAGE))
             {
                 saveDrawImage(timestamp, image);
@@ -202,7 +201,7 @@ namespace rune_detector
                     armor_msg.pose.orientation.x = tf2_quaternion.x();
                     armor_msg.pose.orientation.y = tf2_quaternion.y();
                     armor_msg.pose.orientation.z = tf2_quaternion.z();
-                    armor_msg.pose.orientation.w = tf2_quaternion.w();//四元数
+                    armor_msg.pose.orientation.giw = tf2_quaternion.w();//四元数
 
                     armors_msg.armors.push_back(armor_msg);
                 }

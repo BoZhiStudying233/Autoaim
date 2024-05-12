@@ -234,16 +234,16 @@ namespace RuneDetector
         bool find_target = false;
         double last_target_conf = 0.0;
         double last_circle_center_conf = 0.0;
-        double min_distance = DBL_MAX;
+        // double min_distance = DBL_MAX;
         for(int i = 0; i < output.size(); i++)
         {
             if(find_blue)
             {
-                if(output[i].id == 0 && output[i].conf > last_circle_center_conf)
-                {
-                    this->dl_circle = output[i];
-                    last_circle_center_conf = output[i].conf;
-                }
+                // if(output[i].id == 0 && output[i].conf > last_circle_center_conf)
+                // {
+                //     this->dl_circle = output[i];
+                //     last_circle_center_conf = output[i].conf;
+                // }
 
                 if(find_no_activate && output[i].id == 1 && output[i].conf > last_target_conf)
                 {
@@ -251,9 +251,7 @@ namespace RuneDetector
                     last_target_conf = output[i].conf; 
                     find_target = true;        
                     rune_armors.push_back(base::RuneArmor(output[i].points));
-
-
-                }       
+                }
                 
                 if(find_no_activate&&output[i].id==2)
                 {
@@ -285,11 +283,11 @@ namespace RuneDetector
 
             else
             {
-                if(output[i].id == 3 && output[i].conf > last_circle_center_conf)
-                {
-                    this->dl_circle= output[i];
-                    last_circle_center_conf = output[i].conf;
-                }
+                // if(output[i].id == 3 && output[i].conf > last_circle_center_conf)
+                // {
+                //     this->dl_circle= output[i];
+                //     last_circle_center_conf = output[i].conf;
+                // }
 
                 if(find_no_activate && output[i].id == 4 && output[i].conf > last_target_conf)
                 {
@@ -326,6 +324,43 @@ namespace RuneDetector
                 // }
             }
         }
+
+        /*目前已经有了待击打扇叶，我们根据待击打扇叶离圆心最近的点和我们识别到的圆心的距离大小
+        判断哪个圆心正确，认为距离最近的圆心正确。*/
+        double min_distance = DBL_MAX;
+        if(find_blue)
+        {
+            for(int i = 0; i < output.size(); i++)
+            {
+                if(output[i].id == 0)
+                {
+                    cv::Point2f center = (output[i].points[0] + output[i].points[1] + output[i].points[2] + output[i].points[3] + output[i].points[4])/5;
+                    double distance = calDistance(center, this->target.circle_point);
+                    if(distance < min_distance)
+                    {
+                        this->dl_circle = output[i];
+                        min_distance = distance;
+                    }
+                }
+            }
+        }
+        else 
+        {
+            for(int i = 0; i < output.size(); i++)
+            {
+                if(output[i].id == 3)
+                {
+                    cv::Point2f center = (output[i].points[0] + output[i].points[1] + output[i].points[2] + output[i].points[3] + output[i].points[4])/5;
+                    double distance = calDistance(center, this->target.circle_point);
+                    if(distance < min_distance)
+                    {
+                        this->dl_circle = output[i];
+                        min_distance = distance;
+                    }
+                }
+            }
+        }
+
         // 若返回关键点点数量不等于5,即有关键点缺损，则返回false
         if(!this->target.have_correct_points)
             return false;
