@@ -73,7 +73,6 @@ namespace rune_detector
             {
                 saveImage(timestamp, image);
             }
-
             if(debug::get_debug_option(base::SAVE_DRAW_IMAGE))
             {
                 saveDrawImage(timestamp, image);
@@ -110,7 +109,6 @@ namespace rune_detector
                         
                 if(fitting_->run(target_rune_armor, rune_next_pos, tVec, rune_detector_->state, this->mode_, rune_armors, this->camera_matrix_, this->dist_coeffs_, transform_to_world, transform_to_camera))
                 {
-                    
                     if(rune_next_pos.size() == 4)//二维圆的情况
                     {
                         // 若预测后的点在图片上才可画图，否则程序会异常终止
@@ -138,7 +136,6 @@ namespace rune_detector
                             cv::waitKey(1);
                             //std::cout<<"debug_image_running!!"<<std::endl;
                         }
-                        return ;
                         //pnp solve
                         cv::Mat tvec;
                         cv::Mat rvec;

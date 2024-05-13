@@ -26,6 +26,7 @@ namespace base
                     this->dl_points[3] = dl_points_[i];
             }
             this->dl_armor_center = (dl_points[0] + dl_points[1] + dl_points[2] + dl_points[3]) / 4;
+            this->circle_point = dl_points_[3];//获取离圆心最近的那个点，辅助圆心
             this->have_correct_points = true;
         }
     }

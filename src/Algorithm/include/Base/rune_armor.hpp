@@ -28,6 +28,7 @@ namespace base
         cv::Point2f points[4];                                      // 返回的四点
 
         cv::Point2f circle_center;                                  // 能量机关圆心 
+        cv::Point2f circle_point;                                   // 能量机关离圆心最近的那个点
         cv::Point2f armor_center;                                   // 装甲板中心
 
         cv::Point3f target;                                         //相机坐标系的三维装甲板中心
