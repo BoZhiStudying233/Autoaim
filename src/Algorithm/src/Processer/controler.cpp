@@ -303,8 +303,8 @@ namespace processer
         // std::cout<<"x  is"<<x<<std::endl;
 
         double fire_area = abs(120/v_yaw);
-        //std::cout<<"v_yaw is"<<v_yaw<<std::endl;
-        //std::cout<<"fire_area is"<<fire_area<<std::endl;
+        std::cout<<"v_yaw is"<<v_yaw<<std::endl;
+        // std::cout<<"fire_area is"<<fire_area<<std::endl;
         if(fire_area<20){
             fire_area=20;
         }
@@ -312,8 +312,8 @@ namespace processer
         {
             fire_area = 200;
         }
-        // std::cout<<"delta_x is"<<delta_x<<std::endl;
-
+        std::cout<<"delta_x is"<<delta_x<<std::endl;
+        std::cout<<"fire_area is"<<fire_area<<std::endl;
         if(delta_x<fire_area)
         {
             return true;
