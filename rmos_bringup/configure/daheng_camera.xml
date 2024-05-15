@@ -9,6 +9,8 @@
     <gain>9</gain>
     <fps>100</fps>
 
+    <time_offset> 2e7 </time_offset>
+
     <rune_exposure>600</rune_exposure>
     <rune_gain>12</rune_gain>
 

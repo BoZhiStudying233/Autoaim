@@ -85,6 +85,7 @@ namespace rmos_cam
         int min_exp = 300; 
         int change_num = 0;
 
+        int time_offset = 0;  // 单位ns
 
         /*mode*/
         base::Mode mode_ = base::Mode::NORMAL;

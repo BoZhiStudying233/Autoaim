@@ -45,6 +45,7 @@ namespace rmos_cam
         fs["auto_exp_change"] >> this->auto_exp_change;
         fs["max_exp"] >> this->max_exp;
         fs["min_exp"] >> this->min_exp;
+        fs["time_offset"] >> this->time_offset;
 
         fs.release();
 
@@ -111,7 +112,7 @@ namespace rmos_cam
                                               if (cam_dev_->grab_image(image_))
                                               {
                                                   image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(),"bgr8",image_).toImageMsg();
-                                                  (*image_msg_).header.stamp = camera_info_msg_.header.stamp = this->now();
+                                                  (*image_msg_).header.stamp = camera_info_msg_.header.stamp = this->now() - rclcpp::Duration(0, this->time_offset);
                                                   (*image_msg_).header.frame_id = "camera";
                                                   camera_info_msg_.header.frame_id = (*image_msg_).header.frame_id;
 
@@ -203,9 +204,3 @@ namespace rmos_cam
 // This acts as a sort of entry point, allowing the component to be discoverable when its library
 // is being loaded into a running process.
 RCLCPP_COMPONENTS_REGISTER_NODE(rmos_cam::DahengCamNode)
-
-
-
-
-
-
