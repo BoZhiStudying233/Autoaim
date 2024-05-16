@@ -214,6 +214,7 @@ namespace rmos_transporter
                 // ForceSetMode(mode_msg_); // bi sai zhu shi diao
                 // tellMode(mode_msg_);
                 this->mode_pub_->publish(mode_msg_);
+                quaternion_time_msg_.quaternion_stamped.header.stamp = this->now();
                 quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)package.q0;
                 quaternion_time_msg_.quaternion_stamped.quaternion.x = (double)package.q1;
                 quaternion_time_msg_.quaternion_stamped.quaternion.y = (double)package.q2;
