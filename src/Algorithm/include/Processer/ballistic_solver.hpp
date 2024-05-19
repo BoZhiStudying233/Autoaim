@@ -21,6 +21,7 @@ namespace processer
         float distance_first;
         float distance_second;
         float distance_third;
+        // float distance_fourth;
         double k;   // 空气阻力系数/质量
         double g;   // 重力加速度
     };

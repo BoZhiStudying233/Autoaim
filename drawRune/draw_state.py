@@ -28,7 +28,7 @@ max_file_path = path + '/' + max_file_name
 with open(max_file_path , "r") as speed_txt:
     for line in speed_txt.readlines():
         curLine = line.strip().split(" ")
-        floatLine = map(float,curLine) 
+        floatLine = map(float,curLine)
         floatLine = list(floatLine)
 
         predict_speed.append(floatLine[0])

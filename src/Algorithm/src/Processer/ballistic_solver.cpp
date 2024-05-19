@@ -18,8 +18,12 @@ namespace processer
         fs1["level_first"] >> normal_ballistic_param_.bs_coeff_first;
         fs1["level_second"] >> normal_ballistic_param_.bs_coeff_second;
         fs1["level_third"] >> normal_ballistic_param_.bs_coeff_third;
-        fs1["distance_first"] >> normal_ballistic_param_.distance_first;
         
+        fs1["level_fourth"] >> normal_ballistic_param_.bs_coeff_fourth;
+        fs1["distance_first"] >> normal_ballistic_param_.distance_first;
+        fs1["distance_second"] >> normal_ballistic_param_.distance_second;
+        fs1["distance_third"] >> normal_ballistic_param_.distance_third;
+        // fs1["distance_fourth"] >> normal_ballistic_param_.distance_third\;
 
         fs1["k"] >> normal_ballistic_param_.k;
         fs1["g"] >> normal_ballistic_param_.g;
@@ -95,17 +99,23 @@ namespace processer
             float distance = sqrt(position.x*position.x+
                                 position.y*position.y+
                                 position.z*position.z);
-            // std::cout<<"distance:"<<distance<<std::endl;
+            std::cout<<"distance:"<<distance<<std::endl;
             this->bs_coeff_ = normal_ballistic_param_.bs_coeff_first;
+            // std::cout<<"bs_coeff_1:"<<this->bs_coeff_<<std::endl;
             if(distance >= normal_ballistic_param_.distance_first)
             {
                 this->bs_coeff_ = normal_ballistic_param_.bs_coeff_second;
             }
+            // std::cout<<"bs_coeff_2:"<<this->bs_coeff_<<std::endl;
             if(distance >= normal_ballistic_param_.distance_second)
             {
                 this->bs_coeff_ = normal_ballistic_param_.bs_coeff_third;
             }
-            // std::cout<<"bs_coeff_:"<<this->bs_coeff_<<std::endl;
+            if(distance >= normal_ballistic_param_.distance_third)
+            {
+                this->bs_coeff_ = normal_ballistic_param_.bs_coeff_fourth;
+            }
+            std::cout<<"bs_coeff_:"<<this->bs_coeff_<<std::endl;
         }
         if(is_rune == true) // 打符模式下弹速系数的调节
         {
@@ -117,8 +127,8 @@ namespace processer
                 else if (position.z >= rune_ballistic_param_.height_third)
                     bs_coeff_ = rune_ballistic_param_.level_fourth;
 
-                // std::cout<<"bs_coeff_:"<<this->bs_coeff_<<std::endl;
-                // std::cout<<"position.z:"<<position.z<<std::endl;
+                std::cout<<"bs_coeff_:"<<this->bs_coeff_<<std::endl;
+                std::cout<<"position.z:"<<position.z<<std::endl;
         }
 
      }
