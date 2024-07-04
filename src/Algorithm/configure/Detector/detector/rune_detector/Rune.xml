@@ -4,16 +4,16 @@
     <show_R>0</show_R>
 
     <!--图像参数-->
-    <blue_brightness_thresh>10</blue_brightness_thresh>
-    <blue_color_thresh>10</blue_color_thresh>
-    <red_brightness_thresh>20</red_brightness_thresh>
-    <red_color_thresh>20</red_color_thresh>
+    <blue_brightness_thresh>30</blue_brightness_thresh>
+    <blue_color_thresh>50</blue_color_thresh>
+    <red_brightness_thresh>30</red_brightness_thresh><!--20-->
+    <red_color_thresh>50</red_color_thresh><!--20-->
     <blue_red_diff>20</blue_red_diff>
 
 
     <!--深度学习使用参数-->
     <circle_center_conf>0</circle_center_conf>
-    <no_activate_conf>0</no_activate_conf>
+    <no_activate_conf>0.7</no_activate_conf>
     <acvitate_conf>0</acvitate_conf>
     <circle_center_roi_width>20</circle_center_roi_width>
 
@@ -23,7 +23,7 @@
     <!-- <delay_time>0.45</delay_time> -->
     <points_num> 50 </points_num>
     <delay_time>0.45</delay_time><!--0.42-->
-    <save_txt>1</save_txt>  
+    <save_txt>0</save_txt>  
     <print_result>1</print_result>
     <force_mode>0</force_mode><!--强制设置模式，0为不强制，1为自瞄，2为小符，3为大符-->
 

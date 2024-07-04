@@ -14,19 +14,10 @@ namespace base
         this->have_correct_points = false;
         if(dl_points_.size() == 5)
         {
-            for(int i = 0; i < dl_points_.size(); i++)
-            {
-                if(i == 0)
-                    this->dl_points[2] = dl_points_[i];
-                else if(i == 1)
-                    this->dl_points[1] = dl_points_[i];
-                else if(i == 2)
-                    this->dl_points[0] = dl_points_[i];
-                else if(i == 4)
-                    this->dl_points[3] = dl_points_[i];
-            }
+            for(int i = 0;i < 5;i++)
+                this->dl_points[i] = dl_points_[i];
             this->dl_armor_center = (dl_points[0] + dl_points[1] + dl_points[2] + dl_points[3]) / 4;
-            this->circle_point = dl_points_[3];//获取离圆心最近的那个点，辅助圆心
+            this->circle_point = dl_points_[4];//获取离圆心最近的那个点，辅助圆心
             this->have_correct_points = true;
         }
     }

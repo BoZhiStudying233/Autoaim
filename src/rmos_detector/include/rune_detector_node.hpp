@@ -109,7 +109,7 @@ namespace rune_detector
                     ("/color_info", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Color::ConstSharedPtr color_msg)
                     {
                         int enemy_color = (*color_msg).color;
-                        this->detector_->setEnemyColor(enemy_color);//有两个？(ˇˍˇ)
+                        this->detector_->setEnemyColor(enemy_color);
                         this->rune_detector_->setEnemyColor(enemy_color);
                     });
  

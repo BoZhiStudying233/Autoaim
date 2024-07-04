@@ -235,6 +235,7 @@ namespace RuneDetector
         double last_target_conf = 0.0;
         double last_circle_center_conf = 0.0;
         // double min_distance = DBL_MAX;
+        this->high_size = DBL_MAX;
         for(int i = 0; i < output.size(); i++)
         {
             if(find_blue)
@@ -247,10 +248,15 @@ namespace RuneDetector
 
                 if(find_no_activate && output[i].id == 1 && output[i].conf > last_target_conf)
                 {
-                    this->target = base::RuneArmor(output[i].points);
-                    last_target_conf = output[i].conf; 
-                    find_target = true;        
-                    rune_armors.push_back(base::RuneArmor(output[i].points));
+                    changePoints(output[i].points);
+                    int temp_size = calculateBinarySize(output[i].points);
+                    if(this->high_size > temp_size && temp_size < this->high_threshold)
+                    {
+                        this->target = base::RuneArmor(output[i].points);
+                        last_target_conf = output[i].conf; 
+                        find_target = true;        
+                        rune_armors.push_back(base::RuneArmor(output[i].points));
+                    }
                 }
                 
                 if(find_no_activate&&output[i].id==2)
@@ -289,13 +295,20 @@ namespace RuneDetector
                 //     last_circle_center_conf = output[i].conf;
                 // }
 
-                if(find_no_activate && output[i].id == 4 && output[i].conf > last_target_conf)
+                if(find_no_activate && output[i].id == 4)
                 {
-                    this->target = base::RuneArmor(output[i].points);
-                    last_target_conf = output[i].conf; 
-                    find_target = true;        
-                    rune_armors.push_back(base::RuneArmor(output[i].points));
-                }       
+                    changePoints(output[i].points);
+                    int temp_size = calculateBinarySize(output[i].points);
+                    if(this->high_size > temp_size && temp_size< this->high_threshold)
+                    {
+                        this->high_size = temp_size;
+                        this->target = base::RuneArmor(output[i].points);
+                        std::cout<<"output[i].conf:"<<output[i].conf<<std::endl;
+                        last_target_conf = output[i].conf; 
+                        find_target = true;        
+                        rune_armors.push_back(base::RuneArmor(output[i].points));
+                    }  
+                }
                 
                 if(find_no_activate && output[i].id == 5)
                 {
@@ -371,6 +384,49 @@ namespace RuneDetector
                 }
             }
         return find_target;
+    }
+    void DlRuneDetector::changePoints(vector<cv::Point2d>& points)
+    {
+        if(points.size() != 5)
+            std::cout<<"Rune points size is not 5!"<<std::endl;
+        vector<cv::Point2d> temp_points;
+
+        temp_points.push_back(points[2]);
+        temp_points.push_back(points[1]);
+        temp_points.push_back(points[0]);
+        temp_points.push_back(points[4]);
+
+        temp_points.push_back(points[3]);
+
+        
+        points = temp_points;
+    }
+    int DlRuneDetector::calculateBinarySize(std::vector<cv::Point2d> points)
+    {
+        cv::Mat binaryImage = this->bin;
+        cv::Mat mask = cv::Mat::zeros(binaryImage.size(), binaryImage.type());
+        std::vector<cv::Point2i> int_points;
+        for (int i = 0; i < 4; ++i) {
+            int_points.push_back(points[i]);
+        }
+        cv::fillPoly(mask, int_points, 255); // 填充多边形区域
+
+        // 应用掩膜，只保留多边形内的像素
+        cv::Mat maskedImage;
+        cv::bitwise_and(binaryImage, mask, maskedImage);
+        // 计算面积，统计为True的像素数量
+        int area = 0;
+        for (int y = 0; y < maskedImage.rows; ++y) {
+            for (int x = 0; x < maskedImage.cols; ++x) {
+                if (maskedImage.at<uchar>(y, x) == 255) {
+                    area++;
+                }
+            }
+        }
+
+        // area现在包含了多边形内部的像素数量
+        std::cout << "Area of the object: " << area << std::endl;
+        return area;
     }
 
     void DlRuneDetector::DlPreDeal(Mat frame)

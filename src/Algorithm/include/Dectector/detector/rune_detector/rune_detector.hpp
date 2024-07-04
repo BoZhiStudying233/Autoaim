@@ -84,6 +84,9 @@ namespace RuneDetector
         DetectResult dl_circle;
         base::Color vane_color = base::Color::BLUE;
         Point2f dl_points[4];
+        int high_size;// 高亮区域大小
+        int high_threshold = 2200; // 高亮区域阈值
+
 
         /**
          *  @brief  通过当前扇叶与上次识别的扇叶靶心距离判断扇叶切换情况
@@ -150,6 +153,8 @@ namespace RuneDetector
             return sqrt(pow(dis.x,2)+pow(dis.y,2));
         };
 
+        int calculateBinarySize(std::vector<cv::Point2d> points);
+        void changePoints(vector<cv::Point2d>& points);
     };
 
 
