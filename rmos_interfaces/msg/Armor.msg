@@ -1,0 +1,4 @@
+uint8 num_id
+geometry_msgs/Pose pose
+float32 distance_to_image_center
+float32 distance
