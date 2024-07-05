@@ -1,12 +1,14 @@
 <?xml version="1.0"?>
 <opencv_storage>
-    <level_first>1</level_first>
-    <level_second>1</level_second>
-    <level_third>1.1</level_third>
+    <level_first>1.1</level_first>
+    <level_second>1.3</level_second>
+    <level_third>1.3</level_third>
+    <level_fourth>1.5</level_fourth>
 
-    <distance_first>0</distance_first>
+    <distance_first>2500</distance_first>
     <distance_second>3000</distance_second>
-    <distance_third>0</distance_third>
+    <distance_third>6500</distance_third>
+
 
     <k>0.0402</k>
     <g>9.75</g>

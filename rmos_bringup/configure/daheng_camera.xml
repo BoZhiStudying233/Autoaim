@@ -2,7 +2,7 @@
 <opencv_storage>
     <width>1280</width>
     <height>720</height>
-    <exposure>550</exposure><!--晚上1000   中午550不错-->
+    <exposure>1000</exposure><!--晚上1000   中午550不错-->
     <rgain>19.8</rgain>
     <bgain>19.8</bgain>
     <ggain>10</ggain>
@@ -11,7 +11,7 @@
 
     <time_offset> 2e7 </time_offset>
 
-    <rune_exposure>600</rune_exposure>
+    <rune_exposure>800</rune_exposure>
     <rune_gain>12</rune_gain>
 
     <auto_exp_change>0</auto_exp_change>

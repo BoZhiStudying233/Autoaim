@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <opencv_storage>
     
-    <level_first>1.2</level_first>
-    <level_second>1.1</level_second><!--0.8-->
-    <level_third>1.0</level_third><!--0.8-->
-    <level_fourth>0.88</level_fourth><!--0.8-->
+    <level_first>1.22</level_first>
+    <level_second>1.19</level_second><!--0.8-->
+    <level_third>1.13</level_third><!--0.8-->
+    <level_fourth>1.13</level_fourth><!--0.8-->
 
     <height_first>400</height_first>
     <height_second>900</height_second>

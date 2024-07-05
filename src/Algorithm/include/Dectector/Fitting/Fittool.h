@@ -111,8 +111,8 @@ private:
     double normal_rune_speed = CV_PI / 3;
 
     // 拟合数据
-    double w_min = 1.884;
-    double w_max = 2.000; 
+    double w_min = 1.584;
+    double w_max = 3.800; 
     double dw = 0.001;
     
     double w = 1.9;

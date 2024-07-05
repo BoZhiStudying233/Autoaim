@@ -33,6 +33,7 @@ namespace rune_detector
 {
     void RuneDetectorNode::imageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr &image_msg)
     {
+        this->mode_ = base::Mode::NORMAL_RUNE;
         if(this->mode_ == base::Mode::RUNE||this->mode_ == base::Mode::NORMAL_RUNE)
         {
             //发布相机到陀螺仪的静态tf
@@ -97,6 +98,7 @@ namespace rune_detector
                 Eigen::Vector3d tVec;
                 std::vector<cv::Point2f> rune_next_pos;
                 geometry_msgs::msg::TransformStamped transform_to_world, transform_to_camera;
+
                 try
                     {//实车记得改坐标系名称！ remeber to change
                         transform_to_world = tf_buffer->lookupTransform("world", "camera", tf2::TimePointZero);
@@ -106,7 +108,7 @@ namespace rune_detector
                     {
                         RCLCPP_ERROR(this->get_logger(), "Could not get the transformation!!");
                         }
-                        
+                
                 if(fitting_->run(target_rune_armor, rune_next_pos, tVec, rune_detector_->state, this->mode_, rune_armors, this->camera_matrix_, this->dist_coeffs_, transform_to_world, transform_to_camera))
                 {
                     if(rune_next_pos.size() == 4)//二维圆的情况
@@ -134,8 +136,9 @@ namespace rune_detector
                             debug_img_pub_.publish(*debug_image_msg_,camera_info_msg_);
                             cv::imshow("image", image);
                             cv::waitKey(1);
-                            //std::cout<<"debug_image_running!!"<<std::endl;
+                            std::cout<<"debug_image_running!!"<<std::endl;
                         }
+                                        return ;
                         //pnp solve
                         cv::Mat tvec;
                         cv::Mat rvec;
