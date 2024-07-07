@@ -1,11 +1,15 @@
 /**:
   ros__parameters:
+    use_video: false
+    video_path: "/home/lizengyang/Videos/2021-1280-720.mp4"
+    images_floder_path: "/home/lizengyang/Pictures/std_imgs/"
+
     width: 1280
     height: 720
     exposure: 1200
     auto_exposure: false
     gain: 9
-    fps: 100
+    fps: 185
     auto_white_balace: false
     rgain: 19.8
     bgain: 19.8

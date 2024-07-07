@@ -55,7 +55,6 @@ namespace rmos_cam
         cam_info_manager_ = std::make_unique<camera_info_manager::CameraInfoManager>(this, "DahengCam");
         auto pkg_path = ament_index_cpp::get_package_share_directory("rmos_bringup");
         auto yaml_path = "file://" + pkg_path + "/config/daheng_cam_info.yaml";
-        std::cout << yaml_path << std::endl;
         if (!cam_info_manager_->loadCameraInfo(yaml_path))
         {
             RCLCPP_WARN(this->get_logger(), "Load Camera Info Fail!");
@@ -96,9 +95,9 @@ namespace rmos_cam
                                                   (*image_msg_).header.stamp = camera_info_msg_.header.stamp = this->now() - rclcpp::Duration(0, this->time_offset);
                                                   (*image_msg_).header.frame_id = "camera";
                                                   camera_info_msg_.header.frame_id = (*image_msg_).header.frame_id;
+                                                  camera_info_pub_->publish(camera_info_msg_);
 
                                                   img_pub_.publish(*image_msg_, camera_info_msg_);
-                                                  camera_info_pub_->publish(camera_info_msg_);
 
                                                   if(this->auto_exp_change)
                                                     autoExpChange();

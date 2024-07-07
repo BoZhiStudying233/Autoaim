@@ -143,6 +143,7 @@ namespace rmos_processer
         sensor_msgs::msg::CameraInfo camera_info_msg_;
         cv::Mat camera_matrix_;
         bool finish_camera_info_set{false};
+        bool debug_{false};
     };
 }
 

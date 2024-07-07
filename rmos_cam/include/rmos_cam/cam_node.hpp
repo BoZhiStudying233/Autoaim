@@ -1,7 +1,3 @@
-//
-// Created by Wang on 23-6-14.
-//
-
 #ifndef RMOS_CAM_NODE_HPP
 #define RMOS_CAM_NODE_HPP
 
@@ -30,7 +26,7 @@
 #include "camera_interface.hpp"
 #include "daheng.hpp"
 #include "rmos_utils/base.hpp"
-// #include "virtual_cam.hpp"
+#include "virtual_cam.hpp"
 
 // #include "rmos_interfaces/msg/mode.hpp"
 // #include "rmos_interfaces/msg/exp.hpp"
@@ -101,15 +97,18 @@ namespace rmos_cam
         std::thread capture_thread_;                    // 采图线程
     };
 
-    // class VirtualCamNode : public virtual CamNode
-    // {
-    // public:
-    //     VirtualCamNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
-    //     ~VirtualCamNode();
-    // protected:
-    //     std::shared_ptr<camera::VirtualCam> virtual_dev_;
-    //     std::thread capture_thread_;                    // 采图线程
-    // };
+    class VirtualCamNode : public virtual CamNode
+    {
+    public:
+        VirtualCamNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+        ~VirtualCamNode();
+    protected:
+        std::shared_ptr<camera::VirtualCam> virtual_dev_;
+        std::thread capture_thread_;                    // 采图线程
+
+        std::vector<std::string> image_paths;
+        bool is_video;
+    };
 } // namespace rmos_cam
 
 

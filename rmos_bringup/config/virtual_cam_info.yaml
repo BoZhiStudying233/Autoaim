@@ -1,0 +1,20 @@
+image_width: 1280
+image_height: 720
+camera_name: VirtualCam
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [1587.195883, 0.0, 659.356550, 0.0, 1587.373646, 361.929101, 0.0, 0.0, 1.0]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.270566, 0.243631, 0.000962, 0.000876, 0.0]
+rectification_matrix: # 暂不使用
+  rows: 3
+  cols: 3
+  data: [0.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 1.000000]
+projection_matrix:  # 暂不使用
+  rows: 3
+  cols: 4
+  data: [0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000]

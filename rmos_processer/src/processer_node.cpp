@@ -124,7 +124,6 @@ namespace rmos_processer {
                 double armor_roll, armor_pitch, armor_yaw;
                 tf2::Matrix3x3(tf_armor_q).getRPY(armor_roll, armor_pitch, armor_yaw);
                 //new_armor.yaw = armor_yaw;
-                //std::cout<<"armor_yaw="<<armor_yaw/3.1415926*180<<"   armor_pitch="<<armor_pitch/3.1415926*180<<"   armor_roll="<<armor_roll/3.1415926*180<<std::endl;
                 new_armor.yaw = controler_->tracker_.last_yaw_ +
                                 angles::shortest_angular_distance(controler_->tracker_.last_yaw_, armor_yaw);
 
@@ -163,12 +162,10 @@ namespace rmos_processer {
     void ProcesserNode::publishTarget()
     {
         rmos_interfaces::msg::Target target_msg;
-        // std::cout << "111" << std::endl;
         if (quaternion_buf_.size() < 1)
             return;
 
         target_msg = this->controler_->getTarget(quaternion_buf_);
-        // std::cout << "222" << std::endl;
 
         //将瞄准点投影回2d平面，通过像素距离判断，判断开火
         geometry_msgs::msg::PoseStamped px;
@@ -327,7 +324,6 @@ namespace rmos_processer {
 
 
         if (is_tracking) {
-
             double yaw = controler_->tracker_.target_state(6), r1 = controler_->tracker_.target_state(8), r2 = controler_->tracker_.another_r;
             double xc = controler_->tracker_.target_state(0), yc = controler_->tracker_.target_state(2), za = controler_->tracker_.target_state(4);
             double vx = controler_->tracker_.target_state(1), vy = controler_->tracker_.target_state(3), vz = controler_->tracker_.target_state(5);
@@ -399,6 +395,8 @@ namespace rmos_processer {
 
     void ProcesserNode::initParams()
     {
+        this->debug_ = this->declare_parameter("debug", 1);
+
         this->controler_->lost_time_thres_ = this->declare_parameter("lost_time_thres", 0.0);
         this->controler_->s2qxyz_ = this->declare_parameter("s2qxyz", 1.0);
         this->controler_->s2qyaw_ = this->declare_parameter("s2qyaw", 0.5);

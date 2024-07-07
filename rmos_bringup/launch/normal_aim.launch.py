@@ -18,8 +18,13 @@ def generate_launch_description():
     os.getcwd(), 'rmos_bringup', 'config', 'launch_params.yaml')))
 
     if launch_params['video_play']: 
-        # To do
-        return
+        daheng_node_  = Node(
+            package='rmos_cam',
+            executable='virtual_camera',
+            output='screen',
+            parameters=[get_params('camera')],
+            # extra_arguments=[{'use_video': True}]
+        )
     else:
         daheng_node_  = Node(
             package='rmos_cam',
@@ -70,7 +75,7 @@ def generate_launch_description():
 
     # 延迟启动
     delay_basic_armor_detector_node_ = TimerAction(
-        period=1.0,
+        period=0.0,
         actions=[basic_armor_detector_node_],
     )
     

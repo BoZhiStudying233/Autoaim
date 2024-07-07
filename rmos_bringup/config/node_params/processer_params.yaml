@@ -1,5 +1,8 @@
 /**:
   ros__parameters:
+    debug: 1
+    control_interval: 10 # 控制间隔--ms
+
     lost_time_thres: 0.5
     # ekf params
     s2qxyz: 1.0

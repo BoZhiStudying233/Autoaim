@@ -43,7 +43,6 @@ namespace detector
             rune_armor.push_back(cv::Point3d(0.0,rune_width / 2.0, rune_height / 2.0));
             rune_armor.push_back(cv::Point3d(0.0,-rune_width / 2.0, rune_height / 2.0));
             rune_armor.push_back(cv::Point3d(0.0,-rune_width / 2.0, -rune_height / 2.0));
-
         };
         ~PnpSolver(){};
 
