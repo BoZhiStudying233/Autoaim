@@ -53,7 +53,7 @@ install(DIRECTORY
         DESTINATION share/${PROJECT_NAME})
 
 install(
-        DIRECTORY                  # 发现你项目中的lib中所有的文件
+        DIRECTORY  ${3RDPARTY_LIB}    # 发现你项目中的lib中所有的文件
         DESTINATION lib/     # 拷贝到install目录中
 )
 
