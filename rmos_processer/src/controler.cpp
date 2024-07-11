@@ -143,9 +143,9 @@ namespace processer
             int move_state = this->getAimingPoint(this->aiming_point_, this->center_point_);
             float new_pitch, new_yaw; 
             // 击打点
-            cv::Point3f p_y_t = this->ballistic_solver_.getAngleTime(aiming_point_*1000, 1); // 第二参数为打符 
+            cv::Point3f p_y_t = this->ballistic_solver_.getAngleTime(aiming_point_*1000, 0); // 第二参数为打符 
             // 中心点
-            cv::Point3f c_y_t = this->ballistic_solver_.getAngleTime(center_point_*1000, 1); // 第二参数为打符 
+            cv::Point3f c_y_t = this->ballistic_solver_.getAngleTime(center_point_*1000, 0); // 第二参数为打符 
             // v_yaw 大于一定值即瞄中心点
             if(abs(this->tracker_.target_state(7))>2)
             {
