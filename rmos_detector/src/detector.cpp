@@ -29,7 +29,6 @@ namespace detector
     {
         if(image.empty())return false;
 
-
         src_ = image;
         std::vector<base::LightBlob> lights;
         bool is_find_lights = this->findLights(image,lights);
@@ -48,40 +47,48 @@ namespace detector
     bool Detector::findLights(const cv::Mat & image, std::vector<base::LightBlob>& lights)
     {
         lights.clear();
-        cv::Mat gaussian;
+        // cv::Mat gaussian;
         cv::Mat gray;
 
         cvtColor(image, gray, cv::COLOR_BGR2GRAY);
 
-        std::vector<cv::Mat> bgr;
-        split(image, bgr);
+        // std::vector<cv::Mat> bgr;
+        // split(image, bgr);
 
         /*-----------预处理得二值图-----------*/
-        cv::Mat gray_binary, color_binary, binary;
-        if (enemy_color_ == base::RED)
-        {
-            threshold(gray, gray_binary, process_params_.red_threshold, 255, cv::THRESH_BINARY);
+        // cv::Mat gray_binary, color_binary, binary;
+        // auto start = std::chrono::steady_clock::now();
+        // if (enemy_color_ == base::RED)
+        // {
+        //     threshold(gray, gray_binary, process_params_.red_threshold, 255, cv::THRESH_BINARY);
 
-            subtract(bgr[2], bgr[0], color_binary);
-            threshold(color_binary, color_binary, process_params_.red_blue_diff, 255, cv::THRESH_BINARY);
+        //     subtract(bgr[2], bgr[0], color_binary);
+        //     threshold(color_binary, color_binary, process_params_.red_blue_diff, 255, cv::THRESH_BINARY);
+        //     binary = gray_binary & color_binary;
+        // }
+        // else
+        // {
+        //     threshold(gray, gray_binary, process_params_.blue_threshold, 255, cv::THRESH_BINARY);
 
-            binary = gray_binary & color_binary;
-        }
-        else
-        {
-            threshold(gray, gray_binary, process_params_.blue_threshold, 255, cv::THRESH_BINARY);
+        //     subtract(bgr[0], bgr[2], color_binary);
+        //     threshold(color_binary, color_binary, process_params_.blue_red_diff, 255, cv::THRESH_BINARY);
+        //     binary = gray_binary & color_binary;
+        // }
+        // cv::imshow("image", image);
+        // cv::imshow("gray_binary", gray_binary);
+        // cv::imshow("color_binary", color_binary);
+        // cv::imshow("binary", binary);
+        // cv::waitKey(0);
 
-            subtract(bgr[0], bgr[2], color_binary);
-            threshold(color_binary, color_binary, process_params_.blue_red_diff, 255, cv::THRESH_BINARY);
+        // cv::Mat element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5));
+        // cv::morphologyEx(binary, binary, cv::MORPH_CLOSE, element);
 
-            binary = gray_binary & color_binary;
-        }
-        cv::Mat element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5));
-        cv::morphologyEx(binary, binary, cv::MORPH_CLOSE, element);
+        cv::Mat binary;
+        cv::threshold(gray, binary, process_params_.bin_threshold, 255, cv::THRESH_BINARY);
+        debug_binary_ = binary;
         /*-----------寻找并筛选灯条轮廓-----------*/
         std::vector<std::vector<cv::Point>> contours;
         cv::findContours(binary, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
-        debug_binary_ = binary;
         for (const auto &contour: contours)
         {
             if (cv::contourArea(contour) < 4)continue;
@@ -94,10 +101,21 @@ namespace detector
             base::LightBlob  light(light_rrect);
             if(isLight(light))
             {
-                lights.push_back(light);
-            }
+                int sum_r = 0, sum_b = 0;
+                for (const auto &point : contour) {
+                sum_b += image.at<cv::Vec3b>(point.y, point.x)[0];
+                sum_r += image.at<cv::Vec3b>(point.y, point.x)[2];
+                }
+                if (std::abs(sum_r - sum_b) / static_cast<int>(contour.size()) >
+                    20) {
+                    light.color = sum_r > sum_b ? base::Color::RED : base::Color::BLUE;
+                }
 
+                if(enemy_color_ == light.color)
+                    lights.push_back(light);
+            }
         }
+
         if (lights.size() < 2)
         {
             return false;
@@ -124,8 +142,6 @@ namespace detector
 
     bool Detector::matchLights(std::vector<base::LightBlob>& lights,std::vector<base::Armor>& armors)
     {
-
-
         armors.clear();
         std::vector<base::Armor> temp_armors;
         auto cmp = [](base::LightBlob a, base::LightBlob b) -> bool
@@ -281,7 +297,4 @@ namespace detector
             return false;
         }
     }
-
-
-
 }

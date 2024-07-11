@@ -188,10 +188,7 @@ namespace rmos_detector
     std::unique_ptr<detector::Detector> BasicDetectorNode::initDetector()
     {
         detector::ProcessParams p_params = {
-            .blue_threshold = this->declare_parameter("image_process_params.blue_threshold", 70.0),
-            .red_threshold = this->declare_parameter("image_process_params.red_threshold", 100.0),
-            .blue_red_diff = this->declare_parameter("image_process_params.blue_red_diff", 10.0),
-            .red_blue_diff = this->declare_parameter("image_process_params.red_blue_diff", 10.0),
+            .bin_threshold = this->declare_parameter("image_process_params.bin_threshold", 90.0),
             .enemy_color = this->declare_parameter("image_process_params.enemy_color", 1)
         };
 

@@ -77,9 +77,6 @@ namespace rmos_cam {
                         // 根据需要添加适当的延时
                         std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // 例如，每100ms发布一张图片
                     }
-                    if (!virtual_dev_->is_open()) {
-                        exit(0);
-                    }
                 }
                 else
                 {

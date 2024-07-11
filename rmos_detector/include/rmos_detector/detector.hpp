@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <chrono>
 
 #include "rmos_utils/armor.hpp"
 #include "rmos_utils/base.hpp"
@@ -26,13 +27,10 @@ namespace detector
 {
     struct ProcessParams
     {
-        double blue_threshold;
-        double red_threshold;
-        double blue_red_diff;
-        double red_blue_diff;
+        double bin_threshold;
         int enemy_color;
     };
-
+    
     struct LightParams
     {
         double angle_to_vertigal_max;
@@ -73,7 +71,6 @@ namespace detector
         cv::Mat src_;
         cv::Mat debug_binary_;
     };
-
 }
 
 #endif //RMOS_DETECTOR_HPP
