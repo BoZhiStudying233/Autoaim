@@ -1,0 +1,2 @@
+rmos_transporter::CanCommNode;lib/librmos_transporter.so
+rmos_transporter::UsbCommNode;lib/librmos_transporter.so

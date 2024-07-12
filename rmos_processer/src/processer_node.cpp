@@ -163,13 +163,10 @@ namespace rmos_processer {
     void ProcesserNode::publishTarget()
     {
         rmos_interfaces::msg::Target target_msg;
-        // std::cout << "111" << std::endl;
         if (quaternion_buf_.size() < 1)
             return;
-
-        target_msg = this->controler_->getTarget(quaternion_buf_);
-        // std::cout << "222" << std::endl;
-
+            target_msg = this->controler_->getTarget(quaternion_buf_);
+        
         //将瞄准点投影回2d平面，通过像素距离判断，判断开火
         geometry_msgs::msg::PoseStamped px;
         px.header = target_msg.header;

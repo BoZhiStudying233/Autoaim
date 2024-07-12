@@ -4,7 +4,7 @@
 
 
 
-#include "rmos_detector//detector.hpp"
+#include "rmos_detector/detector.hpp"
 
 namespace detector
 {

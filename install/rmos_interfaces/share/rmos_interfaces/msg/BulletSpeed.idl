@@ -1,0 +1,12 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from rmos_interfaces/msg/BulletSpeed.msg
+// generated code does not contain a copyright notice
+
+
+module rmos_interfaces {
+  module msg {
+    struct BulletSpeed {
+      uint8 speed;
+    };
+  };
+};

@@ -1,0 +1,32 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from rmos_interfaces/msg/Target.msg
+// generated code does not contain a copyright notice
+
+#include "geometry_msgs/msg/Point.idl"
+#include "std_msgs/msg/Header.idl"
+
+module rmos_interfaces {
+  module msg {
+    struct Target {
+      std_msgs::msg::Header header;
+
+      uint8 id;
+
+      uint8 track_state;
+
+      boolean suggest_fire;
+
+      float gun_pitch;
+
+      float gun_yaw;
+
+      @verbatim (language="comment", text=
+        " 电控发来的陀螺仪时间戳")
+      uint32 timestamp_recv;
+
+      int8 outpost_direction;
+
+      geometry_msgs::msg::Point position;
+    };
+  };
+};

@@ -1,0 +1,3 @@
+source;share/rmos_transporter/environment/ament_prefix_path.sh
+source;share/rmos_transporter/environment/library_path.sh
+source;share/rmos_transporter/environment/path.sh
