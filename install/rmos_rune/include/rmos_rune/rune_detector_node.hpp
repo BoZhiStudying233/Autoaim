@@ -128,6 +128,7 @@ namespace rmos_rune
                     this->Exposure = (*exp_msg).exp;
                 });
 
+            this->rune_detector_ = initDetector();
             // publisher
             this->armors_pub_ = this->create_publisher<rmos_interfaces::msg::Armors>("/rmos_detector/armors", rclcpp::SensorDataQoS());
 
@@ -138,7 +139,6 @@ namespace rmos_rune
 
             //cj_detector_ = std::make_shared<detector::CjDetector>();
             // detector_ = std::make_shared<detector::Detector>();            
-            rune_detector_ = std::make_shared<RuneDetector::DlRuneDetector>();
             fitting_ = std::make_shared<RuneDetector::Fitting>();
             //cj_classifier_ = std::make_shared<detector::CjClassifier>();
             pnp_solver_ = std::make_shared<detector::PnpSolver>();
@@ -180,6 +180,7 @@ namespace rmos_rune
 
         //std::shared_ptr<detector::CjDetector> cj_detector_;
         // std::shared_ptr<detector::Detector> detector_;
+        std::unique_ptr<RuneDetector::DlRuneDetector> initDetector();
         std::shared_ptr<RuneDetector::DlRuneDetector> rune_detector_;
 
         std::shared_ptr<RuneDetector::Fitting> fitting_;

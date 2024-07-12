@@ -24,7 +24,7 @@ namespace RuneDetector
         
         float circle_center_conf;                   // 能量机关圆心阈值
         float no_activate_conf;                     // 未激活扇叶阈值
-        float acvitate_conf;                        // 已激活扇叶阈值
+        float activate_conf;                        // 已激活扇叶阈值
         float circle_center_roi_width;              // 中心R标roi宽
 
         float max_diff_distance_ratio;              // judge for old vane
@@ -32,8 +32,8 @@ namespace RuneDetector
         // 拟合使用参数
         float delay_time;                           // 预测延迟
         int save_txt;                             // 保存txt文件用来绘图
-
-    } RuneParam; 
+        bool print_result;
+    }; 
 
 
     class DlRuneDetector{
@@ -56,7 +56,7 @@ namespace RuneDetector
         /**
          *  @brief  构造函数,初始化yolov7模型与RuneParam内的参数
          */
-        DlRuneDetector();
+        DlRuneDetector(RuneParam params);
 
         ~DlRuneDetector(); 
 

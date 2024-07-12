@@ -3,7 +3,7 @@
 
 namespace RuneDetector
 {
-    DlRuneDetector::DlRuneDetector()
+    DlRuneDetector::DlRuneDetector(RuneParam params)
     {
             //~~~
         rt.init("./rmos_utils/AIOF-IP/config/rtc_rm_v7_rune.yaml");
@@ -11,29 +11,23 @@ namespace RuneDetector
         
         this->state = base::TrackState::LOST;
 
-        cv::FileStorage fs("/home/bozhi/Desktop/OLD-Autoaim/src/Algorithm/configure/Detector/detector/rune_detector/Rune.xml", cv::FileStorage::READ);
+        
+        this->param.show_R = params.show_R;
+        this->param.blue_brightness_thresh = params.blue_brightness_thresh;
+        this->param.red_brightness_thresh = params.red_brightness_thresh;
+        this->param.red_color_thresh = params.red_color_thresh;
+        this->param.blue_color_thresh = params.blue_color_thresh;
+        this->param.blue_red_diff = params.blue_red_diff;
 
-        if(!fs.isOpened())
-        {
-            std::cout<<"open rune detect param fail"<<std::endl;
-        }
+        this->param.circle_center_conf = params.circle_center_conf;
+        this->param.no_activate_conf = params.no_activate_conf;
+        this->param.activate_conf = params.activate_conf; 
+        this->param.circle_center_roi_width = params.circle_center_roi_width;
+        this->param.max_diff_distance_ratio = params.max_diff_distance_ratio;
 
-        fs["show_R"] >>  param.show_R;
-
-        fs["blue_brightness_thresh"] >>  param.blue_brightness_thresh;
-        fs["blue_color_thresh"] >> param.blue_color_thresh;
-        fs["red_brightness_thresh"] >>  param.red_brightness_thresh;
-        fs["red_color_thresh"] >>  param.red_color_thresh;
-        fs["blue_red_diff"] >>  param.blue_red_diff;
-     
-        fs["circle_center_conf"] >>  param.circle_center_conf;
-        fs["acvitate_conf"] >>  param.acvitate_conf;
-        fs["no_activate_conf"] >>  param.no_activate_conf;
-        fs["circle_center_roi_width"] >>  param.circle_center_roi_width;
-
-        fs["max_diff_distance_ratio"] >>  param.max_diff_distance_ratio;
-
-        fs.release();
+        this->param.delay_time = params.delay_time;
+        this->param.save_txt = params.save_txt;
+        this->param.print_result = params.print_result;
     }
 
     DlRuneDetector::~DlRuneDetector(){}
@@ -66,8 +60,6 @@ namespace RuneDetector
         inputs.clear();
         result_mats.clear();
         inputs.push_back(image);
-        // imshow("input", image);
-        // waitKey(100);
         rt.run(inputs, outputs);
         std::vector<DetectResult> output = outputs[0];
 
@@ -201,7 +193,7 @@ namespace RuneDetector
             }
             if((*iter).id == 2 || (*iter).id == 5)
             {
-                if((*iter).conf < this->param.acvitate_conf)
+                if((*iter).conf < this->param.activate_conf)
                 {
                     output.erase(iter);
                     continue;
@@ -308,7 +300,7 @@ namespace RuneDetector
                     {
                         this->high_size = temp_size;
                         this->target = base::RuneArmor(output[i].points);
-                        std::cout<<"output[i].conf:"<<output[i].conf<<std::endl;
+                        // std::cout<<"output[i].conf:"<<output[i].conf<<std::endl;
                         last_target_conf = output[i].conf; 
                         find_target = true;        
                         rune_armors.push_back(base::RuneArmor(output[i].points));

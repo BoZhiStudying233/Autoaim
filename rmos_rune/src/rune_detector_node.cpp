@@ -130,10 +130,8 @@ namespace rmos_rune
                                 cv::line(image, rune_next_pos[i], rune_next_pos[(i+1)%4], cv::Scalar(50, 100, 50));
                             }
                         }
-                        // std::cout<<"debug_image_running!!"<<std::endl;
                         //pnp solve
 
-                        return;
                         cv::Mat tvec;
                         cv::Mat rvec;
                         bool is_solve;
@@ -313,6 +311,34 @@ namespace rmos_rune
             }
         }
         return fileCount;
+    }
+
+    std::unique_ptr<RuneDetector::DlRuneDetector> RuneDetectorNode::initDetector()
+    {
+        RuneDetector::RuneParam params = {
+            .show_R = this->declare_parameter("image_params.show_R", 0),
+
+            .blue_brightness_thresh = this->declare_parameter("image_params.blue_brightness_thresh", 30),
+            .blue_color_thresh = this->declare_parameter("image_params.blue_color_thresh", 50),
+            .red_brightness_thresh = this->declare_parameter("image_params.red_brightness_thresh", 30),
+            .red_color_thresh = this->declare_parameter("image_params.red_color_thresh", 50),
+            .blue_red_diff = this->declare_parameter("image_params.blue_red_diff", 20),
+
+            .circle_center_conf = this->declare_parameter("deep_learning_params.circle_center_conf", 0),
+            .no_activate_conf = this->declare_parameter("deep_learning_params.no_activate_conf", 0.7),
+            .activate_conf = this->declare_parameter("deep_learning_params.activate_conf", 0),
+            .circle_center_roi_width = this->declare_parameter("deep_learning_params.circle_center_roi_width", 20),
+            .max_diff_distance_ratio = this->declare_parameter("deep_learning_params.max_diff_distance_ratio", 0.5),
+
+            .delay_time = this->declare_parameter("fitting_params.delay_time", 0.45f),
+            .save_txt = this->declare_parameter("fitting_params.save_txt", 0),
+            .print_result = this->declare_parameter("fitting_params.print_result", 1) // 添加了 print_result 参数声明
+        };
+
+
+        auto rune_detector = std::make_unique<RuneDetector::DlRuneDetector>(params);
+
+        return rune_detector;
     }
 
 }
