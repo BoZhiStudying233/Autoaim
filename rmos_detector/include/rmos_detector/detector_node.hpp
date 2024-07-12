@@ -30,6 +30,7 @@
 //interfaces
 #include "rmos_interfaces/msg/armors.hpp"
 #include "rmos_interfaces/msg/armor.hpp"
+#include "rmos_interfaces/msg/color.hpp"
 
 #include "detector.hpp"
 #include "onnx_classifier.hpp"
@@ -51,7 +52,7 @@ namespace rmos_detector
 
         std::shared_ptr<image_transport::Subscriber> image_sub_;
         rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_sub_;
-        rclcpp::Subscription<std_msgs::msg::Int8>::SharedPtr color_sub_;
+        rclcpp::Subscription<rmos_interfaces::msg::Color>::SharedPtr color_sub_;
     };
 
     class BasicDetectorNode : public virtual BaseDetectorNode

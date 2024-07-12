@@ -54,10 +54,10 @@ namespace rmos_detector
                                                                                                 this->camera_info_sub_.reset();
                                                                                             });
 
-        this->color_sub_ = this->create_subscription<std_msgs::msg::Int8>
-                ("/color_info", rclcpp::SensorDataQoS(), [this](std_msgs::msg::Int8::ConstSharedPtr color_msg)
+        this->color_sub_ = this->create_subscription<rmos_interfaces::msg::Color>
+                ("/color_info", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Color::ConstSharedPtr color_msg)
                 {
-                    int enemy_color = (*color_msg).data;
+                    int enemy_color = (*color_msg).color;
                     this->detector_->setEnemyColor(enemy_color);
                 });
         // publisher

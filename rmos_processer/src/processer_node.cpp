@@ -139,8 +139,7 @@ namespace rmos_processer {
                 detect_marker_array_.markers.emplace_back(text_marker_);
             }
 
-            if(new_armors.size()>0)
-                controler_->updateTracker(new_armors, timestamp);
+            controler_->updateTracker(new_armors, timestamp);
 
             using Marker = visualization_msgs::msg::Marker;
             armor_marker_.action = (armors_msg->armors).empty() ? Marker::DELETE : Marker::ADD;

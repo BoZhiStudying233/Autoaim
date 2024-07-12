@@ -9,8 +9,8 @@
     s2qyaw: 0.5
     s2qr: 0.2
 
-    r_xyz_factor: 1.2
-    r_yaw: 0.3
+    r_xyz_factor: 3.4e-4
+    r_yaw: 3e-2
 
     delay: 0.1
     true_x: 640

@@ -14,7 +14,7 @@
     rgain: 19.8
     bgain: 19.8
     ggain: 10.0
-    time_offset: 0
+    time_offset: 30000000
     offsetX: 0  # TODO
     offsetY: 0  # TODO
 
