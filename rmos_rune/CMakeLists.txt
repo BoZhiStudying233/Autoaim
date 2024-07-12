@@ -26,6 +26,7 @@ find_package(InferenceEngine)
 find_package(ngraph REQUIRED)
 find_package(rmos_utils REQUIRED)
 
+
 include_directories(
   ${EIGEN3_INCLUDE_DIR}
   /usr/include/eigen3
@@ -47,11 +48,13 @@ target_include_directories(${PROJECT_NAME}
                         $<INSTALL_INTERFACE:include>
                         )
 
+find_library(AIOF_LIBRARY NAMES aiof)
+
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS}
 ${InferenceEngine_LIBRARIES} 
 ${NGRAPH_LIBRARIES}
-/home/bozhi/Desktop/Code/Autoaim/install/rmos_utils/lib/libaiof.so
-/home/bozhi/Desktop/Code/Autoaim/install/rmos_utils/lib/librmos_utils.so)
+${AIOF_LIBRARY}
+)
 
 ament_target_dependencies(${PROJECT_NAME} rmos_utils)
 
