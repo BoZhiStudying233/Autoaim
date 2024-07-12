@@ -23,17 +23,12 @@ namespace detector
         }
 
         return true;
-
-
-
     }
     
     bool PnpSolver::solveRuneArmorPose(std::vector<cv::Point2f> rune_next_pos,const cv::Mat& camera_matrix,const cv::Mat& dist_coeffs,cv::Mat &tVec, cv::Mat &rVec)
     {
-        
         if (camera_matrix.empty())
             return false;
-
 
         cv::solvePnP(rune_armor,rune_next_pos, camera_matrix, dist_coeffs, rVec, tVec, false,cv::SOLVEPNP_IPPE);
   

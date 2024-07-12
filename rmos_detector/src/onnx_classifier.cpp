@@ -73,8 +73,7 @@ namespace detector {
                 std::remove_if(
                         armors.begin(), armors.end(),
                         [this](const base::Armor & armor) {
-
-                            if ( armor.type == base::ArmorType::WRONG) {
+                            if (armor.type == base::ArmorType::WRONG) {
                                 return true;
                             }
                             else
@@ -84,7 +83,6 @@ namespace detector {
 
                         }),
                 armors.end());
-
 
         return true;
     }
@@ -100,10 +98,8 @@ namespace detector {
         cls_success = this->classify(temp,getlabel,getconf,getname);
         if(cls_success)
         {
-
             confidence = getconf;
             return getlabel;
-
         }
         else
         {
@@ -128,7 +124,7 @@ namespace detector {
         //std::cout<<"onnx model path: "<<model_path_<<std::endl;
         ORT_ABORT_ON_ERROR(g_ort->CreateEnv(ORT_LOGGING_LEVEL_WARNING, "test", &env_));
         ORT_ABORT_ON_ERROR(g_ort->CreateSessionOptions(&session_options_));
-        g_ort->SetIntraOpNumThreads(session_options_,1);
+        g_ort->SetIntraOpNumThreads(session_options_, 8);
         g_ort->SetSessionExecutionMode(session_options_,ORT_SEQUENTIAL);
         g_ort->SetSessionGraphOptimizationLevel(session_options_,ORT_ENABLE_ALL);
         ORT_ABORT_ON_ERROR(g_ort->CreateSession(env_, model_path, session_options_, &session_));
@@ -185,6 +181,7 @@ namespace detector {
         const size_t model_input_len = model_input_ele_count * sizeof(float);
 
         bool flag = preprocessing(process_image_,&model_input,&model_input_ele_count);
+
         if(flag==false)
         {
             return -1;
@@ -218,6 +215,7 @@ namespace detector {
         ORT_ABORT_ON_ERROR(
                 g_ort->Run(session, NULL, input_names, (const OrtValue *const *) &input_tensor, 1, output_names, 1,
                            &output_tensor));
+
         assert(output_tensor != NULL);
         ORT_ABORT_ON_ERROR(g_ort->IsTensor(output_tensor, &is_tensor));
         assert(is_tensor);
@@ -336,5 +334,4 @@ namespace detector {
         *infer_data = temp_data;
         return true;
     }
-
 }

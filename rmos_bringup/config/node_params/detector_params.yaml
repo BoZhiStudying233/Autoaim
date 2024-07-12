@@ -8,10 +8,7 @@
     camera2imu_offset_z: 0.0
 
     image_process_params:
-      blue_threshold: 70.0
-      red_threshold: 100.0
-      blue_red_diff: 10.0
-      red_blue_diff: 10.0
+      bin_threshold: 90.0
       enemy_color: 1 # 1--blue 0--red
 
     light_params:

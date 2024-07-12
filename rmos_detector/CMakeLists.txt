@@ -21,8 +21,8 @@ include_directories(include/${PROJECT_NAME})
 find_package(ament_cmake_auto REQUIRED)
 find_package(OpenCV 4 REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(InferenceEngine)
-find_package(ngraph REQUIRED)
+# find_package(InferenceEngine)
+# find_package(ngraph REQUIRED)
 
 include_directories(
   ${EIGEN3_INCLUDE_DIR}
@@ -42,9 +42,9 @@ target_include_directories(${PROJECT_NAME}
                       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                         $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS}  ${3RDPARTY_LIB}/libonnxruntime.so.1.14.1    
-${InferenceEngine_LIBRARIES}
-${NGRAPH_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS}  ${3RDPARTY_LIB}/libonnxruntime.so.1.14.1)
+# ${InferenceEngine_LIBRARIES}
+# ${NGRAPH_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME}
        DESTINATION lib/${PROJECT_NAME})
@@ -53,7 +53,7 @@ install(DIRECTORY
         DESTINATION share/${PROJECT_NAME})
 
 install(
-        DIRECTORY                  # 发现你项目中的lib中所有的文件
+        DIRECTORY  ${3RDPARTY_LIB}    # 发现你项目中的lib中所有的文件
         DESTINATION lib/     # 拷贝到install目录中
 )
 

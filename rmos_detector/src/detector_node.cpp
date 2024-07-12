@@ -32,7 +32,7 @@ namespace rmos_detector
         this->image_sub_ = std::make_shared<image_transport::Subscriber>(image_transport::create_subscription(
                 this, "/image_raw", std::bind(&BasicDetectorNode::imageCallBack, this, std::placeholders::_1),
                 "raw", rmw_qos_profile_default));
-        this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/daheng_camera_info", rclcpp::SensorDataQoS(),
+        this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/camera_info", rclcpp::SensorDataQoS(),
                                                                                             [this](sensor_msgs::msg::CameraInfo::ConstSharedPtr camera_info_msg)
                                                                                             {
                                                                                                 RCLCPP_INFO(this->get_logger(), "Receive camera infomation");
@@ -54,10 +54,10 @@ namespace rmos_detector
                                                                                                 this->camera_info_sub_.reset();
                                                                                             });
 
-        this->color_sub_ = this->create_subscription<std_msgs::msg::Int8>
-                ("/color_info", rclcpp::SensorDataQoS(), [this](std_msgs::msg::Int8::ConstSharedPtr color_msg)
+        this->color_sub_ = this->create_subscription<rmos_interfaces::msg::Color>
+                ("/color_info", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Color::ConstSharedPtr color_msg)
                 {
-                    int enemy_color = (*color_msg).data;
+                    int enemy_color = (*color_msg).color;
                     this->detector_->setEnemyColor(enemy_color);
                 });
         // publisher
@@ -127,6 +127,7 @@ namespace rmos_detector
             if(!is_solve)
             {
                 RCLCPP_WARN(this->get_logger(), "camera param empty");
+                continue;
             }
             armor_msg.pose.position.x = tVec.at<double>(0, 0)/1000;
             armor_msg.pose.position.y = tVec.at<double>(1, 0)/1000;
@@ -168,7 +169,7 @@ namespace rmos_detector
         }
         auto time2 = steady_clock_.now();
 
-        // if(this->debug)RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
+        if(this->debug)RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
 
         if(this->debug)
         {
@@ -187,10 +188,7 @@ namespace rmos_detector
     std::unique_ptr<detector::Detector> BasicDetectorNode::initDetector()
     {
         detector::ProcessParams p_params = {
-            .blue_threshold = this->declare_parameter("image_process_params.blue_threshold", 70.0),
-            .red_threshold = this->declare_parameter("image_process_params.red_threshold", 100.0),
-            .blue_red_diff = this->declare_parameter("image_process_params.blue_red_diff", 10.0),
-            .red_blue_diff = this->declare_parameter("image_process_params.red_blue_diff", 10.0),
+            .bin_threshold = this->declare_parameter("image_process_params.bin_threshold", 90.0),
             .enemy_color = this->declare_parameter("image_process_params.enemy_color", 1)
         };
 
@@ -223,8 +221,10 @@ namespace rmos_detector
                     cv::Scalar(0, 255, 0), 1.8);
         cv::putText(image, text2, armor.right.up, cv::FONT_HERSHEY_SIMPLEX, 0.5,
                     cv::Scalar(0, 255, 0), 0.5);
-        cv::line(image,armor.left.up,armor.right.down ,cv::Scalar(255, 0, 255),1);
-        cv::line(image,armor.left.down,armor.right.up ,cv::Scalar(255, 0, 255),1);
+        cv::line(image,armor.left.up,armor.left.down ,cv::Scalar(255, 0, 255),1);
+        cv::line(image,armor.left.down,armor.right.down ,cv::Scalar(255, 0, 255),1);
+        cv::line(image,armor.right.down,armor.right.up ,cv::Scalar(255, 0, 255),1);
+        cv::line(image,armor.right.up,armor.left.up ,cv::Scalar(255, 0, 255),1);
         float distance = sqrt(pow(armor.position.x,2)+pow(armor.position.y,2)+pow(armor.position.z,2));
         std::string text3 = std::to_string(distance);
         cv::putText(image, text3, armor.right.down, cv::FONT_HERSHEY_SIMPLEX, 1,

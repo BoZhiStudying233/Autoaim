@@ -19,6 +19,7 @@ namespace rmos_ec {
         ECNode(const std::string &node_name, const rclcpp::NodeOptions &options) : Node(node_name, options) {
 
             color_pub_ = this->create_publisher<rmos_interfaces::msg::Color>("/color_info", rclcpp::SensorDataQoS());
+            this->quaternion_pub_ = this->create_publisher<rmos_interfaces::msg::QuaternionTime>("/imu_quaternion", rclcpp::SensorDataQoS());
             mode_pub_ = this->create_publisher<std_msgs::msg::Int8>("/mode_info", rclcpp::SensorDataQoS());
             autoaim_state_pub_ = this->create_publisher<rmos_interfaces::msg::AutoaimState>("/autoaim_state", rclcpp::SensorDataQoS());
 
@@ -27,7 +28,8 @@ namespace rmos_ec {
         rclcpp::Publisher<rmos_interfaces::msg::Color>::SharedPtr color_pub_;
         rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr mode_pub_;
         rclcpp::Publisher<rmos_interfaces::msg::AutoaimState>::SharedPtr autoaim_state_pub_;
-        std::shared_ptr<tf2_ros::TransformBroadcaster> tf_publisher_;        
+        std::shared_ptr<tf2_ros::TransformBroadcaster> tf_publisher_;       
+        rclcpp::Publisher<rmos_interfaces::msg::QuaternionTime>::SharedPtr quaternion_pub_; 
     };
     class VirtualECNode : public ECNode {
     public:
@@ -45,13 +47,13 @@ namespace rmos_ec {
         rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr mode_pub_; 
         rclcpp::Publisher<rmos_interfaces::msg::AutoaimState>::SharedPtr autoaim_state_pub_; 
         std::shared_ptr<tf2_ros::TransformBroadcaster> tf_publisher_; 
-    
         // msg
         rmos_interfaces::msg::Color color_msg_;
         std_msgs::msg::Int8 mode_msg_;
         rmos_interfaces::msg::AutoaimState autoaim_state_msg_;
-
         geometry_msgs::msg::TransformStamped transformstamped;
-    
+        rmos_interfaces::msg::QuaternionTime quaternion_time_msg_;
+
+        long imu_data_count_{0};
     };  // class VirtualECNode 
 }  // namespace rmos_ec 
