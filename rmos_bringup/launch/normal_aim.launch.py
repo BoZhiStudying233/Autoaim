@@ -52,6 +52,19 @@ def generate_launch_description():
         parameters=[get_params('processer')],
     )
 
+
+    rune_node_ = Node(
+        package='rmos_rune',
+        namespace= 'rmos_rune',
+        executable='rune_detector',
+        name='rune_detector',
+        output='screen',
+        parameters=[get_params('rune')],
+    )
+
+
+
+
     if launch_params['virtual_serial']: 
         communicate_node_ = Node(
             package='rmos_ec',
@@ -89,7 +102,8 @@ def generate_launch_description():
         daheng_node_,
         delay_basic_armor_detector_node_,
         delay_processer_node_,
-        communicate_node_
+        communicate_node_,
+        rune_node_
         ]
 
     # Done

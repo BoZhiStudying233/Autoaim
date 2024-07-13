@@ -34,7 +34,7 @@
 
 #include "detector.hpp"
 #include "onnx_classifier.hpp"
-#include "pnp_solver.hpp"
+#include "rmos_utils/pnp_solver.hpp"
 
 namespace rmos_detector
 {

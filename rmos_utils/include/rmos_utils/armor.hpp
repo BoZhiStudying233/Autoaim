@@ -3,8 +3,8 @@
 
 #include <opencv2/core.hpp>
 
-#include "base.hpp"
-
+// #include "base.hpp"
+#include "const.hpp"
 namespace base
 {
     class LightBlob
@@ -25,16 +25,7 @@ namespace base
             float angle;
     };
 
-    enum ArmorType
-    {
-        WRONG,
-        SMALL,
-        BIG,
-        RUNE_ARMOR,
-        GRAY_BIG_ARMOR,
-        GRAY_SMALL_ARMOR,
-        DEAD_ARMOR,
-    };
+
 
     class Armor
     {

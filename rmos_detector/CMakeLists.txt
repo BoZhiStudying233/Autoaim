@@ -28,7 +28,7 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
   /usr/include/eigen3
   ${3RDPARTY_LIB}
- ./AIOF-IP/include
+#  ./AIOF-IP/include
 )
 
 ament_auto_find_build_dependencies()

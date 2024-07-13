@@ -1,4 +1,4 @@
-#include "rmos_detector/pnp_solver.hpp"
+#include "rmos_utils/pnp_solver.hpp"
 
 namespace detector
 {
