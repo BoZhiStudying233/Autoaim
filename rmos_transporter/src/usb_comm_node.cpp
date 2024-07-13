@@ -1,7 +1,7 @@
 #include <vector>
 #include <Eigen/Dense>
 #include "rmos_transporter/comm_node.hpp"
-#include "rmos_utils/base.hpp"
+#include "rmos_utils/const.hpp"
 
 using namespace std::chrono;
 
@@ -79,8 +79,8 @@ namespace rmos_transporter
         send_package_._EOF = 0xFF;
         send_package_.ID = RMOS_SEND_ID;
         this->target2state(target, &(send_package_.AimbotState));
-        send_package_.PitchRelativeAngle = (float)(target->gun_pitch );//* 32768.0 / 180.0
-        send_package_.YawRelativeAngle = (float)(target->gun_yaw );
+        send_package_.PitchAbsoluteAngle = (float)(target->gun_pitch );//* 32768.0 / 180.0
+        send_package_.YawAbsoluteAngle = (float)(target->gun_yaw );
         send_package_.SystemTimer = (int16_t)(target->timestamp_recv);
         send_package_.AimbotTarget = 0;
         send_package_.TargetYawSpeed = 0;
@@ -90,7 +90,7 @@ namespace rmos_transporter
 
     void UsbCommNode::target2state(const rmos_interfaces::msg::Target::SharedPtr target, u_char *buf)
     {
-        memset(buf, 0, 3);
+        memset(buf, 0,3);
         switch ((base::TrackState)target->track_state)
         {
             case base::TrackState::TRACKING:
@@ -140,20 +140,6 @@ namespace rmos_transporter
                 break;
             default:
                 break;
-        }
-
-        double distance = sqrt(target->position.x *  target->position.x +
-                               target->position.y *  target->position.y +
-                               target->position.z *  target->position.z);
-
-        if(distance<3){
-            buf[2] |= 0x01;
-        }
-        else if(3< distance&&distance<5){
-            buf[2] |= 0x02;
-        }
-        else{
-            buf[2] |= 0x03;
         }
     }
 

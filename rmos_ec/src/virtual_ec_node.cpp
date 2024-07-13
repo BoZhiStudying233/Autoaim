@@ -15,6 +15,8 @@ namespace rmos_ec
 
         // create publisher and subscriber
         this->tf_publisher_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
+        // this->mode_pub_ = this->create_publisher<std_msgs::msg::Int8>("/mode_info", 10);
+        this->mode_pub_ = this->create_publisher<std_msgs::msg::Int8>("/mode_info", rclcpp::SensorDataQoS());
         // subscriber is write by ec
         //...
 
@@ -34,8 +36,7 @@ namespace rmos_ec
         // //color_msg_.color = 1;//(int)(base::Color::BLUE);
         // color_msg_.color = 0;//(int)(base::Color::RED);
         // this->autoaim_state_msg_.autoaim_state = 1;
-        // this->mode_msg_.data = (int) (0);
-
+        this->mode_msg_.data = (int) (0);
 
         // this->transformstamped.transform.rotation.x = (double) 1.0;
         // this->transformstamped.transform.rotation.y = (double) 1.0;
@@ -47,8 +48,8 @@ namespace rmos_ec
         // //autoaim state
         // this->autoaim_state_pub_->publish(autoaim_state_msg_);
 
-        // //mode
-        // this->mode_pub_->publish(mode_msg_);
+        //mode
+        this->mode_pub_->publish(mode_msg_);
 
         // //tf
         // this->transformstamped.header.stamp = this->now();

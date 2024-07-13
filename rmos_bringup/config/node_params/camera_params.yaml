@@ -6,7 +6,7 @@
 
     width: 1280
     height: 720
-    exposure: 1200
+    exposure: 2500
     auto_exposure: false
     gain: 9
     fps: 185

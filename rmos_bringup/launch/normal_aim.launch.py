@@ -63,8 +63,6 @@ def generate_launch_description():
     )
 
 
-
-
     if launch_params['virtual_serial']: 
         communicate_node_ = Node(
             package='rmos_ec',
@@ -102,9 +100,11 @@ def generate_launch_description():
         daheng_node_,
         delay_basic_armor_detector_node_,
         delay_processer_node_,
-        communicate_node_,
-        rune_node_
+        communicate_node_
         ]
+
+    if launch_params['rune_enable']:
+        launch_description_list.append(rune_node_)
 
     # Done
     return LaunchDescription(launch_description_list)

@@ -8,8 +8,16 @@ namespace base
 {
     enum Color
     {
-        RED,
-        BLUE,
+        RED=0,
+        BLUE=1,
+    };
+
+    enum Mode{
+        NORMAL=0,     // 普通模式
+        NORMAL_RUNE=1, // 小符模式
+        RUNE=2,       // 大符模式
+        OUTPOST=3,    // 前哨站模式
+        WAIT=4,
     };
 
     enum ArmorType
@@ -30,16 +38,6 @@ namespace base
         TEMP_LOST,      // 丢失目标
         TRACKING,      // 持续识别目标
     };
-
-    enum Mode{
-        NORMAL,     // 普通模式
-        NORMAL_RUNE, // 小符模式
-        RUNE,       // 大符模式
-        OUTPOST,    // 前哨站模式
-        WAIT,
-        
-    };
-
 
     enum DebugOption{
     CONTEST,

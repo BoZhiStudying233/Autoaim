@@ -25,7 +25,7 @@
 
 #include "camera_interface.hpp"
 #include "daheng.hpp"
-#include "rmos_utils/base.hpp"
+#include "rmos_utils/const.hpp"
 #include "virtual_cam.hpp"
 
 // #include "rmos_interfaces/msg/mode.hpp"

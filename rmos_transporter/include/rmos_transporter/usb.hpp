@@ -55,8 +55,8 @@ typedef struct
 		uint8_t AimbotState;
     uint8_t AimbotTarget;
 		// 自瞄数据
-		float PitchRelativeAngle;
-    float YawRelativeAngle;
+		float PitchAbsoluteAngle;
+    float YawAbsoluteAngle;
     // 目标角速度
     float TargetPitchSpeed;
     float TargetYawSpeed;
