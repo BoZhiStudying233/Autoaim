@@ -130,7 +130,7 @@ namespace rmos_rune
 
             this->rune_detector_ = initDetector();
             // publisher
-            this->armors_pub_ = this->create_publisher<rmos_interfaces::msg::Armors>("/rmos_detector/armors", rclcpp::SensorDataQoS());
+            this->armors_pub_ = this->create_publisher<rmos_interfaces::msg::Armors>("/rune_detector/armors", rclcpp::SensorDataQoS());
 
             //debug info publisher
             debug_img_pub_ = image_transport::create_camera_publisher(this, "/debug_image", rmw_qos_profile_default);

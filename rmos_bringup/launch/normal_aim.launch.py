@@ -61,6 +61,14 @@ def generate_launch_description():
         output='screen',
         parameters=[get_params('rune')],
     )
+    solver_ = Node(
+        package='rmos_solver',
+        namespace= 'rmos_solver',
+        executable='solver',
+        name='solver',
+        output='screen',
+        parameters=[get_params('solver')],
+    )
 
 
 
@@ -103,7 +111,8 @@ def generate_launch_description():
         delay_basic_armor_detector_node_,
         delay_processer_node_,
         communicate_node_,
-        rune_node_
+        rune_node_,
+        solver_
         ]
 
     # Done
