@@ -58,9 +58,7 @@ namespace rmos_solver {
         this->aimstate_sub_callback_group_ = this->create_callback_group(CallbackGroupType::Reentrant);
         auto autoaim_state_sub_option = rclcpp::SubscriptionOptions();
         autoaim_state_sub_option.callback_group = this->aimstate_sub_callback_group_;
-        // this->autoaim_state_sub_ = this->create_subscription<rmos_interfaces::msg::AutoaimState>("/autoaim_state", rclcpp::SensorDataQoS(),
-        //                                                                                          std::bind(&RuneSolverNode::autoaimStateCallBack, this, std::placeholders::_1),
-        //                                                                                          autoaim_state_sub_option);
+        
         this->initParams();
 
         // this->detect_marker_pub_ =
@@ -69,16 +67,7 @@ namespace rmos_solver {
         //         this->create_publisher<visualization_msgs::msg::MarkerArray>("/process/marker", 10);
         this->target_pub_ = this->create_publisher<rmos_interfaces::msg::Target>("/target", rclcpp::SensorDataQoS());
 
-        // int control_interval = this->declare_parameter("control_interval", 10);
-        // auto duration = std::chrono::milliseconds(control_interval); // 毫秒
-        // auto timer_callback =
-        //     [this]() -> void
-        //     {
-        //         if(this->finish_camera_info_set)
-        //             this->publishTarget();
-        //     };
-            
-        // this->tracker_sample_ = this->create_wall_timer(duration, timer_callback);
+
     }
 
     void RuneSolverNode::armorsCallBack(const rmos_interfaces::msg::Armors::SharedPtr armors_msg)
@@ -107,11 +96,7 @@ namespace rmos_solver {
             }
 
             rmos_interfaces::msg::Target target_msg;
-            // base::Armor new_armor;
-            // new_armor.position.x = armor.pose.position.x;
-            // new_armor.position.y = armor.pose.position.y;
-            // new_armor.position.z = armor.pose.position.z;
-            // new_armor.distance_to_image_center = armor.distance_to_image_center;
+
             aiming_point.x = target_rune_armor.pose.position.x;
             aiming_point.y = target_rune_armor.pose.position.y;
             aiming_point.z = target_rune_armor.pose.position.z;
@@ -189,22 +174,6 @@ namespace rmos_solver {
         this->controler_->ballistic_solver_.setBulletSpeed(bullet_speed);
     }
 
-    // void RuneSolverNode:: autoaimStateCallBack(const rmos_interfaces::msg::AutoaimState::SharedPtr autoaim_state_msg)
-    // {
-    //     if(this->autoaim_state_buf_.size()>0)
-    //     {
-    //         if(autoaim_state_buf_.back().autoaim_state == 0 &&(*autoaim_state_msg).autoaim_state == 1) //操作手按下右键即重置当前追踪器
-    //         {
-    //             this->controler_->tracker_.reset();
-    //         }
-    //     }
-    //     this->autoaim_state_buf_.push(*autoaim_state_msg);
-    //     if (this->autoaim_state_buf_.size() > 5)
-    //     {
-    //         this->autoaim_state_buf_.pop();
-    //     }
-    // }
-
     void RuneSolverNode::initParams()
     {
         this->controler_->rune_gun_pitch_offset_ = this->declare_parameter("rune_gun_pitch_offset", 0.0f);
@@ -222,7 +191,6 @@ namespace rmos_solver {
             .height_first  = this->declare_parameter("distance_first", 400),
             .height_second  = this->declare_parameter("distance_second", 900),
             .height_third  = this->declare_parameter("distance_third", 1200),
-
         };
 
     }
