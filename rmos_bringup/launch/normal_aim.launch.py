@@ -107,10 +107,10 @@ def generate_launch_description():
 
     launch_description_list = [
         push_namespace,
-        daheng_node_,
-        delay_basic_armor_detector_node_,
-        delay_processer_node_,
-        communicate_node_,
+        # daheng_node_,
+        # delay_basic_armor_detector_node_,
+        # delay_processer_node_,
+        # communicate_node_,
         rune_node_,
         solver_
         ]

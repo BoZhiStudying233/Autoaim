@@ -51,7 +51,7 @@ namespace RuneDetector
         
         int id = 0;                                     // 扇叶识别次序
         RuneParam param;
-        base::Color enemy_color_{base::BLUE};
+        base::Color enemy_color_{base::RED};
 
         /**
          *  @brief  构造函数,初始化yolov7模型与RuneParam内的参数

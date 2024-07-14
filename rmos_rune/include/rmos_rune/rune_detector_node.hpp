@@ -128,7 +128,7 @@ namespace rmos_rune
                     this->Exposure = (*exp_msg).exp;
                 });
 
-            this->rune_detector_ = initDetector();
+            
             // publisher
             this->armors_pub_ = this->create_publisher<rmos_interfaces::msg::Armors>("/rune_detector/armors", rclcpp::SensorDataQoS());
 
@@ -147,6 +147,37 @@ namespace rmos_rune
 
             /*publish static TF*/
             this->tf_publisher_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
+            this->rune_detector_ = initDetector();
+            
+
+
+            //发布相机到陀螺仪的静态tf
+            cv::Mat cam2IMU_matrix;
+            cam2IMU_matrix = (cv::Mat_<double>(3, 3) <<0,0,1,-1,0,0,0,-1,0);
+            tf2::Matrix3x3 tf2_cam2IMU_matrix(
+                    cam2IMU_matrix.at<double>(0, 0), cam2IMU_matrix.at<double>(0, 1),
+                    cam2IMU_matrix.at<double>(0, 2), cam2IMU_matrix.at<double>(1, 0),
+                    cam2IMU_matrix.at<double>(1, 1), cam2IMU_matrix.at<double>(1, 2),
+                    cam2IMU_matrix.at<double>(2, 0), cam2IMU_matrix.at<double>(2, 1),
+                    cam2IMU_matrix.at<double>(2, 2));
+            
+            tf2::Quaternion tf2_cam2IMU_quaternion;
+            tf2_cam2IMU_matrix.getRotation(tf2_cam2IMU_quaternion);
+
+            geometry_msgs::msg::TransformStamped t;
+            // t.header.stamp =  image_msg->header.stamp;
+            // t.header.stamp = this->now();
+            t.header.frame_id = "IMU";
+            t.child_frame_id = "camera";
+            t.transform.rotation.x = tf2_cam2IMU_quaternion.x();
+            t.transform.rotation.y = tf2_cam2IMU_quaternion.y();
+            t.transform.rotation.z = tf2_cam2IMU_quaternion.z();
+            t.transform.rotation.w = tf2_cam2IMU_quaternion.w();
+            //相机到IMU存在位置的偏移，每辆车不同，请在参数文件自行更改
+            t.transform.translation.x = this->declare_parameter("camera2imu_offset_x", 0.0);
+            t.transform.translation.y = this->declare_parameter("camera2imu_offset_y", 0.0);
+            t.transform.translation.z = this->declare_parameter("camera2imu_offset_z", 0.0);
+            this->tf_publisher_->sendTransform(t) ;
         }
 
     protected:

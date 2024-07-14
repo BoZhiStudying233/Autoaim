@@ -40,17 +40,20 @@ public:
 
     BuffTrajPoint watched_points[360];  //用于拟合三维圆。将角度分为360度  日后在合适的地方清空此变量
     int get_angle_num = 0;
+    Fit fit;
+
+    int Points_num;                 //三维圆开始拟合的最小点数
+    int save_txt;
 private:
     
     Judgement judge;
-    Fit fit;
+
 
     // double DT = 0.01;                // 采样时间间隔，单位：秒
     int N = 160;                        // 角速度采样数
     int N_min = 20;                         // 角速度最小采样数
 
-    int Points_num;                 //三维圆开始拟合的最小点数
-    int save_txt;
+
 
     int DN = 1;                         // 逐差法测速度间距
 

@@ -424,7 +424,7 @@ namespace RuneDetector
         }
 
         // area现在包含了多边形内部的像素数量
-        std::cout << "Area of the object: " << area << std::endl;
+        // std::cout << "Area of the object: " << area << std::endl;
         return area;
     }
 

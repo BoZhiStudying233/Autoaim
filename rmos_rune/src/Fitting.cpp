@@ -19,14 +19,7 @@ namespace RuneDetector
     /*-----------Fitting-----------*/
     Fitting::Fitting()
     {
-        cv::FileStorage fs("/home/bozhi/Desktop/OLD-Autoaim/src/Algorithm/configure/Detector/detector/rune_detector/Rune.xml", cv::FileStorage::READ);
-        if(!fs.isOpened())
-        {
-            std::cout<<"open rune detect param fail"<<std::endl;
-        }
-        fs["points_num"] >> Points_num;
-        fs["save_txt"] >> save_txt;
-        fs.release();
+
     }
 
     bool Fitting::run(base::RuneArmor armor_1,vector<cv::Point2f> &nextPosition, Eigen::Vector3d &tVector, TrackState armor_state, base::Mode rune_mode, vector<base::RuneArmor>& rune_armors, Mat camera_matrix, Mat dist_coeffs, geometry_msgs::msg::TransformStamped transform_to_world, geometry_msgs::msg::TransformStamped transform_to_camera)

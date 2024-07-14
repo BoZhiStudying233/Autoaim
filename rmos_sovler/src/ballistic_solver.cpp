@@ -17,7 +17,7 @@ namespace solver
         double y_temp = position.z / 1000.0;
         double y = y_temp;
         double x = sqrt(position.x * position.x + position.y * position.y) / 1000.0;
-
+        
         for (int i = 0; i < 40; i++) {
             angle = atan2(y_temp, x);
             // t_actual = (exp(this->normal_ballistic_param_.k * x) - 1.0) /
@@ -29,7 +29,7 @@ namespace solver
             if (abs(dy) < 0.001)
                 break;
         }
-
+        std::cout<<"angle:"<<angle<<std::endl;
         float pitch = (angle) / M_PI * 180.0;
         float yaw = atan2(position.y,position.x)/CV_PI*180.0;
         return cv::Point3f(pitch,yaw,t_actual);

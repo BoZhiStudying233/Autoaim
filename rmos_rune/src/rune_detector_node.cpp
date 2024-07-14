@@ -33,41 +33,16 @@ namespace rmos_rune
 {
     void RuneDetectorNode::imageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr &image_msg)
     {
+        this->mode_ = base::Mode::RUNE;
         if(this->mode_ != base::Mode::RUNE&&this->mode_ != base::Mode::NORMAL_RUNE)
             return;
 
-            //发布相机到陀螺仪的静态tf
-            cv::Mat cam2IMU_matrix;
-            cam2IMU_matrix = (cv::Mat_<double>(3, 3) <<0,0,1,-1,0,0,0,-1,0);
-            tf2::Matrix3x3 tf2_cam2IMU_matrix(
-                    cam2IMU_matrix.at<double>(0, 0), cam2IMU_matrix.at<double>(0, 1),
-                    cam2IMU_matrix.at<double>(0, 2), cam2IMU_matrix.at<double>(1, 0),
-                    cam2IMU_matrix.at<double>(1, 1), cam2IMU_matrix.at<double>(1, 2),
-                    cam2IMU_matrix.at<double>(2, 0), cam2IMU_matrix.at<double>(2, 1),
-                    cam2IMU_matrix.at<double>(2, 2));
-            
-            tf2::Quaternion tf2_cam2IMU_quaternion;
-            tf2_cam2IMU_matrix.getRotation(tf2_cam2IMU_quaternion);
 
-            geometry_msgs::msg::TransformStamped t;
-            t.header.stamp =  image_msg->header.stamp;
-            t.header.frame_id = "IMU";
-            t.child_frame_id = "camera";
-            t.transform.rotation.x = tf2_cam2IMU_quaternion.x();
-            t.transform.rotation.y = tf2_cam2IMU_quaternion.y();
-            t.transform.rotation.z = tf2_cam2IMU_quaternion.z();
-            t.transform.rotation.w = tf2_cam2IMU_quaternion.w();
-            
-            //相机到IMU存在位置的偏移，每辆车不同，请在参数文件自行更改
-            t.transform.translation.x = 0.005;
-            t.transform.translation.y = 0;
-            t.transform.translation.z = 0;
-            this->tf_publisher_->sendTransform(t) ;
 
 
 
             rclcpp::Clock steady_clock_{RCL_STEADY_TIME};
-            double timestamp = t.header.stamp.sec + t.header.stamp.nanosec*1e-9;
+            double timestamp = image_msg->header.stamp.sec + image_msg->header.stamp.nanosec*1e-9;
             auto time1 = steady_clock_.now();
             cv::Mat image = cv_bridge::toCvShare(image_msg, "bgr8")->image;
             // if(debug::get_debug_option(base::SAVE_IMAGE))
@@ -130,17 +105,23 @@ namespace rmos_rune
                             }
                         }
                         //pnp solve
-                        cv::Mat tvec;
-                        cv::Mat rvec;
-                        bool is_solve;
-                        is_solve = this->pnp_solver_->solveRuneArmorPose(rune_next_pos,this->camera_matrix_,this->dist_coeffs_,tvec,rvec);
-                        if(!is_solve)
-                        {
-                            RCLCPP_WARN(this->get_logger(), "camera param empty");
-                        }
-                        tVec.x() = tvec.at<double>(0, 0);
-                        tVec.y() = tvec.at<double>(1, 0);
-                        tVec.z() = tvec.at<double>(2, 0);
+                        // cv::Mat tvec;
+                        // cv::Mat rvec;
+                        // bool is_solve;
+                        // is_solve = this->pnp_solver_->solveRuneArmorPose(rune_next_pos,this->camera_matrix_,this->dist_coeffs_,tvec,rvec);
+                        // if(!is_solve)
+                        // {
+                        //     RCLCPP_WARN(this->get_logger(), "camera param empty");
+                        // }
+                        // tVec.x() = tvec.at<double>(0, 0);
+                        // tVec.y() = tvec.at<double>(1, 0);
+                        // tVec.z() = tvec.at<double>(2, 0);
+                        tVec.x() = 1;
+                        tVec.y() = 1;
+
+                        tVec.z() = 1;
+                        cv::imshow("image", image);
+                        cv::waitKey(1);
                     }
                     else//三维圆的情况
                     {
@@ -232,7 +213,10 @@ namespace rmos_rune
             // double t1 = armors_msg.header.stamp.sec+armors_msg.header.stamp.nanosec*1e-9;//这段用于测试程序耗时用
             // double t2 = rclcpp::Clock().now().nanoseconds()*1e-9;
             //std::cout<<"time="<<t2-t1<<std::endl;
-            armors_pub_->publish(armors_msg); 
+            if(armors_msg.armors.size()!=0){
+                armors_pub_->publish(armors_msg); 
+                // std::cout<<"已发布armos"<<std::endl;
+            }
 
     }
     void RuneDetectorNode::setMode(int mode)
@@ -332,8 +316,12 @@ namespace rmos_rune
             .save_txt = this->declare_parameter("fitting_params.save_txt", 0),
             .print_result = this->declare_parameter("fitting_params.print_result", 1) // 添加了 print_result 参数声明
         };
-
-
+        // this->fitting_->fit.delay_time = this->declare_parameter("fitting_params.delay_time", 0.45f);
+        this->fitting_->Points_num =  this->declare_parameter("fitting_params.points_num", 50);
+        // this->fitting_->fit.save_txt = this->declare_parameter("fitting_params.save_txt", 0);
+        this->fitting_->fit.delay_time = params.delay_time;
+        this->fitting_->fit.print_result = params.print_result;
+        this->fitting_->fit.save_txt = this->fitting_-> save_txt = params.save_txt;
         auto rune_detector = std::make_unique<RuneDetector::DlRuneDetector>(params);
 
         return rune_detector;

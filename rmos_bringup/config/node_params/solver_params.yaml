@@ -4,4 +4,5 @@
     rune_gun_yaw_offset: 0.2 
 
     bs_fly_time: 580.0     
-    ready_time: 150.0             
+    ready_time: 150.0
+    bullet_speed: 27

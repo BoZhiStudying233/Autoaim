@@ -1,0 +1,8 @@
+digraph G {
+"IMU" -> "camera"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"world" -> "camera_optical_frame"[label=" Broadcaster: default_authority\nAverage rate: 27.866\nBuffer length: 5.024\nMost recent transform: 1720940057.933898\nOldest transform: 1720940052.909871\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1720940057.955152"[ shape=plaintext ] ;
+}->"world";
+}
