@@ -29,7 +29,7 @@ namespace solver
             if (abs(dy) < 0.001)
                 break;
         }
-        std::cout<<"angle:"<<angle<<std::endl;
+        // std::cout<<"angle:"<<angle<<std::endl;
         float pitch = (angle) / M_PI * 180.0;
         float yaw = atan2(position.y,position.x)/CV_PI*180.0;
         return cv::Point3f(pitch,yaw,t_actual);

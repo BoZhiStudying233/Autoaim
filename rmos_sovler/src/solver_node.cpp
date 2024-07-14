@@ -83,7 +83,6 @@ namespace rmos_solver {
 
     void RuneSolverNode::armorsCallBack(const rmos_interfaces::msg::Armors::SharedPtr armors_msg)
     {
-        // std::cout<<"已开始回调"<<std::endl;
         this->mode__ = base::Mode::RUNE;
         if(this->mode__ != base::Mode::RUNE&&this->mode__ != base::Mode::NORMAL_RUNE)
             return;
@@ -129,7 +128,7 @@ namespace rmos_solver {
             float pitch = gimble_pitch * 180.0 / 3.1415926535;
             float yaw = gimble_yaw * 180.0 / 3.1415926535;
             float gun_pitch = -new_pitch + controler_->rune_gun_pitch_offset_;
-            std::cout<<"gun_pitch:"<<gun_pitch<<std::endl;
+
             float gun_yaw = new_yaw + controler_->rune_gun_yaw_offset_;
 
             target_msg.id = 20;
@@ -148,7 +147,9 @@ namespace rmos_solver {
 
             target_msg.gun_pitch = gun_pitch;
             target_msg.gun_yaw = gun_yaw;
+
             target_pub_->publish(target_msg);
+
         }
         else
         {
@@ -207,22 +208,21 @@ namespace rmos_solver {
     void RuneSolverNode::initParams()
     {
         this->controler_->rune_gun_pitch_offset_ = this->declare_parameter("rune_gun_pitch_offset", 0.0f);
-        this->controler_->rune_gun_yaw_offset_ = this->declare_parameter("rune_gun_yaw_offset", 0.0f);
-        this->controler_->ballistic_solver_.bullet_speed_ = this->declare_parameter("bullet_speed", 27);
-        this->controler_->bs_fly_time_ = this->declare_parameter("bs_fly_time", 0.0f);
-        this->controler_->ready_time_ = this->declare_parameter("ready_time", 0.0f);
-
+        this->controler_->rune_gun_yaw_offset_ = this->declare_parameter("rune_gun_yaw_offset", 1.0f);
+        this->controler_->ballistic_solver_.bullet_speed_ = this->declare_parameter("bullet_speed", 26);
+        this->controler_->bs_fly_time_ = this->declare_parameter("bs_fly_time", 570.0f);
+        this->controler_->ready_time_ = this->declare_parameter("ready_time", 150.0f);
 
         this->controler_->ballistic_solver_.rune_ballistic_param_ = {
-            .bs_coeff_first = this->declare_parameter("bs_coeff_first", 1.0),
-            .bs_coeff_second = this->declare_parameter("bs_coeff_second", 1.0),
-            .bs_coeff_third = this->declare_parameter("bs_coeff_third", 1.0),
-            .bs_coeff_fourth = this->declare_parameter("bs_coeff_fourth", 1.0),
-            .distance_first  = this->declare_parameter("distance_first", 0),
-            .distance_second  = this->declare_parameter("distance_second", 0),
-            .distance_third  = this->declare_parameter("distance_third", 0),
-            .k = this->declare_parameter("k", 0.0402),
-            .g = this->declare_parameter("g", 9.75),
+            .level_first = this->declare_parameter("bs_coeff_first", 1.22),
+            .level_second = this->declare_parameter("bs_coeff_second", 1.19),
+            .level_third = this->declare_parameter("bs_coeff_third", 1.13),
+            .level_fourth = this->declare_parameter("bs_coeff_fourth", 1.13),
+            
+            .height_first  = this->declare_parameter("distance_first", 400),
+            .height_second  = this->declare_parameter("distance_second", 900),
+            .height_third  = this->declare_parameter("distance_third", 1200),
+
         };
 
     }

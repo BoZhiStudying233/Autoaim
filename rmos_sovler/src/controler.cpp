@@ -31,7 +31,7 @@ namespace solver
         uint32_t delta_vane_change_timestamp = timestamp - this->vane_change_timestamp_;
         uint32_t delta_fire_timestamp = timestamp - this->last_fire_timestamp_;
 
-        if(delta_vane_change_timestamp > ready_time_ && 
+        if(delta_vane_change_timestamp > this->ready_time_ && 
             delta_fire_timestamp > bs_fly_time_)
         {
             last_fire_timestamp_ = timestamp;
