@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <chrono>
+#include <cstdlib>
 
 #include <rclcpp/rclcpp.hpp>
 #include <tf2_ros/transform_broadcaster.h>
@@ -74,6 +75,8 @@ namespace rmos_transporter
          */
         void recevieCallBack();
 
+        void setUsbPermission();
+
         void ForceSetMode(std_msgs::msg::Int8 &mode_msg);
         void tellMode(std_msgs::msg::Int8 mode_msg);
 
@@ -88,6 +91,7 @@ namespace rmos_transporter
 
         /*time*/
         double last_time_;
+        rclcpp::Time last_receive_time_;
 
         /* Send Timer */
         rclcpp::TimerBase::SharedPtr receive_timer_;

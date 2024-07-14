@@ -9,7 +9,7 @@ namespace rmos_transporter
 {
     UsbCommNode::UsbCommNode(const rclcpp::NodeOptions &options) : CommNode("usb_comm", options)
     {
-
+        // this->setUsbPermission();
         // create callback group
         this->receive_callback_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
         this->target_sub_callback_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -22,7 +22,7 @@ namespace rmos_transporter
                  std::bind(&UsbCommNode::targetCallBack, this, std::placeholders::_1),
                  target_sub_options);
 
-        this->receive_timer_ = this->create_wall_timer(1ms, std::bind(&UsbCommNode::recevieCallBack, this));
+        this->receive_timer_ = this->create_wall_timer(100ms, std::bind(&UsbCommNode::recevieCallBack, this));
         // 可尝试定时器会不会出问题 再用线程
         // this->recevie_thread_ = std::thread(&UsbCommNode::recevieCallBack, this);
 
@@ -52,9 +52,9 @@ namespace rmos_transporter
         }
         else {
             RCLCPP_INFO(this->get_logger(), "FAILED!!!");
+            // exit(1);
         }
         RCLCPP_INFO(this->get_logger(), "Finish Init");
-
     }
 
     UsbCommNode::~UsbCommNode()
@@ -145,9 +145,22 @@ namespace rmos_transporter
 
     void UsbCommNode::recevieCallBack()
     {
+        RCLCPP_INFO(this->get_logger(), "read size :1111" );
         uint8_t receive_package[64];
         int read_size = transporter_->read(receive_package, 64);
-        // RCLCPP_INFO(gimbal_hw_node_->get_logger(), "read size : %d", read_size);
+        // TODO
+        // if(read_size == -1)
+        // {
+        //     rclcpp::Clock steady_clock_{RCL_STEADY_TIME};
+        //     if((steady_clock_.now() - last_receive_time_) > rclcpp::Duration(5, 0)) // 5s无数据包
+        //     {
+        //         setUsbPermission();
+        //         transporter_->open();
+        //     }
+        //     return;
+        // }
+        // rclcpp::Clock steady_clock_{RCL_STEADY_TIME};
+        // last_receive_time_ = steady_clock_.now();;
 
         switch (receive_package[1])
         {
@@ -202,6 +215,14 @@ namespace rmos_transporter
             }
             
         }
+    }
+
+    void UsbCommNode::setUsbPermission()
+    {        
+        system("echo 'nuc' | sudo -s chmod 777 /dev/bus/usb/001/*");
+        system("echo 'nuc' | sudo -s chmod 777 /dev/bus/usb/002/*");
+        system("echo 'nuc' | sudo -s chmod 777 /dev/bus/usb/003/*");
+        system("echo 'nuc' | sudo -s chmod 777 /dev/bus/usb/004/*");
     }
 
     void UsbCommNode::ForceSetMode(std_msgs::msg::Int8 &mode_msg)
