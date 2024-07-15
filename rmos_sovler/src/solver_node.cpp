@@ -72,7 +72,7 @@ namespace rmos_solver {
 
     void RuneSolverNode::armorsCallBack(const rmos_interfaces::msg::Armors::SharedPtr armors_msg)
     {
-        this->mode__ = base::Mode::RUNE;
+        // this->mode__ = base::Mode::RUNE;
         if(this->mode__ != base::Mode::RUNE&&this->mode__ != base::Mode::NORMAL_RUNE)
             return;
         if (quaternion_buf_.size() > 0) {

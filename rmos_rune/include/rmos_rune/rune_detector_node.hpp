@@ -118,7 +118,6 @@ namespace rmos_rune
                     //RCLCPP_INFO(this->get_logger(), "mode is %d", (*mode_msg).mode);
                     int mode = (*mode_msg).data;
                     setMode(mode);
-                    
                 });
             this->exp_sub_ = this->create_subscription<rmos_interfaces::msg::Exp>
                 ("/exp_info", rclcpp::SensorDataQoS(), [this](rmos_interfaces::msg::Exp::ConstSharedPtr exp_msg)

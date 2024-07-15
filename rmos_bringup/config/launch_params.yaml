@@ -10,4 +10,4 @@ video_play: true
 # true: 虚拟下位机 false: 实车 
 virtual_serial: true 
 # true: 开启打符 false：关闭打符
-rune: false 
+rune_enable: true 

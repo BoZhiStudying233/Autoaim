@@ -67,6 +67,8 @@ namespace rmos_transporter
          */
         void target2state(const rmos_interfaces::msg::Target::SharedPtr target, u_char *buf);
 
+        void target2AimbotTarget(const rmos_interfaces::msg::Target::SharedPtr target, u_char *buf);
+
         /**
          *  @brief  读取usb数据的线程函数
          */

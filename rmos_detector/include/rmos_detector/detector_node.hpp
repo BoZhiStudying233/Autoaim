@@ -53,6 +53,8 @@ namespace rmos_detector
         std::shared_ptr<image_transport::Subscriber> image_sub_;
         rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_sub_;
         rclcpp::Subscription<rmos_interfaces::msg::Color>::SharedPtr color_sub_;
+        rclcpp::Subscription<std_msgs::msg::Int8>::SharedPtr mode_sub_;
+        base::Mode mode_ = base::Mode::NORMAL;
     };
 
     class BasicDetectorNode : public virtual BaseDetectorNode

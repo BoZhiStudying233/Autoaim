@@ -60,6 +60,13 @@ namespace rmos_detector
                     int enemy_color = (*color_msg).color;
                     this->detector_->setEnemyColor(enemy_color);
                 });
+
+        this->mode_sub_ = this->create_subscription<std_msgs::msg::Int8>
+                ("/mode_info", rclcpp::SensorDataQoS(), [this](std_msgs::msg::Int8::ConstSharedPtr mode_msg)
+                {
+                    //RCLCPP_INFO(this->get_logger(), "mode is %d", (*mode_msg).mode);
+                    this->mode_ = (*mode_msg).data==0 ? base::Mode::NORMAL : base::Mode::WAIT;
+                });
         // publisher
         this->armors_pub_ = this->create_publisher<rmos_interfaces::msg::Armors>("/rmos_detector/armors", rclcpp::SensorDataQoS());
 
@@ -106,6 +113,11 @@ namespace rmos_detector
 
     void BasicDetectorNode::imageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr &image_msg)
     {
+        if(this->mode_ != base::Mode::NORMAL)
+        {
+            return;
+        }
+
         rclcpp::Clock steady_clock_{RCL_STEADY_TIME};
         auto time1 = steady_clock_.now();
         auto image = cv_bridge::toCvShare(image_msg, "bgr8")->image;

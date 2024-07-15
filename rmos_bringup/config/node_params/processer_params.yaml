@@ -10,9 +10,9 @@
     s2qr: 0.2
 
     r_xyz_factor: 3.4e-4
-    r_yaw: 3e-2
+    r_yaw: 3e-3
 
-    delay: 0.1
+    delay: 0.03
     true_x: 640
 
     gun_pitch_offset: 0.0
@@ -34,7 +34,7 @@
 
     k: 0.0402
     g: 9.75
-    bullet_speed: 27
+    bullet_speed: 28
 
     # tracker params
     max_match_distance: 0.5

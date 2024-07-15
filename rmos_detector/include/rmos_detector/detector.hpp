@@ -21,7 +21,7 @@
 #include <chrono>
 
 #include "rmos_utils/armor.hpp"
-#include "rmos_utils/base.hpp"
+#include "rmos_utils/const.hpp"
 
 namespace detector
 {
