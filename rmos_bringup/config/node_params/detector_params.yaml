@@ -3,7 +3,7 @@
     debug: 1
 
     # 相机到IMU存在位置的偏移
-    camera2imu_offset_x: 0.005
+    camera2imu_offset_x: 0.065
     camera2imu_offset_y: 0.0
     camera2imu_offset_z: 0.0
 

@@ -348,7 +348,7 @@ namespace processer
         double delta_x = abs(x-this->true_x_);
         // std::cout<<"x  is"<<x<<std::endl;
 
-        double fire_area = abs(120/v_yaw);
+        double fire_area = abs(100/v_yaw);
         if(fire_area<20){
             fire_area=20;
         }
