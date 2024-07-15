@@ -61,6 +61,14 @@ def generate_launch_description():
         output='screen',
         parameters=[get_params('rune')],
     )
+    solver_ = Node(
+        package='rmos_solver',
+        namespace= 'rmos_solver',
+        executable='solver',
+        name='solver',
+        output='screen',
+        parameters=[get_params('solver')],
+    )
 
 
     if launch_params['virtual_serial']: 
@@ -105,6 +113,7 @@ def generate_launch_description():
 
     if launch_params['rune_enable']:
         launch_description_list.append(rune_node_)
+        launch_description_list.append(solver_)
 
     # Done
     return LaunchDescription(launch_description_list)

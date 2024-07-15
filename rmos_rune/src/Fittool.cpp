@@ -129,15 +129,8 @@ namespace RuneDetector
 
     Fit::Fit()
     {
-        cv::FileStorage fs("/home/bozhi/Desktop/OLD-Autoaim/src/Algorithm/configure/Detector/detector/rune_detector/Rune.xml", cv::FileStorage::READ);
-        if(!fs.isOpened())
-        {
-            std::cout<<"open rune detect param fail"<<std::endl;
-        }
-        fs["delay_time"] >> delay_time;
-        fs["save_txt"] >> save_txt;
-        fs["print_result"] >> print_result;
-        fs.release();
+
+
     }
 
     double Fit::run(vector<SpeedTime> Fittingdata, double N, base::Mode rune_mode)
