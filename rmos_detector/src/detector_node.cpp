@@ -117,7 +117,7 @@ namespace rmos_detector
         {
             return;
         }
-
+        // return ;
         rclcpp::Clock steady_clock_{RCL_STEADY_TIME};
         auto time1 = steady_clock_.now();
         auto image = cv_bridge::toCvShare(image_msg, "bgr8")->image;
@@ -181,7 +181,7 @@ namespace rmos_detector
         }
         auto time2 = steady_clock_.now();
 
-        if(this->debug)RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
+        // if(this->debug)RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
 
         if(this->debug)
         {

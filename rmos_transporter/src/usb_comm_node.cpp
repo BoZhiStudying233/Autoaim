@@ -82,7 +82,8 @@ namespace rmos_transporter
         send_package_.PitchAbsoluteAngle = (float)(target->gun_pitch );//* 32768.0 / 180.0
         send_package_.YawAbsoluteAngle = (float)(target->gun_yaw );
         send_package_.SystemTimer = (int16_t)(target->timestamp_recv);
-        send_package_.AimbotTarget = 0;
+        // send_package_.AimbotTarget = 0;
+        // std::cout<<"send_package_.AimbotTarget:"<<(int)send_package_.AimbotTarget<<std::endl;
         send_package_.TargetYawSpeed = 0;
         send_package_.TargetPitchSpeed = 0;
         transporter_->write((unsigned char *)&send_package_, sizeof(transporter::RMOSSendPackage));
@@ -110,6 +111,7 @@ namespace rmos_transporter
         }
         if (target->suggest_fire)
             buf[0] |= 0x02;
+        // this->send_package_.AimbotTarget = target->id;
         switch (target->id)
         {
             case 0:
@@ -145,7 +147,7 @@ namespace rmos_transporter
 
     void UsbCommNode::recevieCallBack()
     {
-        RCLCPP_INFO(this->get_logger(), "read size :1111" );
+        // RCLCPP_INFO(this->get_logger(), "read size :1111" );
         uint8_t receive_package[64];
         int read_size = transporter_->read(receive_package, 64);
         // TODO
@@ -228,7 +230,7 @@ namespace rmos_transporter
     void UsbCommNode::ForceSetMode(std_msgs::msg::Int8 &mode_msg)
     {
         int force_mode = this->declare_parameter("force_mode", 0);
-
+        std::cout<<"force_mode:"<<force_mode<<std::endl;
         switch(force_mode)
         {
             case -1: break;
