@@ -82,7 +82,6 @@ namespace rmos_transporter
         send_package_.PitchAbsoluteAngle = (float)(target->gun_pitch );//* 32768.0 / 180.0
         send_package_.YawAbsoluteAngle = (float)(target->gun_yaw );
         send_package_.SystemTimer = (int16_t)(target->timestamp_recv);
-        send_package_.AimbotTarget = 0;
         send_package_.TargetYawSpeed = 0;
         send_package_.TargetPitchSpeed = 0;
         transporter_->write((unsigned char *)&send_package_, sizeof(transporter::RMOSSendPackage));
@@ -133,7 +132,7 @@ namespace rmos_transporter
                 buf[1] |= 0x10;
                 break;
             case 6:
-                buf[1] |= 0x40;
+                buf[1] |= 0x40;  // sentry
                 break;
             case 7:
                 buf[1] |= 0x20;
