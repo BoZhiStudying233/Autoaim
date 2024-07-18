@@ -81,7 +81,7 @@ namespace rmos_transporter
         void tellMode(std_msgs::msg::Int8 mode_msg);
 
         std::shared_ptr<transporter_sdk::TransporterInterface> transporter_; // usb通信接口
-
+        
         /* package */
         transporter::RMOSSendPackage send_package_;
 
@@ -112,6 +112,8 @@ namespace rmos_transporter
         int interface_usb_write_timeout_;
 
         bool debug;
+
+        int force_mode;
     };
 
 }

@@ -35,6 +35,8 @@ namespace rmos_transporter
         interface_usb_write_endpoint_ = this->declare_parameter("interface_usb_write_endpoint", 0x01);
         interface_usb_read_timeout_ = this->declare_parameter("interface_usb_read_timeout", 1);
         interface_usb_write_timeout_ = this->declare_parameter("interface_usb_write_timeout", 1);
+        
+        force_mode = this->declare_parameter("force_mode", 0);
 
         this->debug = this->declare_parameter("debug", 0);
         RCLCPP_INFO(this->get_logger(), "Init Transporter");
@@ -83,6 +85,8 @@ namespace rmos_transporter
         send_package_.PitchAbsoluteAngle = (float)(target->gun_pitch );//* 32768.0 / 180.0
         send_package_.YawAbsoluteAngle = (float)(target->gun_yaw );
         send_package_.SystemTimer = (int16_t)(target->timestamp_recv);
+        // send_package_.AimbotTarget = 0;
+        // std::cout<<"send_package_.AimbotTarget:"<<(int)send_package_.AimbotTarget<<std::endl;
         // send_package_.AimbotTarget = 0;
         // std::cout<<"send_package_.AimbotTarget:"<<(int)send_package_.AimbotTarget<<std::endl;
         send_package_.TargetYawSpeed = 0;
@@ -240,9 +244,8 @@ namespace rmos_transporter
 
     void UsbCommNode::ForceSetMode(std_msgs::msg::Int8 &mode_msg)
     {
-        int force_mode = this->declare_parameter("force_mode", 0);
-        std::cout<<"force_mode:"<<force_mode<<std::endl;
-        switch(force_mode)
+        std::cout<<"force_mode:"<<this->force_mode<<std::endl;
+        switch(this->force_mode)
         {
             case -1: break;
             case 0:
