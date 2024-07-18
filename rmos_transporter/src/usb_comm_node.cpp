@@ -27,6 +27,7 @@ namespace rmos_transporter
         // this->recevie_thread_ = std::thread(&UsbCommNode::recevieCallBack, this);
 
         quaternion_time_msg_.quaternion_stamped.header.frame_id = std::string("Imu");
+        this->tf_publisher_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
         interface_usb_vid_ = this->declare_parameter("interface_usb_vid", 0x0483);
         interface_usb_pid_ = this->declare_parameter("interface_usb_pid", 0x5740);
@@ -82,7 +83,8 @@ namespace rmos_transporter
         send_package_.PitchAbsoluteAngle = (float)(target->gun_pitch );//* 32768.0 / 180.0
         send_package_.YawAbsoluteAngle = (float)(target->gun_yaw );
         send_package_.SystemTimer = (int16_t)(target->timestamp_recv);
-        send_package_.AimbotTarget = 0;
+        // send_package_.AimbotTarget = 0;
+        // std::cout<<"send_package_.AimbotTarget:"<<(int)send_package_.AimbotTarget<<std::endl;
         send_package_.TargetYawSpeed = 0;
         send_package_.TargetPitchSpeed = 0;
         transporter_->write((unsigned char *)&send_package_, sizeof(transporter::RMOSSendPackage));
@@ -110,6 +112,7 @@ namespace rmos_transporter
         }
         if (target->suggest_fire)
             buf[0] |= 0x02;
+        // this->send_package_.AimbotTarget = target->id;
         switch (target->id)
         {
             case 0:
@@ -145,7 +148,7 @@ namespace rmos_transporter
 
     void UsbCommNode::recevieCallBack()
     {
-        RCLCPP_INFO(this->get_logger(), "read size :1111" );
+        // RCLCPP_INFO(this->get_logger(), "read size :1111" );
         uint8_t receive_package[64];
         int read_size = transporter_->read(receive_package, 64);
         // TODO
@@ -210,7 +213,17 @@ namespace rmos_transporter
                 quaternion_time_msg_.quaternion_stamped.quaternion.y = (double)package.q2;
                 quaternion_time_msg_.quaternion_stamped.quaternion.z = (double)package.q3;  
                 memcpy(&quaternion_time_msg_.timestamp_recv, &package.TimeStamp, 4);   
-                this->quaternion_pub_->publish(quaternion_time_msg_);       
+                this->quaternion_pub_->publish(quaternion_time_msg_);     
+
+                geometry_msgs::msg::TransformStamped t;
+                t.header.stamp =  quaternion_time_msg_.quaternion_stamped.header.stamp;
+                t.header.frame_id = "world"; //注意坐标系
+                t.child_frame_id = "IMU";
+                t.transform.rotation.x = quaternion_time_msg_.quaternion_stamped.quaternion.x;
+                t.transform.rotation.y = quaternion_time_msg_.quaternion_stamped.quaternion.y;
+                t.transform.rotation.z = quaternion_time_msg_.quaternion_stamped.quaternion.z;
+                t.transform.rotation.w = quaternion_time_msg_.quaternion_stamped.quaternion.w;
+                tf_publisher_->sendTransform(t);
                 break;
             }
             
@@ -228,7 +241,7 @@ namespace rmos_transporter
     void UsbCommNode::ForceSetMode(std_msgs::msg::Int8 &mode_msg)
     {
         int force_mode = this->declare_parameter("force_mode", 0);
-
+        std::cout<<"force_mode:"<<force_mode<<std::endl;
         switch(force_mode)
         {
             case -1: break;

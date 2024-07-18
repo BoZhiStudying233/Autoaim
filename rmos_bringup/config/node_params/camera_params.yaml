@@ -6,7 +6,7 @@
 
     width: 1280
     height: 720
-    exposure: 2500
+    exposure: 1600
     auto_exposure: false
     gain: 9
     fps: 185
@@ -14,7 +14,7 @@
     rgain: 19.8
     bgain: 19.8
     ggain: 10.0
-    time_offset: 30000000
+    time_offset: 70000000
     offsetX: 0  # TODO
     offsetY: 0  # TODO
 

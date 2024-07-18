@@ -212,10 +212,11 @@ namespace processer
             cv::Point3d p_center = cv::Point3d(xc, yc, za + dz/ 2);
             cv::Point3d velocity_linear = cv::Point3d(vx, vy, vz);
             double all_time = ballistic_solver_.getAngleTime(p_center * 1000, false).z + delay_;
+            // double all_time=0;
 
-            cv::Point3d linear_change = cv::Point3d(velocity_linear.x * (all_time+0.05),
-                                                    velocity_linear.y * (all_time+0.05),
-                                                    velocity_linear.z * (all_time+0.05));
+           cv::Point3d linear_change = cv::Point3d(velocity_linear.x * (all_time+0),
+                                                    velocity_linear.y * (all_time+0),
+                                                    velocity_linear.z * (all_time+0));
             cv::Point3d p_predict_center = p_center + linear_change; //预测中心点
             if(std::sqrt(p_predict_center.x * p_predict_center.x +
                 p_predict_center.y * p_predict_center.y +

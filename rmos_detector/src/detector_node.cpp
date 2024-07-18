@@ -117,7 +117,7 @@ namespace rmos_detector
         {
             return;
         }
-
+        // return ;
         rclcpp::Clock steady_clock_{RCL_STEADY_TIME};
         auto time1 = steady_clock_.now();
         auto image = cv_bridge::toCvShare(image_msg, "bgr8")->image;

@@ -40,8 +40,6 @@ namespace rmos_processer {
                 this->get_node_clock_interface(), std::chrono::duration<int>(100));
         tf2_filter_->registerCallback(&ProcesserNode::armorsCallBack, this);
 
-        this->tf_publisher_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
-
         this->quaternion_sub_callback_group_ = this->create_callback_group(CallbackGroupType::Reentrant);
         auto quaternion_sub_option = rclcpp::SubscriptionOptions();
         quaternion_sub_option.callback_group = this->quaternion_sub_callback_group_;
@@ -84,6 +82,7 @@ namespace rmos_processer {
 
     void ProcesserNode::armorsCallBack(const rmos_interfaces::msg::Armors::SharedPtr armors_msg)
     {
+        // return ;
         if (quaternion_buf_.size() > 0) {
             uint32_t timestamp_recv = quaternion_buf_.back().timestamp_recv;
 
@@ -204,15 +203,6 @@ namespace rmos_processer {
         {
             quaternion_buf_.pop();
         }
-        geometry_msgs::msg::TransformStamped t;
-        t.header.stamp =  quaternion_msg->quaternion_stamped.header.stamp;
-        t.header.frame_id = "world"; //注意坐标系
-        t.child_frame_id = "IMU";
-        t.transform.rotation.x = quaternion_msg->quaternion_stamped.quaternion.x;
-        t.transform.rotation.y = quaternion_msg->quaternion_stamped.quaternion.y;
-        t.transform.rotation.z = quaternion_msg->quaternion_stamped.quaternion.z;
-        t.transform.rotation.w = quaternion_msg->quaternion_stamped.quaternion.w;
-        tf_publisher_->sendTransform(t);
     }
 
     void ProcesserNode::bsCallBack(const rmos_interfaces::msg::BulletSpeed::SharedPtr bs_msg)

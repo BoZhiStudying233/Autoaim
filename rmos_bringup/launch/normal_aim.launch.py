@@ -112,7 +112,7 @@ def generate_launch_description():
         ]
 
     if launch_params['rune_enable']:
-        launch_description_list.append(rune_node_)
+        # launch_description_list.append(rune_node_)
         launch_description_list.append(solver_)
 
     # Done
