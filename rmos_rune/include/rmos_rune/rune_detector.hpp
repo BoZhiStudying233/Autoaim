@@ -49,9 +49,12 @@ namespace RuneDetector
         base::RuneArmor last_target;
         std::vector<cv::Point2f> nextPos;
         
+        int vane_change_threshold = 0; // 扇叶切换帧数阈值
+        int vane_change_count = 0; // 扇叶切换帧数计数
+
         int id = 0;                                     // 扇叶识别次序
         RuneParam param;
-        base::Color enemy_color_{base::RED};
+        base::Color enemy_color_{base::BLUE};
 
         /**
          *  @brief  构造函数,初始化yolov7模型与RuneParam内的参数

@@ -105,15 +105,15 @@ def generate_launch_description():
 
     launch_description_list = [
         push_namespace,
-        daheng_node_,
-        delay_basic_armor_detector_node_,
-        delay_processer_node_,
-        communicate_node_
+        # daheng_node_,
+        # delay_basic_armor_detector_node_,
+        # delay_processer_node_,
+        # communicate_node_
         ]
 
     if launch_params['rune_enable']:
         launch_description_list.append(rune_node_)
-        launch_description_list.append(solver_)
+        # launch_description_list.append(solver_)
 
     # Done
     return LaunchDescription(launch_description_list)

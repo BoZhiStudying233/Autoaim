@@ -108,8 +108,17 @@ namespace RuneDetector
     {
         // 通过距离判断是否为旧符
         float max_diff_distance_ratio= calDistance(target.armor_center, last_target.armor_center) / calDistance(target.armor_center, target.circle_center);
+
+        
         if (max_diff_distance_ratio > param.max_diff_distance_ratio)
         {
+            this->vane_change_count++;
+            if(this->vane_change_count < this->vane_change_threshold)
+            {
+                this->target = this->last_target;
+                return true;
+            }
+            this->vane_change_count = 0;
             cout<<"vane is changing!"<<endl;
             this->id++;
             // std::cin.get();
