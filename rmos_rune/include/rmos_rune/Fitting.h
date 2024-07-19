@@ -62,7 +62,7 @@ private:
     bool is_direction_inited = false;   // 能量机关旋转方向初始化
     bool is_clockwise;                  // 顺时针
 
-    double armor_buffer_erase_threshold = 0.2;    // 阈值，armor_buffer首末数据之差，若超过该阈值则清除armor_buffer首数据
+    double armor_buffer_erase_threshold = 0.4;    // 阈值，armor_buffer首末数据之差，若超过该阈值则清除armor_buffer首数据
     double call_speed_threshold = 0.005;          // 阈值，armor_buffer首末数据之差，若超过该阈值则计算角速度
     double clear_data_threshold = 0.8;            // 阈值，新来数据时间与上一时刻存入的时间之差，若超过该阈值则重置所有数据(进入clearData)
     
@@ -72,7 +72,7 @@ private:
     std::vector<float> angle_points;
 
     // txt文件保存数据
-    string path = "./src/Algorithm/configure/Detector/Fitting/angle_state/";
+    string path = "./rmos_rune/drawRune/Data/angle_state/";
     string filename;
     bool have_file_count = false;
     bool have_first_time =false;

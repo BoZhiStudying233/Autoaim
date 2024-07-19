@@ -7,7 +7,7 @@ predict_time = []
 now_speed = []
 now_angle = []
 
-path = './src/Algorithm/configure/Detector/Fitting/angle_state/'
+path = './rmos_rune/drawRune/Data/angle_state/'
 file_list = os.listdir(path)
 
 # 得到文件夹中文件数最大的文件名

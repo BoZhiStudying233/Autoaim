@@ -62,7 +62,7 @@ namespace RuneDetector
         inputs.push_back(image);
         rt.run(inputs, outputs);
         std::vector<DetectResult> output = outputs[0];
-
+        // std::cout<<"size:"<<output.size()<<std::endl;
         image.copyTo(src);
         DlPreDeal(image);
                 
@@ -243,12 +243,13 @@ namespace RuneDetector
                 //     last_circle_center_conf = output[i].conf;
                 // }
 
-                if(find_no_activate && output[i].id == 1 && output[i].conf > last_target_conf)
+                if(find_no_activate && output[i].id == 1)
                 {
                     changePoints(output[i].points);
                     int temp_size = calculateBinarySize(output[i].points);
                     if(this->high_size > temp_size && temp_size < this->high_threshold)
                     {
+                        this->high_size = temp_size;
                         this->target = base::RuneArmor(output[i].points);
                         last_target_conf = output[i].conf; 
                         find_target = true;        

@@ -40,7 +40,6 @@ namespace rmos_rune
 
         rclcpp::Clock steady_clock_{RCL_STEADY_TIME};
         double timestamp = image_msg->header.stamp.sec + image_msg->header.stamp.nanosec*1e-9;
-        auto time1 = steady_clock_.now();
         cv::Mat image = cv_bridge::toCvShare(image_msg, "bgr8")->image;
 
         rmos_interfaces::msg::Armors armors_msg;
@@ -51,9 +50,9 @@ namespace rmos_rune
 
         base::RuneArmor target_rune_armor;
         std::vector<base::RuneArmor> rune_armors;
-    
+        auto time1 = steady_clock_.now();
         this->rune_detector_->DlRuneDetect(image,target_rune_armor, rune_armors);
-
+        // std::cout<<"time:"<<(time1 - time2).seconds()<<std::endl;
 
 
         armor_msg.num_id = rune_detector_->id;
@@ -76,16 +75,17 @@ namespace rmos_rune
             {
                 RCLCPP_ERROR(this->get_logger(), "Could not get the transformation!!");
             }
-        
+            
         if(fitting_->run(target_rune_armor, rune_next_pos, tVec, rune_detector_->state, this->mode_, rune_armors, this->camera_matrix_, this->dist_coeffs_, transform_to_world, transform_to_camera))
         {
+
             if(rune_next_pos.size() == 4)//二维圆的情况
             {
                 // 若预测后的点在图片上才可画图，否则程序会异常终止
                 bool can_draw = true;
                 for(int i = 0; i < 4; i++)
                 {
-                    
+                     
                     if(rune_next_pos[i].x < 0 || rune_next_pos[i].y < 0 || rune_next_pos[i].x > image.cols || rune_next_pos[i].y > image.rows)
                         can_draw = false;
                 }
@@ -176,7 +176,6 @@ namespace rmos_rune
         armors_msg.is_rune = true;
         
 
-        auto time2 = steady_clock_.now();
 
         text = "Exposure:" + std::to_string(this->Exposure);
         cv::putText(image, text, (cv::Point2i(0, 50), cv::Point2i(20, 50)), cv::FONT_HERSHEY_SIMPLEX, 1,
@@ -184,8 +183,9 @@ namespace rmos_rune
 
         if(false)
             saveDrawImage(timestamp, image);
-        
-        if(false)
+        auto time2 = steady_clock_.now();
+
+        if(true)
             RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
         if(true){
             debug_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();

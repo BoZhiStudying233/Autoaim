@@ -207,7 +207,7 @@ namespace rmos_transporter
                 if (package.mode & (0x08)){
                     mode_msg_.data = (int) base::Mode::NORMAL_RUNE;
                 }
-                // ForceSetMode(mode_msg_); // bi sai zhu shi diao
+                ForceSetMode(mode_msg_); // bi sai zhu shi diao
                 // tellMode(mode_msg_);
                 this->mode_pub_->publish(mode_msg_);
 
@@ -244,7 +244,7 @@ namespace rmos_transporter
 
     void UsbCommNode::ForceSetMode(std_msgs::msg::Int8 &mode_msg)
     {
-        std::cout<<"force_mode:"<<this->force_mode<<std::endl;
+        // std::cout<<"force_mode:"<<this->force_mode<<std::endl;
         switch(this->force_mode)
         {
             case -1: break;

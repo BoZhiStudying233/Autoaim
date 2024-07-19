@@ -1,4 +1,5 @@
 #include "rmos_rune/Fittool.h"
+#include <chrono>
 
 namespace RuneDetector
 {
@@ -143,13 +144,15 @@ namespace RuneDetector
         double w_temp = this->w_min; 
         double w_best = this->w_min;
         double min_error = DBL_MAX;
-
         while(w_temp <= this->w_max)
         {
             Eigen::Vector3d output;
             double error;
+            auto Fittime1 = std::chrono::steady_clock::now();
             if(fitting(Fittingdata, w_temp, output, error))
             {
+                auto Fittime2 = std::chrono::steady_clock::now();
+                // std::cout<<"time:"<<(Fittime2 - Fittime1).count()*1e-6<<std::endl;
                 if(min_error > error)
                 {
                     change_data = true;
@@ -181,9 +184,9 @@ namespace RuneDetector
         
         if(this->print_result)
             cout<< "w:" << w
-             << "\tmin_error:"<< min_error<<"\tw_max:"<<this->w_max<<"\t"<<w_min<< endl;   
+             << "\t min_error:"<< min_error<<endl;   
         
-        solve_w();
+        // solve_w();
 
         if(this->save_txt)
         {

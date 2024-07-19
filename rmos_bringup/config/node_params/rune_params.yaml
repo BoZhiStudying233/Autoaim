@@ -11,7 +11,7 @@
 
     deep_learning_params:
       circle_center_conf: 0
-      no_activate_conf: 0.7
+      no_activate_conf: 0.7  
       activate_conf: 0
       circle_center_roi_width: 20
       max_diff_distance_ratio: 0.5

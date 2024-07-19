@@ -86,7 +86,7 @@ namespace RuneDetector
         base::Color vane_color = base::Color::BLUE;
         Point2f dl_points[4];
         int high_size;// 高亮区域大小
-        int high_threshold = 2200; // 高亮区域阈值
+        int high_threshold = 999999; // 高亮区域阈值2200
 
 
         /**

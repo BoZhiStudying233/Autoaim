@@ -100,7 +100,7 @@ namespace rmos_solver {
             aiming_point.x = target_rune_armor.pose.position.x;
             aiming_point.y = target_rune_armor.pose.position.y;
             aiming_point.z = target_rune_armor.pose.position.z;
-
+            // std::cout<<"distance:"<<sqrt(aiming_point.z * aiming_point.z + aiming_point.x * aiming_point.x + aiming_point.y * aiming_point.y)<<std::endl;
             cv::Point3f p_y_t = controler_->ballistic_solver_.getAngleTime(aiming_point*1000, armors_msg->is_rune);
             float new_pitch = p_y_t.x;
             float new_yaw = p_y_t.y;
