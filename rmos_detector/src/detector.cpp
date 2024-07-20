@@ -165,7 +165,6 @@ namespace detector
                         top = cv::Point2f((b_rect.y - b) / k, b_rect.y);
                         bottom = cv::Point2f((b_rect.y + b_rect.height - b) / k, b_rect.y + b_rect.height);
                     }
-                    cv::line(image, top, bottom, cv::Scalar(0, 255, 0), 2);
                     light.up = findMaxBrightnessChange(image(b_rect), top, (top+bottom)/2);
                     light.down = findMaxBrightnessChange(image(b_rect), bottom, (top+bottom)/2);
                 }

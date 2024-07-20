@@ -38,10 +38,10 @@ namespace rmos_ec
         // this->autoaim_state_msg_.autoaim_state = 1;
         this->mode_msg_.data = (int) (0);
 
-        // this->transformstamped.transform.rotation.x = (double) 1.0;
-        // this->transformstamped.transform.rotation.y = (double) 1.0;
-        // this->transformstamped.transform.rotation.z = (double) 1.0;
-        // this->transformstamped.transform.rotation.w = (double) 1.0;
+        this->transformstamped.transform.rotation.x = (double) 1.0;
+        this->transformstamped.transform.rotation.y = (double) 1.0;
+        this->transformstamped.transform.rotation.z = (double) 1.0;
+        this->transformstamped.transform.rotation.w = (double) 1.0;
         // //color
         // this->color_pub_->publish(color_msg_);
 
@@ -52,11 +52,11 @@ namespace rmos_ec
         this->mode_pub_->publish(mode_msg_);
 
         // //tf
-        // this->transformstamped.header.stamp = this->now();
-        // this->transformstamped.header.frame_id = "world";
-        // this->transformstamped.child_frame_id = "IMU";
+        this->transformstamped.header.stamp = this->now();
+        this->transformstamped.header.frame_id = "world";
+        this->transformstamped.child_frame_id = "IMU";
 
-        // tf_publisher_->sendTransform(transformstamped);
+        tf_publisher_->sendTransform(transformstamped);
         quaternion_time_msg_.quaternion_stamped.header.frame_id = std::string("IMU");
         quaternion_time_msg_.quaternion_stamped.header.stamp = this->now();
         quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)1;

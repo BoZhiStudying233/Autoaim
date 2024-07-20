@@ -108,7 +108,6 @@ namespace rmos_processer
         std::shared_ptr <tf2_ros::Buffer> tf2_buffer_;
         std::shared_ptr <tf2_ros::TransformListener> tf2_listener_;
         std::shared_ptr <tf2_filter> tf2_filter_;
-        std::shared_ptr<tf2_ros::TransformBroadcaster> tf_publisher_;
 
         /* Visualization marker publisher  */
         visualization_msgs::msg::MarkerArray detect_marker_array_;
