@@ -36,6 +36,7 @@ namespace detector
         double angle_to_vertigal_max;
         double height_width_min_ratio;
         double size_area_min_ratio;
+        bool isCornerCorrect;
     };
 
     struct ArmorParams
@@ -62,6 +63,7 @@ namespace detector
         bool isLight(base::LightBlob light);
         bool matchLights(std::vector<base::LightBlob>& lights,std::vector<base::Armor>& armors);
         bool isArmor(base::LightBlob light_1,base::LightBlob light_2);
+        cv::Point findMaxBrightnessChange(const cv::Mat& image, cv::Point start, cv::Point end);
 
         ProcessParams process_params_;
         LightParams light_params_;

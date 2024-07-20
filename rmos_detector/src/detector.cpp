@@ -44,6 +44,33 @@ namespace detector
         return true;
     }
 
+    cv::Point Detector::findMaxBrightnessChange(const cv::Mat& image, cv::Point start, cv::Point end) {
+        int maxChange = 0;
+        cv::Point maxChangePoint = start;
+
+        // Generate points on the line using cv::LineIterator
+        cv::LineIterator it(image, start, end, 8);
+
+        cv::Point prevPoint = start;
+        int prevBrightness = image.at<uchar>(prevPoint.y, prevPoint.x);
+
+        for (int i = 1; i < it.count; i++, ++it) {
+            cv::Point currentPoint = it.pos();
+            int currentBrightness = image.at<uchar>(currentPoint.y, currentPoint.x);
+            int change = std::abs(currentBrightness - prevBrightness);
+
+            if (change > maxChange) {
+                maxChange = change;
+                maxChangePoint = currentPoint;
+            }
+
+            prevPoint = currentPoint;
+            prevBrightness = currentBrightness;
+        }
+
+        return maxChangePoint;
+    }
+
     bool Detector::findLights(const cv::Mat & image, std::vector<base::LightBlob>& lights)
     {
         lights.clear();
@@ -93,12 +120,14 @@ namespace detector
         {
             if (cv::contourArea(contour) < 4)continue;
 
-            cv::RotatedRect light_rrect = cv::minAreaRect(contour);
-            if (cv::contourArea(contour) / light_rrect.size.area() < light_params_.size_area_min_ratio)
+            auto b_rect = cv::boundingRect(contour);
+            auto r_rect = cv::minAreaRect(contour);
+            if (cv::contourArea(contour) / r_rect.size.area() < light_params_.size_area_min_ratio)
             {
                 continue;
             }
-            base::LightBlob  light(light_rrect);
+            base::LightBlob light(r_rect);
+
             if(isLight(light))
             {
                 int sum_r = 0, sum_b = 0;
@@ -111,6 +140,36 @@ namespace detector
                     light.color = sum_r > sum_b ? base::Color::RED : base::Color::BLUE;
                 }
 
+                if(light_params_.isCornerCorrect)
+                {
+                    cv::Mat mask = cv::Mat::zeros(b_rect.size(), CV_8UC1);
+                    std::vector<cv::Point> mask_contour;
+                    for (const auto & p : contour) {
+                        mask_contour.emplace_back(p - cv::Point(b_rect.x, b_rect.y));
+                    }
+                    cv::fillPoly(mask, {mask_contour}, 255);
+                    std::vector<cv::Point> points;
+                    cv::findNonZero(mask, points);
+                    // points / rotated rect area
+                    cv::Vec4f return_param;  // 点斜式表示直线
+                    cv::fitLine(points, return_param, cv::DIST_L2, 0, 0.01, 0.01);
+                    cv::Point2f top, bottom;
+                    double angle_k;
+                    if (int(return_param[0] * 100) == 100 || int(return_param[1] * 100) == 0) {
+                        top = cv::Point2f(b_rect.x + b_rect.width / 2, b_rect.y);
+                        bottom = cv::Point2f(b_rect.x + b_rect.width / 2, b_rect.y + b_rect.height);
+                        angle_k = 0;
+                    } else {
+                        auto k = return_param[1] / return_param[0];
+                        auto b = (return_param[3] + b_rect.y) - k * (return_param[2] + b_rect.x);
+                        top = cv::Point2f((b_rect.y - b) / k, b_rect.y);
+                        bottom = cv::Point2f((b_rect.y + b_rect.height - b) / k, b_rect.y + b_rect.height);
+                    }
+                    cv::line(image, top, bottom, cv::Scalar(0, 255, 0), 2);
+                    light.up = findMaxBrightnessChange(image(b_rect), top, (top+bottom)/2);
+                    light.down = findMaxBrightnessChange(image(b_rect), bottom, (top+bottom)/2);
+                }
+
                 if(enemy_color_ == light.color)
                     lights.push_back(light);
             }
@@ -120,7 +179,6 @@ namespace detector
         {
             return false;
         }
-
         return true;
     }
 

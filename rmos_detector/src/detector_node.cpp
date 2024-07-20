@@ -207,7 +207,8 @@ namespace rmos_detector
         detector::LightParams l_params = {
             .angle_to_vertigal_max = this->declare_parameter("light_params.angle_to_vertical_max", 35.0),
             .height_width_min_ratio = this->declare_parameter("light_params.height_width_min_ratio", 1.3),
-            .size_area_min_ratio = this->declare_parameter("light_params.size_area_min_ratio", 0.4)
+            .size_area_min_ratio = this->declare_parameter("light_params.size_area_min_ratio", 0.4),
+            .isCornerCorrect = this->declare_parameter("light_params.isCornerCorrect", true)
         };
 
         detector::ArmorParams a_params = {
