@@ -145,7 +145,6 @@ namespace rmos_transporter
 
     void UsbCommNode::recevieCallBack()
     {
-        RCLCPP_INFO(this->get_logger(), "read size :1111" );
         uint8_t receive_package[64];
         int read_size = transporter_->read(receive_package, 64);
         // TODO
