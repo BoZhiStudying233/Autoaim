@@ -55,7 +55,7 @@ namespace detector
     {
     public:
         Detector(ProcessParams p_params, LightParams l_params, ArmorParams a_params);
-        ~Detector();
+        ~Detector() = default;
         bool detectArmors(const cv::Mat &image, std::vector<base::Armor>& armors);
         bool setEnemyColor(int enemy_color);
     private:

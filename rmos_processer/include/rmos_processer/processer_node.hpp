@@ -19,6 +19,7 @@
 
 #include "std_msgs/msg/bool.hpp"
 #include "std_msgs/msg/int16.hpp"
+#include "std_msgs/msg/int8.hpp"
 
 #include <sensor_msgs/msg/image.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
@@ -102,6 +103,7 @@ namespace rmos_processer
         rclcpp::CallbackGroup::SharedPtr bs_sub_callback_group_;
         rclcpp::Subscription<rmos_interfaces::msg::AutoaimState>::SharedPtr autoaim_state_sub_;
         rclcpp::CallbackGroup::SharedPtr aimstate_sub_callback_group_;
+        rclcpp::Subscription<std_msgs::msg::Int8>::SharedPtr mode_sub_;
 
         /*Subscriber with tf2 message_filter*/
         std::string target_frame_;
@@ -143,6 +145,7 @@ namespace rmos_processer
         cv::Mat camera_matrix_;
         bool finish_camera_info_set{false};
         bool debug_{false};
+        base::Mode mode_ = base::Mode::NORMAL;
     };
 }
 
