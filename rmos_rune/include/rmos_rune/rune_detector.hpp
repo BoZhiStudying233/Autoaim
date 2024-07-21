@@ -49,6 +49,9 @@ namespace RuneDetector
         base::RuneArmor last_target;
         std::vector<cv::Point2f> nextPos;
         
+        int vane_change_threshold = 0; // 扇叶切换帧数阈值
+        int vane_change_count = 0; // 扇叶切换帧数计数
+
         int id = 0;                                     // 扇叶识别次序
         RuneParam param;
         base::Color enemy_color_{base::BLUE};
@@ -86,7 +89,7 @@ namespace RuneDetector
         base::Color vane_color = base::Color::BLUE;
         Point2f dl_points[4];
         int high_size;// 高亮区域大小
-        int high_threshold = 2200; // 高亮区域阈值
+        int high_threshold = 999999; // 高亮区域阈值2200
 
 
         /**

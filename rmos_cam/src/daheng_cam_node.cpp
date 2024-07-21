@@ -34,6 +34,7 @@ namespace rmos_cam
         this->min_exp = this->declare_parameter("min_exp", 0);
         
         this->normal_Exposure = Exposure;
+        this->rune_Exposure = this->declare_parameter("rune_exposure", 1200);
         this->normal_Gamma = Gamma;
         // set paramter
         cam_dev_->set_parameter(camera::CamParamType::Height, Height);
@@ -84,7 +85,7 @@ namespace rmos_cam
                                               JudgeReset();
                                               if (!cam_dev_->is_open())
                                               {
-                                                RCLCPP_WARN(this->get_logger(), "Faid open camera!!");
+                                                RCLCPP_WARN(this->get_logger(), "Faild open camera!!");
                                                 exit(0);
                                               }
                                               //sensor_msgs::msg::Image image_msg_;
@@ -92,7 +93,7 @@ namespace rmos_cam
                                               if (cam_dev_->grab_image(image_))
                                               {
                                                   image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(),"bgr8",image_).toImageMsg();
-                                                  (*image_msg_).header.stamp = camera_info_msg_.header.stamp = this->now() - rclcpp::Duration(0, this->time_offset);
+                                                  (*image_msg_).header.stamp = camera_info_msg_.header.stamp = this->now() + rclcpp::Duration(0, this->time_offset);
                                                   (*image_msg_).header.frame_id = "camera";
                                                   camera_info_msg_.header.frame_id = (*image_msg_).header.frame_id;
                                                   camera_info_pub_->publish(camera_info_msg_);

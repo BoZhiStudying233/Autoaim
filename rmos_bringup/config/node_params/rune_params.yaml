@@ -18,6 +18,6 @@
 
     fitting_params:
       points_num: 50
-      delay_time: 0.45
+      delay_time: 0.0
       save_txt: 0
       print_result: 1

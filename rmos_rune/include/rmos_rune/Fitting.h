@@ -40,17 +40,20 @@ public:
 
     BuffTrajPoint watched_points[360];  //用于拟合三维圆。将角度分为360度  日后在合适的地方清空此变量
     int get_angle_num = 0;
+    Fit fit;
+
+    int Points_num;                 //三维圆开始拟合的最小点数
+    int save_txt;
 private:
     
     Judgement judge;
-    Fit fit;
+
 
     // double DT = 0.01;                // 采样时间间隔，单位：秒
     int N = 160;                        // 角速度采样数
     int N_min = 20;                         // 角速度最小采样数
 
-    int Points_num;                 //三维圆开始拟合的最小点数
-    int save_txt;
+
 
     int DN = 1;                         // 逐差法测速度间距
 
@@ -59,7 +62,7 @@ private:
     bool is_direction_inited = false;   // 能量机关旋转方向初始化
     bool is_clockwise;                  // 顺时针
 
-    double armor_buffer_erase_threshold = 0.2;    // 阈值，armor_buffer首末数据之差，若超过该阈值则清除armor_buffer首数据
+    double armor_buffer_erase_threshold = 0.4;    // 阈值，armor_buffer首末数据之差，若超过该阈值则清除armor_buffer首数据
     double call_speed_threshold = 0.005;          // 阈值，armor_buffer首末数据之差，若超过该阈值则计算角速度
     double clear_data_threshold = 0.8;            // 阈值，新来数据时间与上一时刻存入的时间之差，若超过该阈值则重置所有数据(进入clearData)
     
@@ -69,7 +72,7 @@ private:
     std::vector<float> angle_points;
 
     // txt文件保存数据
-    string path = "./src/Algorithm/configure/Detector/Fitting/angle_state/";
+    string path = "./rmos_rune/drawRune/Data/angle_state/";
     string filename;
     bool have_file_count = false;
     bool have_first_time =false;

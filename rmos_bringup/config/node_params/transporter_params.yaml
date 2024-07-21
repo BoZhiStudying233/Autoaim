@@ -9,4 +9,4 @@
     interface_usb_read_timeout: 1
     interface_usb_write_timeout: 1
 
-    fored_mode: -1 # 0--disable  1--自瞄 2--小符 3--大符
+    fored_mode: 0 # 0--disable  1--自瞄 2--小符 3--大符

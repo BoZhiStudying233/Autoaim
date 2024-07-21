@@ -2,7 +2,7 @@
 #include <Eigen/Dense>
 #include "rmos_transporter/comm_node.hpp"
 #include "rmos_utils/const.hpp"
-
+#include <chrono>  
 using namespace std::chrono;
 
 namespace rmos_transporter
@@ -35,6 +35,8 @@ namespace rmos_transporter
         interface_usb_write_endpoint_ = this->declare_parameter("interface_usb_write_endpoint", 0x01);
         interface_usb_read_timeout_ = this->declare_parameter("interface_usb_read_timeout", 1);
         interface_usb_write_timeout_ = this->declare_parameter("interface_usb_write_timeout", 1);
+        
+        force_mode = this->declare_parameter("force_mode", 0);
 
         this->debug = this->declare_parameter("debug", 0);
         RCLCPP_INFO(this->get_logger(), "Init Transporter");
@@ -76,6 +78,22 @@ namespace rmos_transporter
                 last_time_ = time.seconds();
             }
         }
+
+        if(target->suggest_fire)
+        {
+            // std::ofstream file("output.csv", std::ios_base::app);
+            // 如果你需要包括小数秒（即毫秒或更小的部分），你需要先转换为更精细的持续时间类型  
+            auto now = std::chrono::high_resolution_clock::now(); 
+            auto duration = now.time_since_epoch(); 
+            auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration);  
+            double milliseconds_double = milliseconds.count();  
+            float seconds_with_fraction = milliseconds_double / 1000.0; // 转换为秒  
+            // seconds_with_fraction -= 1.7214e+09;
+            this->interval_pub_->publish(seconds_with_fraction - this->last_fire_time);
+            this->last_fire_time = seconds_with_fraction;
+
+        }
+
         send_package_._SOF = 0x55;
         send_package_._EOF = 0xFF;
         send_package_.ID = RMOS_SEND_ID;
@@ -110,6 +128,7 @@ namespace rmos_transporter
         }
         if (target->suggest_fire)
             buf[0] |= 0x02;
+        // this->send_package_.AimbotTarget = target->id;
         switch (target->id)
         {
             case 0:
@@ -237,9 +256,8 @@ namespace rmos_transporter
 
     void UsbCommNode::ForceSetMode(std_msgs::msg::Int8 &mode_msg)
     {
-        int force_mode = this->declare_parameter("force_mode", 0);
-
-        switch(force_mode)
+        // std::cout<<"force_mode:"<<this->force_mode<<std::endl;
+        switch(this->force_mode)
         {
             case -1: break;
             case 0:

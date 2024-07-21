@@ -58,6 +58,7 @@ namespace rmos_ec
 
         tf_publisher_->sendTransform(transformstamped);
         quaternion_time_msg_.quaternion_stamped.header.frame_id = std::string("IMU");
+
         quaternion_time_msg_.quaternion_stamped.header.stamp = this->now();
         quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)1;
         quaternion_time_msg_.quaternion_stamped.quaternion.x = (double)1;

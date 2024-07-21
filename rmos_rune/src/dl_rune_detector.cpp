@@ -62,7 +62,7 @@ namespace RuneDetector
         inputs.push_back(image);
         rt.run(inputs, outputs);
         std::vector<DetectResult> output = outputs[0];
-
+        // std::cout<<"size:"<<output.size()<<std::endl;
         image.copyTo(src);
         DlPreDeal(image);
                 
@@ -108,8 +108,17 @@ namespace RuneDetector
     {
         // 通过距离判断是否为旧符
         float max_diff_distance_ratio= calDistance(target.armor_center, last_target.armor_center) / calDistance(target.armor_center, target.circle_center);
+
+        
         if (max_diff_distance_ratio > param.max_diff_distance_ratio)
         {
+            this->vane_change_count++;
+            if(this->vane_change_count < this->vane_change_threshold)
+            {
+                this->target = this->last_target;
+                return true;
+            }
+            this->vane_change_count = 0;
             cout<<"vane is changing!"<<endl;
             this->id++;
             // std::cin.get();
@@ -243,12 +252,13 @@ namespace RuneDetector
                 //     last_circle_center_conf = output[i].conf;
                 // }
 
-                if(find_no_activate && output[i].id == 1 && output[i].conf > last_target_conf)
+                if(find_no_activate && output[i].id == 1)
                 {
                     changePoints(output[i].points);
                     int temp_size = calculateBinarySize(output[i].points);
                     if(this->high_size > temp_size && temp_size < this->high_threshold)
                     {
+                        this->high_size = temp_size;
                         this->target = base::RuneArmor(output[i].points);
                         last_target_conf = output[i].conf; 
                         find_target = true;        
@@ -424,7 +434,7 @@ namespace RuneDetector
         }
 
         // area现在包含了多边形内部的像素数量
-        std::cout << "Area of the object: " << area << std::endl;
+        // std::cout << "Area of the object: " << area << std::endl;
         return area;
     }
 
