@@ -45,31 +45,51 @@ namespace detector
     }
 
     cv::Point Detector::findMaxBrightnessChange(const cv::Mat& image, cv::Point start, cv::Point end) {
-        int maxChange = 0;
-        cv::Point maxChangePoint = start;
+    // Calculate the number of samples along the line
+    int num_samples = std::max(abs(end.x - start.x), abs(end.y - start.y));
 
-        // Generate points on the line using cv::LineIterator
-        cv::LineIterator it(image, start, end, 8);
+    // Variables to store the maximum brightness change and the corresponding point
+    double max_brightness_change = 0;
+    cv::Point max_change_point = start;
 
-        cv::Point prevPoint = start;
-        int prevBrightness = image.at<uchar>(prevPoint.y, prevPoint.x);
+    // Sample points along the line
+    for (int i = 0; i <= num_samples; ++i) {
+        // Calculate the interpolation factor
+        double alpha = static_cast<double>(i) / num_samples;
 
-        for (int i = 1; i < it.count; i++, ++it) {
-            cv::Point currentPoint = it.pos();
-            int currentBrightness = image.at<uchar>(currentPoint.y, currentPoint.x);
-            int change = std::abs(currentBrightness - prevBrightness);
+        // Interpolate the point along the line
+        int x = static_cast<int>(start.x * (1 - alpha) + end.x * alpha);
+        int y = static_cast<int>(start.y * (1 - alpha) + end.y * alpha);
 
-            if (change > maxChange) {
-                maxChange = change;
-                maxChangePoint = currentPoint;
+        // Ensure the point is within the image bounds
+        if (x >= 0 && x < image.cols && y >= 0 && y < image.rows) {
+            // Get the brightness at the current point and the next point
+            int current_brightness = image.at<uchar>(y, x);
+            int next_brightness = 0;
+
+            // Check if we can access the next point along the line
+            if (i < num_samples) {
+                int next_x = static_cast<int>(start.x * (1 - (alpha + 1.0 / num_samples)) + end.x * (alpha + 1.0 / num_samples));
+                int next_y = static_cast<int>(start.y * (1 - (alpha + 1.0 / num_samples)) + end.y * (alpha + 1.0 / num_samples));
+
+                if (next_x >= 0 && next_x < image.cols && next_y >= 0 && next_y < image.rows) {
+                    next_brightness = image.at<uchar>(next_y, next_x);
+                }
             }
 
-            prevPoint = currentPoint;
-            prevBrightness = currentBrightness;
-        }
+            // Calculate the brightness change
+            double brightness_change = std::abs(current_brightness - next_brightness);
 
-        return maxChangePoint;
+            // Update the maximum brightness change and the corresponding point if needed
+            if (brightness_change > max_brightness_change) {
+                max_brightness_change = brightness_change;
+                max_change_point = cv::Point(x, y);
+            }
+        }
     }
+
+    return max_change_point;
+}
 
     bool Detector::findLights(const cv::Mat & image, std::vector<base::LightBlob>& lights)
     {
@@ -118,7 +138,7 @@ namespace detector
         cv::findContours(binary, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
         for (const auto &contour: contours)
         {
-            if (cv::contourArea(contour) < 4)continue;
+            if (cv::contourArea(contour) < 9)continue;
 
             auto b_rect = cv::boundingRect(contour);
             auto r_rect = cv::minAreaRect(contour);
@@ -136,8 +156,7 @@ namespace detector
                 sum_b += image.at<cv::Vec3b>(point.y, point.x)[0];
                 sum_r += image.at<cv::Vec3b>(point.y, point.x)[2];
                 }
-                if (std::abs(sum_r - sum_b) / static_cast<int>(contour.size()) >
-                    20) {
+                if (std::abs(sum_r - sum_b) / static_cast<int>(contour.size()) > 20) {
                     light.color = sum_r > sum_b ? base::Color::RED : base::Color::BLUE;
                 }
 
@@ -169,8 +188,8 @@ namespace detector
                         top = cv::Point2f((b_rect.y - b) / k, b_rect.y);
                         bottom = cv::Point2f((b_rect.y + b_rect.height - b) / k, b_rect.y + b_rect.height);
                     }
-                    light.up = findMaxBrightnessChange(image(b_rect), top, (top+bottom)/2);
-                    light.down = findMaxBrightnessChange(image(b_rect), bottom, (top+bottom)/2);
+                    light.up = findMaxBrightnessChange(gray(b_rect), top, (top+bottom)/2);
+                    light.down = findMaxBrightnessChange(gray(b_rect), bottom, (top+bottom)/2);
                 }
 
                 if(enemy_color_ == light.color)
