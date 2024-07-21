@@ -152,7 +152,6 @@ namespace rmos_solver {
 
             target_msg.gun_pitch = gun_pitch;
             target_msg.gun_yaw = gun_yaw;
-            std::cout<<"target_msg.suggest_fire:"<<target_msg.suggest_fire<<std::endl;
             target_pub_->publish(target_msg);
 
         }

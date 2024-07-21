@@ -17,7 +17,7 @@
 
 #include "rmos_utils/armor.hpp"
 #include "rmos_utils/tracker.hpp"
-#include "ballistic_solver.hpp"
+#include "rmos_utils/ballistic_solver.hpp"
 #include "rmos_interfaces/msg/quaternion_time.hpp"
 #include "rmos_interfaces/msg/target.hpp"
 

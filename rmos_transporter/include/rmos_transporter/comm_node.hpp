@@ -115,7 +115,7 @@ namespace rmos_transporter
 
         bool debug;
 
-        float last_fire_time;
+        double last_fire_time;
         int force_mode;
     };
 
