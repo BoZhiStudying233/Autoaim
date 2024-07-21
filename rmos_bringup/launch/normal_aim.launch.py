@@ -62,7 +62,14 @@ def generate_launch_description():
         parameters=[get_params('rune')],
     )
 
-
+    solver_ = Node(
+        package='rmos_solver',
+        namespace= 'rmos_solver',
+        executable='solver',
+        name='solver',
+        output='screen',
+        parameters=[get_params('solver')],
+    )
     if launch_params['virtual_serial']: 
         communicate_node_ = Node(
             package='rmos_ec',

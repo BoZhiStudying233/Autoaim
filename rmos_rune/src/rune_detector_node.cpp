@@ -33,8 +33,8 @@ namespace rmos_rune
 {
     void RuneDetectorNode::imageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr &image_msg)
     {
-        this->mode_ = base::Mode::RUNE;
-        // std::cout<<"1214"<<std::endl;
+
+
         if(this->mode_ != base::Mode::RUNE&&this->mode_ != base::Mode::NORMAL_RUNE)
             return;
 
@@ -101,9 +101,7 @@ namespace rmos_rune
                 cv::Mat tvec;
                 cv::Mat rvec;
                 bool is_solve;
-                cv::imshow("image", image);
-                cv::waitKey(1);
-                return ;
+
 
                 is_solve = this->pnp_solver_->solveRuneArmorPose(rune_next_pos,this->camera_matrix_,this->dist_coeffs_,tvec,rvec);
                 if(!is_solve)
@@ -222,6 +220,7 @@ namespace rmos_rune
     }
     void RuneDetectorNode::setMode(int mode)
     {
+        // std::cout<<"mode:"<<mode<<std::endl;
         if(mode == 1)
             this->mode_ = base::Mode::NORMAL_RUNE;
         else if(mode == 2)

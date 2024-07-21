@@ -36,6 +36,9 @@
 #include "rmos_interfaces/msg/quaternion_time.hpp"
 #include "rmos_interfaces/msg/bullet_speed.hpp"
 #include "rmos_interfaces/msg/autoaim_state.hpp"
+#include "std_msgs/msg/int8.hpp"
+
+
 
 #include "controler.hpp"
 
@@ -77,9 +80,12 @@ namespace rmos_solver
         /**
          *  @brief 设置模式
         */
-        // void setMode(int mode);
-        // base::Mode mode_ = base::Mode::NORMAL;
-        // base::Mode last_mode_ = base::Mode::NORMAL; 
+        void setMode(int mode);
+        base::Mode mode_ = base::Mode::NORMAL;
+        base::Mode last_mode_ = base::Mode::NORMAL; 
+
+
+        
 
         // void initMarkers();
 
@@ -87,9 +93,7 @@ namespace rmos_solver
 
         void initParams();
         
-        int mode__=0; // 调节弹速系数时用于判断是打符模式还是自瞄模式
-        int last_mode__=0;
-        
+        rclcpp::Subscription<std_msgs::msg::Int8>::SharedPtr mode_sub_;
         rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_sub_;
 
         message_filters::Subscriber<rmos_interfaces::msg::Armors> armors_sub_;
@@ -133,7 +137,7 @@ namespace rmos_solver
         // std::queue<rmos_interfaces::msg::AutoaimState> autoaim_state_buf_;
 
         std::shared_ptr<solver::Controler> controler_;
-
+        
         /*params*/
         int imu_data_count_{0};
 

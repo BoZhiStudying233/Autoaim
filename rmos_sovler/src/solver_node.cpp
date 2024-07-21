@@ -59,6 +59,13 @@ namespace rmos_solver {
         auto autoaim_state_sub_option = rclcpp::SubscriptionOptions();
         autoaim_state_sub_option.callback_group = this->aimstate_sub_callback_group_;
         
+
+        this->mode_sub_ = this->create_subscription<std_msgs::msg::Int8>("/mode_info", rclcpp::SensorDataQoS(), [this](std_msgs::msg::Int8::ConstSharedPtr mode_msg)
+            {
+                //RCLCPP_INFO(this->get_logger(), "mode is %d", (*mode_msg).mode);
+                int mode = (*mode_msg).data;
+                setMode(mode);
+            });
         this->initParams();
 
         // this->detect_marker_pub_ =
@@ -69,15 +76,31 @@ namespace rmos_solver {
 
 
     }
+    void RuneSolverNode::setMode(int mode)
+    {
+        // std::cout<<"mode:"<<mode<<std::endl;
+        if(mode == 1)
+            this->mode_ = base::Mode::NORMAL_RUNE;
+        else if(mode == 2)
+            this->mode_ = base::Mode::RUNE;
+        else if(mode == 0)
+            this->mode_ = base::Mode::NORMAL;
+        // normal就是自瞄状态
+        else
+            this->mode_ = this->last_mode_;
 
+        this->last_mode_ = this->mode_;
+    }
     void RuneSolverNode::armorsCallBack(const rmos_interfaces::msg::Armors::SharedPtr armors_msg)
     {
-        this->mode__ = base::Mode::RUNE;
-        if(this->mode__ != base::Mode::RUNE&&this->mode__ != base::Mode::NORMAL_RUNE)
+        std::cout<<"12341"<<std::endl;
+        if(this->mode_ != base::Mode::RUNE&&this->mode_ != base::Mode::NORMAL_RUNE)
             return;
+                    std::cout<<"safasf"<<std::endl;
 
         if (quaternion_buf_.size() > 0) {
             rmos_interfaces::msg::Target target_msg;
+           
 
             uint32_t timestamp_recv = quaternion_buf_.back().timestamp_recv;
             target_msg.header.frame_id = target_frame_;
