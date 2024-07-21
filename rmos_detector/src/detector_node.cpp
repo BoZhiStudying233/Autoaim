@@ -117,7 +117,7 @@ namespace rmos_detector
         {
             return;
         }
-        // return ;
+
         rclcpp::Clock steady_clock_{RCL_STEADY_TIME};
         auto time1 = steady_clock_.now();
         auto image = cv_bridge::toCvShare(image_msg, "bgr8")->image;
@@ -181,7 +181,7 @@ namespace rmos_detector
         }
         auto time2 = steady_clock_.now();
 
-        // if(this->debug)RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
+        if(this->debug)RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
 
         if(this->debug)
         {
@@ -207,7 +207,8 @@ namespace rmos_detector
         detector::LightParams l_params = {
             .angle_to_vertigal_max = this->declare_parameter("light_params.angle_to_vertical_max", 35.0),
             .height_width_min_ratio = this->declare_parameter("light_params.height_width_min_ratio", 1.3),
-            .size_area_min_ratio = this->declare_parameter("light_params.size_area_min_ratio", 0.4)
+            .size_area_min_ratio = this->declare_parameter("light_params.size_area_min_ratio", 0.4),
+            .isCornerCorrect = this->declare_parameter("light_params.isCornerCorrect", true)
         };
 
         detector::ArmorParams a_params = {

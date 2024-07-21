@@ -185,7 +185,7 @@ namespace rmos_rune
             saveDrawImage(timestamp, image);
         auto time2 = steady_clock_.now();
 
-        if(true)
+        if(false)
             RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
         if(true){
             debug_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
@@ -213,7 +213,6 @@ namespace rmos_rune
         //std::cout<<"time="<<t2-t1<<std::endl;
         if(armors_msg.armors.size()!=0){
             armors_pub_->publish(armors_msg); 
-            // std::cout<<"已发布armos"<<std::endl;
         }
 
     }

@@ -6,7 +6,7 @@
 
     width: 1280
     height: 1080
-    exposure: 8000
+    exposure: 400
     auto_exposure: false
     gain: 9
     fps: 185
@@ -14,11 +14,11 @@
     rgain: 19.8
     bgain: 19.8
     ggain: 10.0
-    time_offset: 000000
+    time_offset: 45500000
     offsetX: 0  # TODO
     offsetY: 0  # TODO
 
-    rune_exposure: 100
+    rune_exposure: 800
     rune_gain: 12
     recording: false    #是否录制 TODO
 

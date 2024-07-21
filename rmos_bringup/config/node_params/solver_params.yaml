@@ -1,7 +1,7 @@
 /**:
   ros__parameters:
-    rune_gun_pitch_offset: -1.8
-    rune_gun_yaw_offset: 0.2 
+    rune_gun_pitch_offset: -10.0
+    rune_gun_yaw_offset: 0.0
 
     bs_fly_time: 580.0     
     ready_time: 150.0

@@ -35,6 +35,7 @@ namespace solver
             delta_fire_timestamp > bs_fly_time_)
         {
             last_fire_timestamp_ = timestamp;
+            std::cout<<"12444444444441"<<std::endl;
             return true;
         }
         else

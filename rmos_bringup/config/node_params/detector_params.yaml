@@ -8,10 +8,11 @@
     camera2imu_offset_z: 0.0
 
     image_process_params:
-      bin_threshold: 90.0
+      bin_threshold: 70.0
       enemy_color: 1 # 1--blue 0--red
 
     light_params:
+      isCornerCorrect: true
       angle_to_vertical_max: 35.0
       height_width_min_ratio: 1.3
       size_area_min_ratio: 0.4

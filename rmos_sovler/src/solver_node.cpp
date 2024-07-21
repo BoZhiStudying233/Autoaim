@@ -75,8 +75,13 @@ namespace rmos_solver {
         this->mode__ = base::Mode::RUNE;
         if(this->mode__ != base::Mode::RUNE&&this->mode__ != base::Mode::NORMAL_RUNE)
             return;
+
         if (quaternion_buf_.size() > 0) {
+            rmos_interfaces::msg::Target target_msg;
+
             uint32_t timestamp_recv = quaternion_buf_.back().timestamp_recv;
+            target_msg.header.frame_id = target_frame_;
+            target_msg.timestamp_recv = timestamp_recv;
             rmos_interfaces::msg::Armor target_rune_armor;
             target_rune_armor = armors_msg->armors[0];
             cv::Point3f aiming_point;
@@ -95,7 +100,6 @@ namespace rmos_solver {
                 return;
             }
 
-            rmos_interfaces::msg::Target target_msg;
 
             aiming_point.x = target_rune_armor.pose.position.x;
             aiming_point.y = target_rune_armor.pose.position.y;
@@ -132,7 +136,7 @@ namespace rmos_solver {
 
             target_msg.gun_pitch = gun_pitch;
             target_msg.gun_yaw = gun_yaw;
-
+            std::cout<<"target_msg.suggest_fire:"<<target_msg.suggest_fire<<std::endl;
             target_pub_->publish(target_msg);
 
         }

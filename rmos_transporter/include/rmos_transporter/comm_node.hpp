@@ -19,7 +19,9 @@
 #include "rmos_interfaces/msg/color.hpp"
 #include "rmos_interfaces/msg/bullet_speed.hpp"
 #include "std_msgs/msg/int8.hpp"
+#include "std_msgs/msg/float64.hpp"
 #include "rmos_interfaces/msg/autoaim_state.hpp"
+
 
 #include "usb.hpp"
 
@@ -37,6 +39,7 @@ namespace rmos_transporter
             this->bs_pub_ = this->create_publisher<rmos_interfaces::msg::BulletSpeed>("/bs_info", rclcpp::SensorDataQoS());
             this->mode_pub_ = this->create_publisher<std_msgs::msg::Int8>("/mode_info", rclcpp::SensorDataQoS());
             this->autoaim_state_pub_ = this->create_publisher<rmos_interfaces::msg::AutoaimState>("/autoaim_state", rclcpp::SensorDataQoS());
+            this->interval_pub_ = this->create_publisher<std_msgs::msg::Float64>("/fire_interval", rclcpp::SensorDataQoS());
         }
 
     protected:
@@ -46,6 +49,7 @@ namespace rmos_transporter
         rclcpp::Publisher<rmos_interfaces::msg::Color>::SharedPtr color_pub_;
         rclcpp::Publisher<rmos_interfaces::msg::BulletSpeed>::SharedPtr bs_pub_;
         rclcpp::Publisher<std_msgs::msg::Int8>::SharedPtr mode_pub_;
+        rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr interval_pub_;
         rclcpp::Publisher<rmos_interfaces::msg::AutoaimState>::SharedPtr autoaim_state_pub_;
         std::shared_ptr<tf2_ros::TransformBroadcaster> tf_publisher_;
 
@@ -113,6 +117,7 @@ namespace rmos_transporter
 
         bool debug;
 
+        float last_fire_time;
         int force_mode;
     };
 

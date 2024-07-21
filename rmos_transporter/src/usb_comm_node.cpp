@@ -2,7 +2,7 @@
 #include <Eigen/Dense>
 #include "rmos_transporter/comm_node.hpp"
 #include "rmos_utils/const.hpp"
-
+#include <chrono>  
 using namespace std::chrono;
 
 namespace rmos_transporter
@@ -78,6 +78,22 @@ namespace rmos_transporter
                 last_time_ = time.seconds();
             }
         }
+
+        if(target->suggest_fire)
+        {
+            // std::ofstream file("output.csv", std::ios_base::app);
+            // 如果你需要包括小数秒（即毫秒或更小的部分），你需要先转换为更精细的持续时间类型  
+            auto now = std::chrono::high_resolution_clock::now(); 
+            auto duration = now.time_since_epoch(); 
+            auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration);  
+            double milliseconds_double = milliseconds.count();  
+            float seconds_with_fraction = milliseconds_double / 1000.0; // 转换为秒  
+            // seconds_with_fraction -= 1.7214e+09;
+            this->interval_pub_->publish(seconds_with_fraction - this->last_fire_time);
+            this->last_fire_time = seconds_with_fraction;
+
+        }
+
         send_package_._SOF = 0x55;
         send_package_._EOF = 0xFF;
         send_package_.ID = RMOS_SEND_ID;
@@ -207,7 +223,7 @@ namespace rmos_transporter
                 if (package.mode & (0x08)){
                     mode_msg_.data = (int) base::Mode::NORMAL_RUNE;
                 }
-                ForceSetMode(mode_msg_); // bi sai zhu shi diao
+                // ForceSetMode(mode_msg_); // bi sai zhu shi diao
                 // tellMode(mode_msg_);
                 this->mode_pub_->publish(mode_msg_);
 

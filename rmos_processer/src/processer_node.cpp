@@ -82,7 +82,7 @@ namespace rmos_processer {
 
     void ProcesserNode::armorsCallBack(const rmos_interfaces::msg::Armors::SharedPtr armors_msg)
     {
-        // return ;
+        return ;
         if (quaternion_buf_.size() > 0) {
             uint32_t timestamp_recv = quaternion_buf_.back().timestamp_recv;
 

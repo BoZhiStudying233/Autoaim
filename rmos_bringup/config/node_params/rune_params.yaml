@@ -11,18 +11,13 @@
 
     deep_learning_params:
       circle_center_conf: 0
-      no_activate_conf: 0.7  
+      no_activate_conf: 0.7
       activate_conf: 0
       circle_center_roi_width: 20
       max_diff_distance_ratio: 0.5
 
     fitting_params:
       points_num: 50
-      delay_time: 0.45
+      delay_time: 0.0
       save_txt: 0
-      print_result: 0
-
-    # 相机到IMU存在位置的偏移
-    camera2imu_offset_x: 0.005
-    camera2imu_offset_y: 0.0
-    camera2imu_offset_z: 0.0
+      print_result: 1
