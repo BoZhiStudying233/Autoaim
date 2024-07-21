@@ -29,17 +29,25 @@ namespace processer
         ~Controler();
 
         /**
-         * @brief   得到最优瞄准点
-         * @param[in]   armors detector得到的装甲板序列
-         * @param[in out]   aiming_point 目标击打点
-         * @param[in]   timestamp imu的时间戳
-         * @param[in out] gun_aim_point 目标车辆中心点
-         * @return  待击打目标状态
+         * @brief   在追踪器中取样装甲板并进行姿态估计，获取最佳击打目标
+         * @param[in]   quaternion_buf_ 枪口四元数队列
+         * @return  待击打目标
         **/
         rmos_interfaces::msg::Target getTarget(std::queue<rmos_interfaces::msg::QuaternionTime> quaternion_buf_);
 
+        /**
+         * @brief   计算目标的击打点
+         * @param[in out]   aiming_point 待击打点
+         * @param[in out]   gun_aim_point 枪口指向目标的目标点
+         * @return  1:move 2:slow_move 3:stop
+        **/
         int getAimingPoint(cv::Point3f& aiming_point, cv::Point3f& gun_aim_point);// 1:move 2:slow_move 3:stop
 
+        /**
+         * @brief   更新追踪器
+         * @param[in]   armors 装甲板列表
+         * @param[in]   timestamp 时间戳
+        **/
         void updateTracker(std::vector<base::Armor> armors, double timestamp);
 
         /**
@@ -93,8 +101,5 @@ namespace processer
         cv::Point3f center_point_;
     };
 }
-
-
-
 
 #endif //RMOS_CONTROLER_HPP

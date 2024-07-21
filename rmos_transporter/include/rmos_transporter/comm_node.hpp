@@ -59,16 +59,14 @@ namespace rmos_transporter
         ~UsbCommNode();
     protected:
         /**
-         *  @brief  target_sub_的回调函数，将msg转换后通过can发送
+         *  @brief  target_sub_的回调函数，将msg转换后通过usb发送
          */
         void targetCallBack(const rmos_interfaces::msg::Target::SharedPtr target);
 
         /**
-         *  @brief  将msg中的自瞄状态信息，转换为字节形式
+         *  @brief  将msg中的自瞄状态信息，包括目标ID，转换为字节形式
          */
         void target2state(const rmos_interfaces::msg::Target::SharedPtr target, u_char *buf);
-
-        void target2AimbotTarget(const rmos_interfaces::msg::Target::SharedPtr target, u_char *buf);
 
         /**
          *  @brief  读取usb数据的线程函数

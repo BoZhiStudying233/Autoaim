@@ -130,6 +130,7 @@ namespace detector
 
             if(isLight(light))
             {
+                // 计算灯条颜色
                 int sum_r = 0, sum_b = 0;
                 for (const auto &point : contour) {
                 sum_b += image.at<cv::Vec3b>(point.y, point.x)[0];
@@ -140,6 +141,9 @@ namespace detector
                     light.color = sum_r > sum_b ? base::Color::RED : base::Color::BLUE;
                 }
 
+                /*
+                计算灯条轮廓最大亮度变化的点作为角点坐标
+                */
                 if(light_params_.isCornerCorrect)
                 {
                     cv::Mat mask = cv::Mat::zeros(b_rect.size(), CV_8UC1);

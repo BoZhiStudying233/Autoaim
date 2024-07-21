@@ -57,12 +57,25 @@ namespace detector
         Detector(ProcessParams p_params, LightParams l_params, ArmorParams a_params);
         ~Detector() = default;
         bool detectArmors(const cv::Mat &image, std::vector<base::Armor>& armors);
+        /**
+         * @brief 设置敌方颜色
+         * @param[in] enemy_color 敌方颜色
+         * @return 是否设置成功
+        **/
         bool setEnemyColor(int enemy_color);
     private:
         bool findLights(const cv::Mat & image, std::vector<base::LightBlob>& lights);
         bool isLight(base::LightBlob light);
         bool matchLights(std::vector<base::LightBlob>& lights,std::vector<base::Armor>& armors);
         bool isArmor(base::LightBlob light_1,base::LightBlob light_2);
+
+        /**
+         * @brief 寻找最大亮度变化点
+         * @param[in] image 输入图像
+         * @param[in] start 起始点
+         * @param[in] end 终止点
+         * @return 最大亮度变化点
+        **/
         cv::Point findMaxBrightnessChange(const cv::Mat& image, cv::Point start, cv::Point end);
 
         ProcessParams process_params_;

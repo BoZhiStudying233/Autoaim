@@ -59,6 +59,11 @@ namespace processer
         NormalBallisticParam normal_ballistic_param_;
         RuneBallisticParam rune_ballistic_param_;
     private:
+        /**
+         * @brief 依据目标位置设置不同弹速系数
+         * @param[in]   position 世界系下3d目标点
+         * @param[in]   is_rune 是否为能量机关击打模式
+        **/
         void setBS_coeff(cv::Point3f position, bool is_rune);
 
         double bs_coeff_;        // 弹速系数
