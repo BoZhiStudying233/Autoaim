@@ -59,6 +59,12 @@ namespace rmos_processer {
         this->autoaim_state_sub_ = this->create_subscription<rmos_interfaces::msg::AutoaimState>("/autoaim_state", rclcpp::SensorDataQoS(),
                                                                                                  std::bind(&ProcesserNode::autoaimStateCallBack, this, std::placeholders::_1),
                                                                                                  autoaim_state_sub_option);
+
+        this->mode_sub_ = this->create_subscription<std_msgs::msg::Int8>("/mode_info", rclcpp::SensorDataQoS(), [this](std_msgs::msg::Int8::ConstSharedPtr mode_msg)
+            {
+                //RCLCPP_INFO(this->get_logger(), "mode is %d", (*mode_msg).mode);
+                this->mode_ = (*mode_msg).data==0 ? base::Mode::NORMAL : base::Mode::WAIT;
+            });
         this->initMarkers();
         this->initParams();
 
@@ -73,7 +79,7 @@ namespace rmos_processer {
         auto timer_callback =
             [this]() -> void
             {
-                if(this->finish_camera_info_set)
+                if(this->finish_camera_info_set && this->mode_ == base::Mode::NORMAL)
                     this->publishTarget();
             };
             

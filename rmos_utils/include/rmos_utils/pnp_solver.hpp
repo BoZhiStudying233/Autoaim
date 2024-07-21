@@ -52,10 +52,10 @@ namespace detector
         //由于打符的特殊性，打符传进来的是点而不是Armor型的量，所以函数是分开的。
         bool solveRuneArmorPose(std::vector<cv::Point2f> rune_next_pos,const cv::Mat& camera_matrix,const cv::Mat& dist_coeffs,cv::Mat &tVec, cv::Mat &rVec);
     private:
-        float small_width = 125;
-        float small_height = 55;
+        float small_width = 133;  // 125
+        float small_height = 50;  // 55
         float big_width = 225;
-        float big_height = 55;
+        float big_height = 50;  // 55
         float rune_width = 253.42;
         float rune_height = 270.49;
         std::vector<cv::Point3f> small_armor;

@@ -101,10 +101,6 @@ namespace rmos_transporter
         send_package_.PitchAbsoluteAngle = (float)(target->gun_pitch );//* 32768.0 / 180.0
         send_package_.YawAbsoluteAngle = (float)(target->gun_yaw );
         send_package_.SystemTimer = (int16_t)(target->timestamp_recv);
-        // send_package_.AimbotTarget = 0;
-        // std::cout<<"send_package_.AimbotTarget:"<<(int)send_package_.AimbotTarget<<std::endl;
-        // send_package_.AimbotTarget = 0;
-        // std::cout<<"send_package_.AimbotTarget:"<<(int)send_package_.AimbotTarget<<std::endl;
         send_package_.TargetYawSpeed = 0;
         send_package_.TargetPitchSpeed = 0;
         transporter_->write((unsigned char *)&send_package_, sizeof(transporter::RMOSSendPackage));
@@ -156,7 +152,7 @@ namespace rmos_transporter
                 buf[1] |= 0x10;
                 break;
             case 6:
-                buf[1] |= 0x40;
+                buf[1] |= 0x40;  // sentry
                 break;
             case 7:
                 buf[1] |= 0x20;
@@ -168,7 +164,6 @@ namespace rmos_transporter
 
     void UsbCommNode::recevieCallBack()
     {
-        // RCLCPP_INFO(this->get_logger(), "read size :1111" );
         uint8_t receive_package[64];
         int read_size = transporter_->read(receive_package, 64);
         // TODO
@@ -227,14 +222,14 @@ namespace rmos_transporter
                 // tellMode(mode_msg_);
                 this->mode_pub_->publish(mode_msg_);
 
+                
+
                 quaternion_time_msg_.quaternion_stamped.header.stamp = this->now();
                 quaternion_time_msg_.quaternion_stamped.quaternion.w = (double)package.q0;
                 quaternion_time_msg_.quaternion_stamped.quaternion.x = (double)package.q1;
                 quaternion_time_msg_.quaternion_stamped.quaternion.y = (double)package.q2;
                 quaternion_time_msg_.quaternion_stamped.quaternion.z = (double)package.q3;  
-                memcpy(&quaternion_time_msg_.timestamp_recv, &package.TimeStamp, 4);   
-                this->quaternion_pub_->publish(quaternion_time_msg_);     
-
+                memcpy(&quaternion_time_msg_.timestamp_recv, &package.TimeStamp, 4);
                 geometry_msgs::msg::TransformStamped t;
                 t.header.stamp =  quaternion_time_msg_.quaternion_stamped.header.stamp;
                 t.header.frame_id = "world"; //注意坐标系
@@ -244,6 +239,7 @@ namespace rmos_transporter
                 t.transform.rotation.z = quaternion_time_msg_.quaternion_stamped.quaternion.z;
                 t.transform.rotation.w = quaternion_time_msg_.quaternion_stamped.quaternion.w;
                 tf_publisher_->sendTransform(t);
+                this->quaternion_pub_->publish(quaternion_time_msg_);
                 break;
             }
             
