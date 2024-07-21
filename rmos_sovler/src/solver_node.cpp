@@ -59,7 +59,6 @@ namespace rmos_solver {
         auto autoaim_state_sub_option = rclcpp::SubscriptionOptions();
         autoaim_state_sub_option.callback_group = this->aimstate_sub_callback_group_;
         
-
         this->mode_sub_ = this->create_subscription<std_msgs::msg::Int8>("/mode_info", rclcpp::SensorDataQoS(), [this](std_msgs::msg::Int8::ConstSharedPtr mode_msg)
             {
                 //RCLCPP_INFO(this->get_logger(), "mode is %d", (*mode_msg).mode);
@@ -68,10 +67,6 @@ namespace rmos_solver {
             });
         this->initParams();
 
-        // this->detect_marker_pub_ =
-        //         this->create_publisher<visualization_msgs::msg::MarkerArray>("/detect/marker", 10);
-        // this->process_marker_pub_ =
-        //         this->create_publisher<visualization_msgs::msg::MarkerArray>("/process/marker", 10);
         this->target_pub_ = this->create_publisher<rmos_interfaces::msg::Target>("/target", rclcpp::SensorDataQoS());
 
 
@@ -93,11 +88,9 @@ namespace rmos_solver {
     }
     void RuneSolverNode::armorsCallBack(const rmos_interfaces::msg::Armors::SharedPtr armors_msg)
     {
-        std::cout<<"12341"<<std::endl;
         if(this->mode_ != base::Mode::RUNE&&this->mode_ != base::Mode::NORMAL_RUNE)
             return;
-                    std::cout<<"safasf"<<std::endl;
-
+        
         if (quaternion_buf_.size() > 0) {
             rmos_interfaces::msg::Target target_msg;
            
@@ -183,15 +176,6 @@ namespace rmos_solver {
         {
             quaternion_buf_.pop();
         }
-        geometry_msgs::msg::TransformStamped t;
-        t.header.stamp =  quaternion_msg->quaternion_stamped.header.stamp;
-        t.header.frame_id = "world"; //注意坐标系
-        t.child_frame_id = "IMU";
-        t.transform.rotation.x = quaternion_msg->quaternion_stamped.quaternion.x;
-        t.transform.rotation.y = quaternion_msg->quaternion_stamped.quaternion.y;
-        t.transform.rotation.z = quaternion_msg->quaternion_stamped.quaternion.z;
-        t.transform.rotation.w = quaternion_msg->quaternion_stamped.quaternion.w;
-        tf_publisher_->sendTransform(t);
     }
 
     void RuneSolverNode::bsCallBack(const rmos_interfaces::msg::BulletSpeed::SharedPtr bs_msg)
