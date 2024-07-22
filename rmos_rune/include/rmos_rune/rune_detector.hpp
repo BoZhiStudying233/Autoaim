@@ -33,7 +33,8 @@ namespace RuneDetector
         float delay_time;                           // 预测延迟
         int save_txt;                             // 保存txt文件用来绘图
         bool print_result;
-    }; 
+
+    };
 
 
     class DlRuneDetector{
