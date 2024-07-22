@@ -87,11 +87,10 @@ namespace rmos_transporter
             auto duration = now.time_since_epoch(); 
             auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration);  
             double milliseconds_double = milliseconds.count();  
-            float seconds_with_fraction = milliseconds_double / 1000.0; // 转换为秒  
+            double seconds_with_fraction = milliseconds_double / 1000.0; // 转换为秒  
             // seconds_with_fraction -= 1.7214e+09;
             this->interval_pub_->publish(seconds_with_fraction - this->last_fire_time);
             this->last_fire_time = seconds_with_fraction;
-
         }
 
         send_package_._SOF = 0x55;
@@ -218,7 +217,7 @@ namespace rmos_transporter
                 if (package.mode & (0x08)){
                     mode_msg_.data = (int) base::Mode::NORMAL_RUNE;
                 }
-                // ForceSetMode(mode_msg_); // bi sai zhu shi diao
+                ForceSetMode(mode_msg_); // bi sai zhu shi diao
                 // tellMode(mode_msg_);
                 this->mode_pub_->publish(mode_msg_);
 
@@ -256,7 +255,6 @@ namespace rmos_transporter
 
     void UsbCommNode::ForceSetMode(std_msgs::msg::Int8 &mode_msg)
     {
-        // std::cout<<"force_mode:"<<this->force_mode<<std::endl;
         switch(this->force_mode)
         {
             case -1: break;
