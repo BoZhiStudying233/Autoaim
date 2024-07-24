@@ -97,10 +97,14 @@ namespace processer
         {
             this->is_tracking_ = false;
             tracker_.init(armors);
+            last_time_ = timestamp;
         }
         else
         {
             dt_ = timestamp - last_time_;
+            if(dt_ <= 0)
+                return;
+            last_time_ = timestamp;
             if(tracker_.tracked_id == 7 )
             {
                 tracker_.lost_thres = static_cast<int>(lost_time_thres_ / dt_)*5;
@@ -119,7 +123,6 @@ namespace processer
                 this->is_tracking_ = true;
             }
         }
-        last_time_ = timestamp;
     }
 
     rmos_interfaces::msg::Target Controler::getTarget(std::queue<rmos_interfaces::msg::QuaternionTime> quaternion_buf_)
@@ -350,10 +353,10 @@ namespace processer
         // std::cout<<"x  is"<<x<<std::endl;
 
         double fire_area = abs(110/v_yaw);
-        if(abs(v_yaw)==2.512)
+        if(abs(v_yaw)==2.512) // 前哨站转速
             fire_area = camera_matrix_.at<double>(0, 0)*70/aiming_point_camera.z;
         else
-            fire_area= camera_matrix_.at<double>(0, 0)*85/aiming_point_camera.z;
+            fire_area= camera_matrix_.at<double>(0, 0)*70/aiming_point_camera.z;
         if(fire_area<5){
             fire_area=5;
         }
