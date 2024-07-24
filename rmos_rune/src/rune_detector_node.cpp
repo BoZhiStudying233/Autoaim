@@ -33,8 +33,6 @@ namespace rmos_rune
 {
     void RuneDetectorNode::imageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr &image_msg)
     {
-
-
         if(this->mode_ != base::Mode::RUNE&&this->mode_ != base::Mode::NORMAL_RUNE)
             return;
 
@@ -45,7 +43,7 @@ namespace rmos_rune
         rmos_interfaces::msg::Armors armors_msg;
         rmos_interfaces::msg::Armor armor_msg;
         armors_msg.header = image_msg->header;
-        if(false)
+        if(this->save_image)
             saveImage(timestamp, image);
 
         base::RuneArmor target_rune_armor;
@@ -97,11 +95,17 @@ namespace rmos_rune
                         cv::line(image, rune_next_pos[i], rune_next_pos[(i+1)%4], cv::Scalar(50, 100, 50));
                     }
                 }
+                if(true){
+                    debug_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
+                    debug_img_pub_.publish(*debug_image_msg_,camera_info_msg_);
+                }
+                
+                
                 //pnp solve
                 cv::Mat tvec;
                 cv::Mat rvec;
+                
                 bool is_solve;
-
 
                 is_solve = this->pnp_solver_->solveRuneArmorPose(rune_next_pos,this->camera_matrix_,this->dist_coeffs_,tvec,rvec);
                 if(!is_solve)
@@ -183,36 +187,17 @@ namespace rmos_rune
         cv::putText(image, text, (cv::Point2i(0, 50), cv::Point2i(20, 50)), cv::FONT_HERSHEY_SIMPLEX, 1,
                     cv::Scalar(0, 255, 0), 0.5);
 
-        if(false)
+        if(this->save_draw_image)
             saveDrawImage(timestamp, image);
         auto time2 = steady_clock_.now();
 
-        if(false)
+        if(this->tell_cost_time)
             RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
-        if(true){
-            debug_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
-            debug_img_pub_.publish(*debug_image_msg_,camera_info_msg_);
-        }
+        
 
 
-        //// if(debug::get_debug_option(base::SHOW_BIN))
-        // {
-        //     if(this->mode_ == base::Mode::NORMAL_RUNE || this->mode_ == base::Mode::RUNE)
-        //         debug_bin_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", this->rune_detector_->bin).toImageMsg();
-        //     else
-        //         debug_bin_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", this->detector_->debug_binary_).toImageMsg();
-        // if(debug::get_debug_option(base::SHOW_BIN))
-        // {
-        //     if(this->mode_ == base::Mode::NORMAL_RUNE || this->mode_ == base::Mode::RUNE)
-        //         debug_bin_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", this->rune_detector_->bin).toImageMsg();
-        //     else
-        //         debug_bin_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", this->detector_->debug_binary_).toImageMsg();
 
-        //     debug_bin_img_pub_.publish(*debug_bin_image_msg_,camera_info_msg_);
-        // }
-        // double t1 = armors_msg.header.stamp.sec+armors_msg.header.stamp.nanosec*1e-9;//这段用于测试程序耗时用
-        // double t2 = rclcpp::Clock().now().nanoseconds()*1e-9;
-        //std::cout<<"time="<<t2-t1<<std::endl;
+       
         if(armors_msg.armors.size()!=0){
             armors_pub_->publish(armors_msg); 
         }
@@ -235,7 +220,7 @@ namespace rmos_rune
     }
 
     void RuneDetectorNode::saveImage(double timestamp, cv::Mat image)
-    {
+    {   
         if(!have_mkdir)
         {
             this->image_folder_path = this->path + std::to_string(countFilesInDirectory(path));
@@ -252,9 +237,12 @@ namespace rmos_rune
         else
         {
             double delta_time = timestamp - last_save_timestamp;
+            // std::cout<<"timestamp:"<<timestamp - 1.7161e+09<<std::endl;
+            // std::cout<<"last_save_timestamp:"<<last_save_timestamp<<std::endl;
+            // std::cout<<"delta_time:"<<delta_time<<std::endl;
             if(!image.empty() && delta_time > save_delta_time)
             {
-                cv::imwrite(image_folder_path + "/" + std::to_string(image_num) + ".png", image);
+                cv::imwrite(image_folder_path + "/" + std::to_string(image_num) + ".jpg", image);
                 image_num++;
                 last_save_timestamp = timestamp;
             }
@@ -278,7 +266,8 @@ namespace rmos_rune
         
         else
         {
-            cv::imwrite(draw_image_folder_path + "/" + std::to_string(draw_image_num) + ".png", image);
+
+            cv::imwrite(draw_image_folder_path + "/" + std::to_string(draw_image_num) + ".jpg", image);
             draw_image_num++;
         }
     }
@@ -314,8 +303,13 @@ namespace rmos_rune
 
             .delay_time = this->declare_parameter("fitting_params.delay_time", 0.45f),
             .save_txt = this->declare_parameter("fitting_params.save_txt", 0),
-            .print_result = this->declare_parameter("fitting_params.print_result", 1) // 添加了 print_result 参数声明
+            .print_result = this->declare_parameter("fitting_params.print_result", 1), // 添加了 print_result 参数声明
+
+            
         };
+        this->save_image = this->declare_parameter("debug_params.save_image", 0);
+        this->save_draw_image = this->declare_parameter("debug_params.save_draw_image", 0);
+        this->tell_cost_time = this->declare_parameter("debug_params.tell_cost_time", 0);
         // this->fitting_->fit.delay_time = this->declare_parameter("fitting_params.delay_time", 0.45f);
         this->fitting_->Points_num =  this->declare_parameter("fitting_params.points_num", 50);
         // this->fitting_->fit.save_txt = this->declare_parameter("fitting_params.save_txt", 0);

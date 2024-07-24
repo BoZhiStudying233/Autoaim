@@ -28,6 +28,7 @@ namespace RuneDetector
         this->param.delay_time = params.delay_time;
         this->param.save_txt = params.save_txt;
         this->param.print_result = params.print_result;
+
     }
 
     DlRuneDetector::~DlRuneDetector(){}

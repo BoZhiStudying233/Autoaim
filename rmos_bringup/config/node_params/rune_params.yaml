@@ -20,4 +20,8 @@
       points_num: 50
       delay_time: 0.0
       save_txt: 0
-      print_result: 1
+      print_result: 0
+    debug_params:
+      save_image: 0
+      save_draw_image: 0
+      tell_cost_time: 0

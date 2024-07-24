@@ -189,19 +189,26 @@ namespace rmos_rune
 
         /*save image*/
         void saveImage(double timestamp, cv::Mat image);
-        std::string path = "./rmos_bringup/image_save/";
+        std::string path = "./rmos_rune/drawRune/image_save/";
         std::string image_folder_path;
         int image_num = 0;
         bool have_mkdir = false;
         double last_save_timestamp = 0;
-        double save_delta_time;     // 保存图片的时间间隔     
+        double save_delta_time = 0.3;     // 保存图片的时间间隔     
 
         void saveDrawImage(double timestamp, cv::Mat image);
-        std::string path_draw = "./rmos_bringup/draw_image_save/";
+        std::string path_draw = "./rmos_rune/drawRune/draw_image_save/";
         std::string draw_image_folder_path;
         int draw_image_num = 0;
         bool have_mkdir_draw = false;
         int Exposure = 0;           
+
+
+
+        bool save_image;
+        bool save_draw_image;
+        bool tell_cost_time;
+
 
         /**
          * @brief 计算文件夹内文件数量
