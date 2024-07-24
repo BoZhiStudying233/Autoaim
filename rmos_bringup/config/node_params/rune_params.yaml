@@ -22,6 +22,6 @@
       save_txt: 0
       print_result: 0
     debug_params:
-      save_image: 1
-      save_draw_image: 1
+      save_image: 0
+      save_draw_image: 0
       tell_cost_time: 0
