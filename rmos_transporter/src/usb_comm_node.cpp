@@ -37,7 +37,8 @@ namespace rmos_transporter
         interface_usb_write_timeout_ = this->declare_parameter("interface_usb_write_timeout", 1);
         
         force_mode = this->declare_parameter("force_mode", 0);
-
+        tell_mode = this->declare_parameter("tell_mode", 0);
+        
         this->debug = this->declare_parameter("debug", 0);
         RCLCPP_INFO(this->get_logger(), "Init Transporter");
         transporter_ = std::make_shared<transporter_sdk::UsbcdcTransporter>(
@@ -217,8 +218,9 @@ namespace rmos_transporter
                 if (package.mode & (0x08)){
                     mode_msg_.data = (int) base::Mode::NORMAL_RUNE;
                 }
-                ForceSetMode(mode_msg_); // bi sai zhu shi diao
-                // tellMode(mode_msg_);
+                ForceSetMode(mode_msg_); 
+                if(this->tell_mode)
+                    tellMode(mode_msg_);
                 this->mode_pub_->publish(mode_msg_);
 
                 

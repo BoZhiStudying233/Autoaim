@@ -4,7 +4,7 @@ camera_name: DahengCam
 camera_matrix:
   rows: 3
   cols: 3
-  data: [1573.905780, 0.0, 653.467492, 0.0, 1574.712966, 518.767236, 0.0, 0.0, 1.0]
+  data: [1573.905780, 0.0, 435.64455902, 0.0, 1574.712966, 345.844823965, 0.0, 0.0, 1.0]
 distortion_model: plumb_bob
 distortion_coefficients:
   rows: 1
