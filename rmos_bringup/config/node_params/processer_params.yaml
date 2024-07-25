@@ -11,12 +11,11 @@
 
     r_xyz_factor: 3.4e-4
     r_yaw: 3e-3
-  
 
     delay: 0.03
     true_x: 640
 
-    gun_pitch_offset: -7.0
+    gun_pitch_offset: -0.0
     gun_yaw_offset: 0.0
     rune_gun_pitch_offset: 0.0
     rune_gun_yaw_offset: 0.0
@@ -40,5 +39,5 @@
     # tracker params
     max_match_distance: 0.5
     max_match_yaw_diff: 0.75
-    tracking_thres: 5
-    lost_thres: 20
+    tracking_thres: 10
+    lost_thres: 50

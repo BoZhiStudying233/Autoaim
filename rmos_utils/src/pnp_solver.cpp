@@ -1,6 +1,6 @@
 #include "rmos_utils/pnp_solver.hpp"
 
-namespace detector
+namespace tool
 {
     bool PnpSolver::solveArmorPose(const base::Armor& armor,const cv::Mat& camera_matrix,const cv::Mat& dist_coeffs,cv::Mat &tVec, cv::Mat &rVec)
     {

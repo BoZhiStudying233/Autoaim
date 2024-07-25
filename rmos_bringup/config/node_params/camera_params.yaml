@@ -1,7 +1,7 @@
 /**:
   ros__parameters:
-    use_video: false
-    video_path: "/home/lizengyang/Videos/2021-1280-720.mp4"
+    use_video: true
+    video_path: "/home/lzy/Videos/test.mp4"
     images_floder_path: "/home/lzy/Pictures/std_imgs/"
 
     width: 1280

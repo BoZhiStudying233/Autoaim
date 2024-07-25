@@ -140,7 +140,7 @@ namespace rmos_rune
             // detector_ = std::make_shared<detector::Detector>();            
             fitting_ = std::make_shared<RuneDetector::Fitting>();
             //cj_classifier_ = std::make_shared<detector::CjClassifier>();
-            pnp_solver_ = std::make_shared<detector::PnpSolver>();
+            pnp_solver_ = std::make_shared<tool::PnpSolver>();
             // onnx_classifier_ =  std::make_shared<detector::OnnxClassifier>();
             // mix_detector_ = std::make_shared<MixDetect::ArmorDetector>();
 
@@ -227,7 +227,7 @@ namespace rmos_rune
 
         // std::shared_ptr<MixDetect::ArmorDetector> mix_detector_;
 
-        std::shared_ptr<detector::PnpSolver> pnp_solver_;
+        std::shared_ptr<tool::PnpSolver> pnp_solver_;
 
         /* Publisher */
         rclcpp::Publisher<rmos_interfaces::msg::Armors>::SharedPtr armors_pub_;

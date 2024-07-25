@@ -163,7 +163,7 @@ protected:
 
     double radians_to_degrees(double radians);
 
-    std::shared_ptr<detector::PnpSolver> pnp_solver_ = std::make_shared<detector::PnpSolver>();
+    std::shared_ptr<tool::PnpSolver> pnp_solver_ = std::make_shared<tool::PnpSolver>();
 
 
     /**

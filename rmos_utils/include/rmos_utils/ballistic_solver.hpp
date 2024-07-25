@@ -4,7 +4,7 @@
 #include <iostream>
 #include <opencv2/core.hpp>
 
-namespace solver
+namespace tool
 {
     struct NormalBallisticParam
     {
