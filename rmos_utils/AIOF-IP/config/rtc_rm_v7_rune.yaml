@@ -22,7 +22,7 @@ interpreters:
                 id: 0
                 port: 0
         params: 
-            model_path: "./rmos_utils/AIOF-IP/model/rune_final_weights/output.xml"
+            model_path: "./rmos_utils/AIOF-IP/model/rm-test/output.xml"
             device_name: "CPU"
 
 post_processers:

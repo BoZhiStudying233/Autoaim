@@ -95,10 +95,7 @@ namespace rmos_rune
                         cv::line(image, rune_next_pos[i], rune_next_pos[(i+1)%4], cv::Scalar(50, 100, 50));
                     }
                 }
-                if(true){
-                    debug_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
-                    debug_img_pub_.publish(*debug_image_msg_,camera_info_msg_);
-                }
+
                 
                 
                 //pnp solve
@@ -194,7 +191,10 @@ namespace rmos_rune
         if(this->tell_cost_time)
             RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
         
-
+        if(true){
+            debug_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
+            debug_img_pub_.publish(*debug_image_msg_,camera_info_msg_);
+        }
 
 
        

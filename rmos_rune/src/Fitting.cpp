@@ -475,6 +475,7 @@ namespace RuneDetector
         // 时间差过长则清除数据;0.8为超参数,可调 
         if (n > clear_data_threshold)
         {
+            
             clearData();
             return;
         }

@@ -36,7 +36,7 @@ namespace rmos_transporter
         interface_usb_read_timeout_ = this->declare_parameter("interface_usb_read_timeout", 1);
         interface_usb_write_timeout_ = this->declare_parameter("interface_usb_write_timeout", 1);
         
-        force_mode = this->declare_parameter("force_mode", 0);
+        force_mode = this->declare_parameter("force_mode", -1);
         tell_mode = this->declare_parameter("tell_mode", 0);
         
         this->debug = this->declare_parameter("debug", 0);
@@ -90,7 +90,10 @@ namespace rmos_transporter
             double milliseconds_double = milliseconds.count();  
             double seconds_with_fraction = milliseconds_double / 1000.0; // 转换为秒  
             // seconds_with_fraction -= 1.7214e+09;
-            this->interval_pub_->publish(seconds_with_fraction - this->last_fire_time);
+            std_msgs::msg::Float64 msg;
+            msg.data = seconds_with_fraction - this->last_fire_time;
+            this->interval_pub_->publish(msg);
+            std::cout<<"fire!!!!"<<std::endl;
             this->last_fire_time = seconds_with_fraction;
         }
 
@@ -179,6 +182,9 @@ namespace rmos_transporter
         // }
         // rclcpp::Clock steady_clock_{RCL_STEADY_TIME};
         // last_receive_time_ = steady_clock_.now();;
+
+
+
 
         switch (receive_package[1])
         {
