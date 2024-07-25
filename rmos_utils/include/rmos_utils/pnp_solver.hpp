@@ -22,7 +22,7 @@
 #include "rmos_utils/armor.hpp"
 
 
-namespace detector
+namespace tool
 {
     class PnpSolver
     {

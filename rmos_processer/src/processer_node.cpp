@@ -391,7 +391,7 @@ namespace rmos_processer {
     {
         this->debug_ = this->declare_parameter("debug", 1);
 
-        this->controler_->lost_time_thres_ = this->declare_parameter("lost_time_thres", 0.0);
+        this->controler_->lost_time_thres_ = this->declare_parameter("lost_time_thres", 0.5);
         this->controler_->s2qxyz_ = this->declare_parameter("s2qxyz", 1.0);
         this->controler_->s2qyaw_ = this->declare_parameter("s2qyaw", 0.5);
         this->controler_->s2qr_ = this->declare_parameter("s2qr", 0.2);

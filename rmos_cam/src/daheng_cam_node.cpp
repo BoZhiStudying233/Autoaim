@@ -86,7 +86,7 @@ namespace rmos_cam
                                               if (!cam_dev_->is_open())
                                               {
                                                 RCLCPP_WARN(this->get_logger(), "Faild open camera!!");
-                                                exit(0);
+                                                cam_dev_->open();
                                               }
                                               //sensor_msgs::msg::Image image_msg_;
 
@@ -110,7 +110,7 @@ namespace rmos_cam
                                               else
                                               {
                                                   std::cout << cam_dev_->error_message() << std::endl;
-                                                  exit(0);
+                                                  cam_dev_->open();
                                               }
                                           }
                                       }};

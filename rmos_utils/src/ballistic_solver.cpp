@@ -1,6 +1,6 @@
 #include "rmos_utils/ballistic_solver.hpp"
 
-namespace solver
+namespace tool
 {
     BallisticSolver::BallisticSolver() {
         return;

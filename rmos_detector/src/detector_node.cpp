@@ -76,7 +76,7 @@ namespace rmos_detector
 
         this->detector_ = initDetector();
         this->onnx_classifier_ = std::make_shared<detector::OnnxClassifier>();
-        this->pnp_solver_ = std::make_shared<detector::PnpSolver>();
+        this->pnp_solver_ = std::make_shared<tool::PnpSolver>();
 
         /*publish static TF*/
         this->tf_publisher_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);

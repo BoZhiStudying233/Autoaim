@@ -67,9 +67,9 @@ namespace rmos_detector
 
         std::unique_ptr<detector::Detector> initDetector();
 
-        std::shared_ptr<detector::Detector> detector_;
+        std::unique_ptr<detector::Detector> detector_;
         std::shared_ptr<detector::OnnxClassifier> onnx_classifier_;
-        std::shared_ptr<detector::PnpSolver> pnp_solver_;
+        std::shared_ptr<tool::PnpSolver> pnp_solver_;
 
         void drawArmor(cv::Mat image, base::Armor armor);
 

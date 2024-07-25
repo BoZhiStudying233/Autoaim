@@ -30,7 +30,7 @@ namespace solver
 
         bool getParam(cv::Mat camera_matrix);
 
-        BallisticSolver ballistic_solver_;
+        tool::BallisticSolver ballistic_solver_;
         
         double rune_gun_pitch_offset_;
         double rune_gun_yaw_offset_;
