@@ -201,6 +201,7 @@ namespace rmos_solver {
             .height_first  = this->declare_parameter("distance_first", 400),
             .height_second  = this->declare_parameter("distance_second", 900),
             .height_third  = this->declare_parameter("distance_third", 1200),
+            .g = this->declare_parameter("g", 9.8),
         };
 
     }

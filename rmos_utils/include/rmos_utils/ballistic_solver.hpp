@@ -33,6 +33,7 @@ namespace solver
         float height_second;
         float height_third;
         // float height_fourth;
+        float g;
     };
     
     class BallisticSolver

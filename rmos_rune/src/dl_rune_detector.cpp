@@ -257,7 +257,13 @@ namespace RuneDetector
                 {
                     changePoints(output[i].points);
                     int temp_size = calculateBinarySize(output[i].points);
-                    if(this->high_size > temp_size && temp_size < this->high_threshold)
+
+                    if(temp_size < this->low_threshold)//若小于此阈值，则舍去
+                        continue;
+                    if(temp_size > this->high_threshold)//若大于阈值，则舍去
+                        continue;
+                    
+                    if(this->high_size > temp_size )
                     {
                         this->high_size = temp_size;
                         this->target = base::RuneArmor(output[i].points);
@@ -307,7 +313,13 @@ namespace RuneDetector
                 {
                     changePoints(output[i].points);
                     int temp_size = calculateBinarySize(output[i].points);
-                    if(this->high_size > temp_size && temp_size< this->high_threshold)
+
+                    if(temp_size < this->low_threshold)//若小于此阈值，则舍去
+                        continue;
+                    if(temp_size > this->high_threshold)//若大于阈值，则舍去
+                        continue;
+
+                    if(this->high_size > temp_size)
                     {
                         this->high_size = temp_size;
                         this->target = base::RuneArmor(output[i].points);

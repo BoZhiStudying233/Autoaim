@@ -23,7 +23,7 @@ namespace solver
             // t_actual = (exp(this->normal_ballistic_param_.k * x) - 1.0) /
               //          (this->normal_ballistic_param_.k * this->bs_coeff * this->bullet_speed_ * cos(angle));
             t_actual=x/(this->bs_coeff_*this->bullet_speed_* cos(angle));
-            y_actual = double( this->bs_coeff_*bullet_speed_ * sin(angle) * t_actual - this->normal_ballistic_param_.g * t_actual * t_actual / 2.0);
+            y_actual = double( this->bs_coeff_*bullet_speed_ * sin(angle) * t_actual - this->rune_ballistic_param_.g * t_actual * t_actual / 2.0);
             dy = y - y_actual;
             y_temp += dy;
             if (abs(dy) < 0.001)
