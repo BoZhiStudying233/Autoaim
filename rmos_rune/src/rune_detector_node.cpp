@@ -303,11 +303,12 @@ namespace rmos_rune
             .low_threshold = this->declare_parameter("image_params.low_threshold", 1000),
             .high_threshold = this->declare_parameter("image_params.high_threshold", 4000),
             .tell_area = this->declare_parameter("image_params.tell_area", 0),
-
+    
             .delay_time = this->declare_parameter("fitting_params.delay_time", 0.45f),
             .save_txt = this->declare_parameter("fitting_params.save_txt", 0),
             .print_result = this->declare_parameter("fitting_params.print_result", 1), // 添加了 print_result 参数声明    
         };
+        std::cout<<"low_threshold:"<<params.low_threshold<<std::endl;
         this->save_image = this->declare_parameter("debug_params.save_image", 0);
         this->save_draw_image = this->declare_parameter("debug_params.save_draw_image", 0);
         this->tell_cost_time = this->declare_parameter("debug_params.tell_cost_time", 0);

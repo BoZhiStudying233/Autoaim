@@ -25,6 +25,12 @@ namespace RuneDetector
         this->param.circle_center_roi_width = params.circle_center_roi_width;
         this->param.max_diff_distance_ratio = params.max_diff_distance_ratio;
 
+        this->param.high_threshold = params.high_threshold;
+        this->param.low_threshold = params.low_threshold;
+        this->param.tell_area = params.tell_area;
+
+
+
         this->param.delay_time = params.delay_time;
         this->param.save_txt = params.save_txt;
         this->param.print_result = params.print_result;
@@ -257,6 +263,7 @@ namespace RuneDetector
                 {
                     changePoints(output[i].points);
                     int temp_size = calculateBinarySize(output[i].points);
+
 
                     if(temp_size < this->param.low_threshold)//若小于此阈值，则舍去
                         continue;

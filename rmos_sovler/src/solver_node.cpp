@@ -148,8 +148,8 @@ namespace rmos_solver {
 
             // std::cout<<"timestamp:"<<timestamp<<std::endl;
             bool is_fire = this->controler_->judgeRuneFire(target_rune_armor.num_id,timestamp_recv);
-            target_msg.suggest_fire = is_fire;
-
+            // target_msg.suggest_fire = is_fire;
+            target_msg.suggest_fire = true;
             target_msg.gun_pitch = gun_pitch;
             target_msg.gun_yaw = gun_yaw;
             target_pub_->publish(target_msg);

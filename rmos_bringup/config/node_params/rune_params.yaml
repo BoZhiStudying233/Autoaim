@@ -8,8 +8,8 @@
       red_color_thresh: 50
       blue_red_diff: 20
       tell_area: 0
-      low_threshold: 1000
-      high_threshold: 4000
+      low_threshold: 1100
+      high_threshold: 5000
 
     deep_learning_params:
       circle_center_conf: 0
@@ -20,10 +20,9 @@
 
     fitting_params:
       points_num: 50
-      delay_time: 0.65
+      delay_time: 0.7
       save_txt: 0
       print_result: 0
-      tell_area: 0
     debug_params:
       save_image: 0
       save_draw_image: 0
