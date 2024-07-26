@@ -64,16 +64,18 @@ namespace tool
         }
         if(is_rune == true) // 打符模式下弹速系数的调节
         {
-                 bs_coeff_ = rune_ballistic_param_.level_first;
+                bs_coeff_ = rune_ballistic_param_.level_first;
                 if (position.z >= rune_ballistic_param_.height_first && position.z < rune_ballistic_param_.height_second)
                     bs_coeff_ = rune_ballistic_param_.level_second;
                 else if(position.z >= rune_ballistic_param_.height_second && position.z < rune_ballistic_param_.height_third)
                     bs_coeff_ = rune_ballistic_param_.level_third;
                 else if (position.z >= rune_ballistic_param_.height_third)
                     bs_coeff_ = rune_ballistic_param_.level_fourth;
-
-                // std::cout<<"bs_coeff_:"<<this->bs_coeff_<<std::endl;
-                // std::cout<<"position.z:"<<position.z<<std::endl;
+            if(rune_ballistic_param_.debug)
+            {
+                std::cout<<"bs_coeff_:"<<this->bs_coeff_<<std::endl;
+                std::cout<<"position.z:"<<position.z<<std::endl;
+            }
         }
 
      }

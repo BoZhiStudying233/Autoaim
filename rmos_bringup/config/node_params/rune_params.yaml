@@ -18,7 +18,7 @@
 
     fitting_params:
       points_num: 50
-      delay_time: 0.0
+      delay_time: 0.65
       save_txt: 0
       print_result: 0
       tell_area: 0

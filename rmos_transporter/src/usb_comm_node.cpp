@@ -93,8 +93,9 @@ namespace rmos_transporter
             std_msgs::msg::Float64 msg;
             msg.data = seconds_with_fraction - this->last_fire_time;
             this->interval_pub_->publish(msg);
-            std::cout<<"fire!!!!"<<std::endl;
+            // std::cout<<"fire!!!!"<<std::endl;
             this->last_fire_time = seconds_with_fraction;
+
         }
 
         send_package_._SOF = 0x55;
@@ -107,6 +108,7 @@ namespace rmos_transporter
         send_package_.TargetYawSpeed = 0;
         send_package_.TargetPitchSpeed = 0;
         transporter_->write((unsigned char *)&send_package_, sizeof(transporter::RMOSSendPackage));
+
     }
 
     void UsbCommNode::target2state(const rmos_interfaces::msg::Target::SharedPtr target, u_char *buf)

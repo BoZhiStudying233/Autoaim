@@ -189,19 +189,18 @@ namespace rmos_solver {
         this->controler_->rune_gun_pitch_offset_ = this->declare_parameter("rune_gun_pitch_offset", 0.0f);
         this->controler_->rune_gun_yaw_offset_ = this->declare_parameter("rune_gun_yaw_offset", 1.0f);
         this->controler_->ballistic_solver_.bullet_speed_ = this->declare_parameter("bullet_speed", 26);
-        this->controler_->bs_fly_time_ = this->declare_parameter("bs_fly_time", 570.0f);
-        this->controler_->ready_time_ = this->declare_parameter("ready_time", 150.0f);
-
+        this->controler_->bs_fly_time_ = this->declare_parameter("bs_fly_time", 570.0f);b
         this->controler_->ballistic_solver_.rune_ballistic_param_ = {
-            .level_first = this->declare_parameter("bs_coeff_first", 1.22),
-            .level_second = this->declare_parameter("bs_coeff_second", 1.19),
-            .level_third = this->declare_parameter("bs_coeff_third", 1.13),
-            .level_fourth = this->declare_parameter("bs_coeff_fourth", 1.13),
+            .level_first = this->declare_parameter("level_first", 1.22),
+            .level_second = this->declare_parameter("level_second", 1.19),
+            .level_third = this->declare_parameter("level_third", 1.13),
+            .level_fourth = this->declare_parameter("level_fourth", 1.13),
             
-            .height_first  = this->declare_parameter("distance_first", 400),
-            .height_second  = this->declare_parameter("distance_second", 900),
-            .height_third  = this->declare_parameter("distance_third", 1200),
+            .height_first  = this->declare_parameter("height_first", 400),
+            .height_second  = this->declare_parameter("height_second", 900),
+            .height_third  = this->declare_parameter("height_third", 1200),
             .g = this->declare_parameter("g", 9.8),
+            .debug = this->declare_parameter("debug", 0),
         };
 
     }

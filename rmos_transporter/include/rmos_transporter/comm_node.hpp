@@ -94,7 +94,6 @@ namespace rmos_transporter
         /*time*/
         double last_time_;
         rclcpp::Time last_receive_time_;
-
         /* Send Timer */
         rclcpp::TimerBase::SharedPtr receive_timer_;
         

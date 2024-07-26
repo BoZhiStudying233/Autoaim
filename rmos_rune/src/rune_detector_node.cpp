@@ -303,8 +303,7 @@ namespace rmos_rune
 
             .delay_time = this->declare_parameter("fitting_params.delay_time", 0.45f),
             .save_txt = this->declare_parameter("fitting_params.save_txt", 0),
-            .print_result = this->declare_parameter("fitting_params.print_result", 1), // 添加了 print_result 参数声明
-
+            .print_result = this->declare_parameter("fitting_params.print_result", 1), // 添加了 print_result 参数声明    
             
         };
         this->save_image = this->declare_parameter("debug_params.save_image", 0);
