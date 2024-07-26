@@ -8,7 +8,7 @@ pre_processers:
     pre_processer0:
         name: "cv-standard-affine-prep"
         params:
-            camera_size: [1280, 768]
+            camera_size: [1280, 1080]
             tensor_shape: [1, 3, 416, 640]
             tensor_layout: "NCHW"
 
@@ -38,7 +38,7 @@ post_processers:
             iou_thre: 0.2
             key_points_num: 5
             remap_src: [640, 416]
-            remap_dst: [1280, 768]
+            remap_dst: [1280, 1080]
 
 
 result_tags: ["B0", "B1", "B2", "R0", "R1", "R2"]
