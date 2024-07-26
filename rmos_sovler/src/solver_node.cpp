@@ -189,7 +189,7 @@ namespace rmos_solver {
         this->controler_->rune_gun_pitch_offset_ = this->declare_parameter("rune_gun_pitch_offset", 0.0f);
         this->controler_->rune_gun_yaw_offset_ = this->declare_parameter("rune_gun_yaw_offset", 1.0f);
         this->controler_->ballistic_solver_.bullet_speed_ = this->declare_parameter("bullet_speed", 26);
-        this->controler_->bs_fly_time_ = this->declare_parameter("bs_fly_time", 570.0f);b
+        this->controler_->bs_fly_time_ = this->declare_parameter("bs_fly_time", 570.0f);
         this->controler_->ballistic_solver_.rune_ballistic_param_ = {
             .level_first = this->declare_parameter("level_first", 1.22),
             .level_second = this->declare_parameter("level_second", 1.19),

@@ -29,10 +29,16 @@ namespace RuneDetector
 
         float max_diff_distance_ratio;              // judge for old vane
         
+        int low_threshold;                         // 最低高亮区域阈值
+        int high_threshold;                        // 最高高亮区域阈值
+        bool tell_area;                            // 输出高亮区域面积
+
         // 拟合使用参数
         float delay_time;                           // 预测延迟
         int save_txt;                             // 保存txt文件用来绘图
         bool print_result;
+
+        
 
     };
 
@@ -90,8 +96,8 @@ namespace RuneDetector
         base::Color vane_color = base::Color::BLUE;
         Point2f dl_points[4];
         int high_size;// 高亮区域大小
-        int high_threshold = 5000; // 高亮区域阈值2200
-        int low_threshold = 1000; // 低亮区域阈值1000
+        // int high_threshold = 5000; // 高亮区域阈值2200
+        // int low_threshold = 1000; // 低亮区域阈值1000
 
         /**
          *  @brief  通过当前扇叶与上次识别的扇叶靶心距离判断扇叶切换情况

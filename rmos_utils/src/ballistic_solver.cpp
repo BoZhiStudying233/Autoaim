@@ -45,23 +45,6 @@ namespace tool
 
     void BallisticSolver::setBS_coeff(cv::Point3f position,bool is_rune)
     {
-        if(is_rune == false) // 自瞄模式下的弹速系数调节
-        {
-            float distance = sqrt(position.x*position.x+
-                                position.y*position.y+
-                                position.z*position.z);
-            // std::cout<<"distance:"<<distance<<std::endl;
-            this->bs_coeff_ = normal_ballistic_param_.bs_coeff_first;
-            if(distance >= normal_ballistic_param_.distance_first)
-            {
-                this->bs_coeff_ = normal_ballistic_param_.bs_coeff_second;
-            }
-            if(distance >= normal_ballistic_param_.distance_second)
-            {
-                this->bs_coeff_ = normal_ballistic_param_.bs_coeff_third;
-            }
-            // std::cout<<"bs_coeff_:"<<this->bs_coeff_<<std::endl;
-        }
         if(is_rune == true) // 打符模式下弹速系数的调节
         {
                 bs_coeff_ = rune_ballistic_param_.level_first;

@@ -258,9 +258,9 @@ namespace RuneDetector
                     changePoints(output[i].points);
                     int temp_size = calculateBinarySize(output[i].points);
 
-                    if(temp_size < this->low_threshold)//若小于此阈值，则舍去
+                    if(temp_size < this->param.low_threshold)//若小于此阈值，则舍去
                         continue;
-                    if(temp_size > this->high_threshold)//若大于阈值，则舍去
+                    if(temp_size > this->param.high_threshold)//若大于阈值，则舍去
                         continue;
                     
                     if(this->high_size > temp_size )
@@ -314,9 +314,9 @@ namespace RuneDetector
                     changePoints(output[i].points);
                     int temp_size = calculateBinarySize(output[i].points);
 
-                    if(temp_size < this->low_threshold)//若小于此阈值，则舍去
+                    if(temp_size < param.low_threshold)//若小于此阈值，则舍去
                         continue;
-                    if(temp_size > this->high_threshold)//若大于阈值，则舍去
+                    if(temp_size > param.high_threshold)//若大于阈值，则舍去
                         continue;
 
                     if(this->high_size > temp_size)
@@ -430,7 +430,6 @@ namespace RuneDetector
             int_points.push_back(points[i]);
         }
         cv::fillPoly(mask, int_points, 255); // 填充多边形区域
-
         // 应用掩膜，只保留多边形内的像素
         cv::Mat maskedImage;
         cv::bitwise_and(binaryImage, mask, maskedImage);
@@ -447,7 +446,8 @@ namespace RuneDetector
         }
 
         // area现在包含了多边形内部的像素数量
-        // std::cout << "Area of the object: " << area << std::endl;
+        if(this->param.tell_area)
+            std::cout << "Area of the object: " << area << std::endl;
         return area;
     }
 
