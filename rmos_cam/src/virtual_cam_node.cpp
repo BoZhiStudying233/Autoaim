@@ -90,7 +90,7 @@ namespace rmos_cam {
                         camera_info_msg_.header.frame_id = (*image_msg_).header.frame_id;
                         // RCLCPP_WARN(this->get_logger(), " Image from video");
                         img_pub_.publish(*image_msg_, camera_info_msg_);
-                        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                        std::this_thread::sleep_for(std::chrono::milliseconds(50));
                     } else {
                         std::cout << virtual_dev_->error_message() << std::endl;
                         exit(0);
