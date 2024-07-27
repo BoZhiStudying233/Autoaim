@@ -95,10 +95,7 @@ namespace rmos_rune
                         cv::line(image, rune_next_pos[i], rune_next_pos[(i+1)%4], cv::Scalar(50, 100, 50));
                     }
                 }
-                if(true){
-                    debug_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
-                    debug_img_pub_.publish(*debug_image_msg_,camera_info_msg_);
-                }
+
                 
                 
                 //pnp solve
@@ -111,6 +108,7 @@ namespace rmos_rune
                 if(!is_solve)
                 {
                     RCLCPP_WARN(this->get_logger(), "camera param empty");
+                    return;
                 }
                 tVec.x() = tvec.at<double>(0, 0);
                 tVec.y() = tvec.at<double>(1, 0);
@@ -186,11 +184,13 @@ namespace rmos_rune
         text = "Exposure:" + std::to_string(this->Exposure);
         cv::putText(image, text, (cv::Point2i(0, 50), cv::Point2i(20, 50)), cv::FONT_HERSHEY_SIMPLEX, 1,
                     cv::Scalar(0, 255, 0), 0.5);
-
         if(this->save_draw_image)
             saveDrawImage(timestamp, image);
         auto time2 = steady_clock_.now();
-
+        if(true){
+            debug_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
+            debug_img_pub_.publish(*debug_image_msg_,camera_info_msg_);
+        }
         if(this->tell_cost_time)
             RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
         

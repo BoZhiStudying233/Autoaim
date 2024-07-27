@@ -1,8 +1,8 @@
 /**:
   ros__parameters:
     use_video: true
-    video_path: "/home/lzy/Videos/test.mp4"
-    images_floder_path: "/home/lzy/Pictures/std_imgs/"
+    video_path: "/home/lzy/Videos/buff.mp4"
+    images_floder_path: "/home/lzy/Pictures/rune_imgs/"
 
     width: 1280
     height: 1080
