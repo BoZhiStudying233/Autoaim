@@ -94,7 +94,6 @@ namespace rmos_transporter
         /*time*/
         double last_time_;
         rclcpp::Time last_receive_time_;
-
         /* Send Timer */
         rclcpp::TimerBase::SharedPtr receive_timer_;
         
@@ -117,6 +116,7 @@ namespace rmos_transporter
 
         double last_fire_time;
         int force_mode;
+        bool tell_mode;
     };
 
 }

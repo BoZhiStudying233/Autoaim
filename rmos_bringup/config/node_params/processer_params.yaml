@@ -9,14 +9,14 @@
     s2qyaw: 0.5
     s2qr: 0.2
 
-    r_xyz_factor: 3.4e-4
-    r_yaw: 3e-3
+    r_xyz_factor: 2.8e-3
+    r_yaw: 3e-4
 
     delay: 0.03
     true_x: 640
 
-    gun_pitch_offset: -0.0
-    gun_yaw_offset: 0.0
+    gun_pitch_offset: -1.2
+    gun_yaw_offset: 0.2
     rune_gun_pitch_offset: 0.0
     rune_gun_yaw_offset: 0.0
 
@@ -40,4 +40,4 @@
     max_match_distance: 0.5
     max_match_yaw_diff: 0.75
     tracking_thres: 10
-    lost_thres: 50
+    lost_thres: 60

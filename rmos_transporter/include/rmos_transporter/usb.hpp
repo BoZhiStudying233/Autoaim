@@ -60,7 +60,8 @@ typedef struct
     // 目标角速度
     float TargetPitchSpeed;
     float TargetYawSpeed;
-    // 时间戳
+    //bag_seq
+
     uint32_t SystemTimer;
     // 包尾
     uint8_t _EOF;

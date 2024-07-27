@@ -33,6 +33,8 @@ namespace tool
         float height_second;
         float height_third;
         // float height_fourth;
+        float g;
+        bool debug;
     };
     
     class BallisticSolver
