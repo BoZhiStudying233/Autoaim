@@ -27,7 +27,7 @@ namespace RuneDetector
         // 数据处理
         if (!processDataState(armor_1, armor_state))
             return false;
-
+        
         // 确定方向
         initDirection();
         if(!is_direction_inited)

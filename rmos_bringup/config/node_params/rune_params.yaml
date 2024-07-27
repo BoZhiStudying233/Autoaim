@@ -1,7 +1,7 @@
 /**:
   ros__parameters:
     image_params:
-      show_R: 0
+      show_R: true
       blue_brightness_thresh: 30
       blue_color_thresh: 50
       red_brightness_thresh: 30

@@ -119,7 +119,7 @@ namespace RuneDetector
     void Judgement::solveBadData(bool &is_direction_inited)
     {
         judge_clear_num++;
-        if(judge_clear_num > 3)
+        if(judge_clear_num > 8)
         {
             judge_clear_num = 0;
             speedJudge.clear();
