@@ -5,7 +5,7 @@ echo "nuc" | sudo -S chmod 777 /dev/bus/usb/001/*
 echo "nuc" | sudo -s chmod 777 /dev/bus/usb/002/*
 echo "nuc" | sudo -s chmod 777 /dev/bus/usb/003/*
 echo "nuc" | sudo -s chmod 777 /dev/bus/usb/004/*
-gnome-terminal -e 'bash -c "source /opt/ros/foxy/setup.bash;source /opt/intel/openvino_2022.3.0/setupvars.sh;source $(pwd)/../install/setup.bash;cd $(pwd)/..;ros2 launch rmos_bringup normal_aim.launch.py " '
+gnome-terminal -e 'bash -c "source /opt/ros/foxy/setup.bash;source /opt/intel/openvino_2023.3.0/setupvars.sh;source /home/nuc/Desktop/Autoaim/install/setup.bash;cd /home/nuc/Desktop/Autoaim;ros2 launch rmos_bringup normal_aim.launch.py " '
 
 sleep 6
 
@@ -17,7 +17,7 @@ detector_pid=$(ps -ef | grep "basic_detector" | grep -v grep | awk '{print $2}')
 processer_pid=$(ps -ef | grep "processer" | grep -v grep | awk '{print $2}')
 comm_pid=$(ps -ef | grep "usb_comm" | grep -v grep | awk '{print $2}')
 
-if [ $cam_pid -ne 0 ] && [ $detector_pid -ne 0 ] && [ $processer_pid -ne 0 ] && [ $comm_pid -ne 0]
+if [ $cam_pid -ne 0 ] && [ $detector_pid -ne 0 ] && [ $processer_pid -ne 0 ] && [ $comm_pid -ne 0 ]
 then                 #如果程序PID在，则程序在运行
         echo `date`
         echo "all_pid is exitable!"
@@ -53,7 +53,7 @@ else
         echo "nuc" | sudo -s chmod 777 /dev/bus/usb/002/*
         echo "nuc" | sudo -s chmod 777 /dev/bus/usb/003/*
         echo "nuc" | sudo -s chmod 777 /dev/bus/usb/004/*
-	gnome-terminal -e 'bash -c "source /opt/ros/foxy/setup.bash;source /opt/intel/openvino_2022.3.0/setupvars.sh;source $(pwd)/../install/setup.bash;cd $(pwd)/..;ros2 launch rmos_bringup normal_aim.launch.py " '
+        gnome-terminal -e 'bash -c "source /opt/ros/foxy/setup.bash;source /opt/intel/openvino_2023.3.0/setupvars.sh;source /home/nuc/Desktop/Autoaim/install/setup.bash;cd /home/nuc/Desktop/Autoaim;ros2 launch rmos_bringup normal_aim.launch.py " '
 
 fi
 

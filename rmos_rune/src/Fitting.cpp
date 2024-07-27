@@ -358,7 +358,7 @@ namespace RuneDetector
                 else
                     break;
             }
-
+-
             break;
 
         case TrackState::LOST:

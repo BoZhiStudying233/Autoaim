@@ -83,7 +83,7 @@ namespace rmos_rune
                     "raw",
                     rmw_qos_profile_sensor_data));
 
-            this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/daheng_camera_info", rclcpp::SensorDataQoS(),
+            this->camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>("/camera_info", rclcpp::SensorDataQoS(),
                                                                                              [this](sensor_msgs::msg::CameraInfo::ConstSharedPtr camera_info_msg)
                                                                                              {
                                                                                                  RCLCPP_INFO(this->get_logger(), "Receive camera infomation!!");

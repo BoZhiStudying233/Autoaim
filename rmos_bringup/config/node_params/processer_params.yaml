@@ -40,4 +40,4 @@
     max_match_distance: 0.5
     max_match_yaw_diff: 0.75
     tracking_thres: 10
-    lost_thres: 60
+    lost_thres: 50

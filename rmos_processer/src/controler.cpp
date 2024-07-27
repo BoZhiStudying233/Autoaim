@@ -150,7 +150,7 @@ namespace processer
             // 中心点
             cv::Point3f c_y_t = this->ballistic_solver_.getAngleTime(center_point_*1000, 0); // 第二参数为打符 
             // v_yaw 大于一定值即瞄中心点
-            if(abs(this->tracker_.target_state(7))>4)
+            if(abs(this->tracker_.target_state(7))>3)
             {
                 new_pitch= p_y_t.x;
                 new_yaw  = c_y_t.y;  // yaw 指中心点
@@ -352,9 +352,11 @@ namespace processer
         double delta_x = abs(x-this->true_x_);
         // std::cout<<"x  is"<<x<<std::endl;
 
-        double fire_area = abs(110/v_yaw);
+        double fire_area = 0;
         if(abs(v_yaw)==2.512) // 前哨站转速
             fire_area = camera_matrix_.at<double>(0, 0)*70/aiming_point_camera.z;
+        else if(abs(v_yaw) <= 2)  // 转速过小则开火范围放大
+            fire_area = 150;
         else
             fire_area= camera_matrix_.at<double>(0, 0)*70/aiming_point_camera.z;
         if(fire_area<5){
