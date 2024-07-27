@@ -7,7 +7,7 @@
       red_brightness_thresh: 30
       red_color_thresh: 50
       blue_red_diff: 20
-      tell_area: 0
+      tell_area: false
       low_threshold: 1100
       high_threshold: 5000
 
