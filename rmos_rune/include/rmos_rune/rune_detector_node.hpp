@@ -187,8 +187,6 @@ namespace rmos_rune
         }
         rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter> &parameters);
 
-
-            
     protected:
 
         OnSetParametersCallbackHandle::SharedPtr callback_handle_;

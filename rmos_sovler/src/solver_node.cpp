@@ -68,7 +68,9 @@ namespace rmos_solver {
         this->initParams();
 
         this->target_pub_ = this->create_publisher<rmos_interfaces::msg::Target>("/target", rclcpp::SensorDataQoS());
-
+        
+        callback_handle_ = this->add_on_set_parameters_callback(
+            std::bind(&RuneSolverNode::parametersCallback, this, std::placeholders::_1));
 
     }
     void RuneSolverNode::setMode(int mode)
@@ -88,6 +90,7 @@ namespace rmos_solver {
     }
     void RuneSolverNode::armorsCallBack(const rmos_interfaces::msg::Armors::SharedPtr armors_msg)
     {
+        this->mode_ = base::Mode::NORMAL_RUNE;
         if(this->mode_ != base::Mode::RUNE&&this->mode_ != base::Mode::NORMAL_RUNE)
             return;
         
@@ -188,7 +191,7 @@ namespace rmos_solver {
     {
         this->controler_->rune_gun_pitch_offset_ = this->declare_parameter("rune_gun_pitch_offset", 0.0f);
         this->controler_->rune_gun_yaw_offset_ = this->declare_parameter("rune_gun_yaw_offset", 1.0f);
-        this->controler_->ballistic_solver_.bullet_speed_ = this->declare_parameter("bullet_speed", 26);
+        this->controler_->ballistic_solver_.bullet_speed_ = this->declare_parameter("bullet_speed", 27.2);
         this->controler_->bs_fly_time_ = this->declare_parameter("bs_fly_time", 570.0f);
         this->controler_->ballistic_solver_.rune_ballistic_param_ = {
             .level_first = this->declare_parameter("level_first", 1.22),
@@ -204,6 +207,67 @@ namespace rmos_solver {
         };
 
     }
+    rcl_interfaces::msg::SetParametersResult RuneSolverNode::parametersCallback(const std::vector<rclcpp::Parameter> &parameters)
+    {
+        rcl_interfaces::msg::SetParametersResult result;
+        result.successful = true;
+        result.reason = "success";
+        // Here update class attributes, do some actions, etc.
+
+        for (const auto &param: parameters)
+        {
+            RCLCPP_INFO(this->get_logger(), "%s", param.get_name().c_str());
+            RCLCPP_INFO(this->get_logger(), "%s", param.get_type_name().c_str());
+            RCLCPP_INFO(this->get_logger(), "%s", param.value_to_string().c_str());
+
+            if (param.get_name() == "rune_gun_pitch_offset") {
+                this->controler_->rune_gun_pitch_offset_ = param.as_double();
+            }    
+            else if (param.get_name() == "rune_gun_yaw_offset") {
+                this->controler_->rune_gun_yaw_offset_ = param.as_double();
+            }   
+            else if (param.get_name() == "bullet_speed") {
+                this->controler_->ballistic_solver_.bullet_speed_ = param.as_double();
+            }   
+            else if (param.get_name() == "bs_fly_time") {
+                this->controler_->bs_fly_time_ = param.as_double();
+            }
+            else if (param.get_name() == "level_first") {
+                this->controler_->ballistic_solver_.rune_ballistic_param_.level_first = param.as_double();
+            }
+            else if (param.get_name() == "level_second") {
+                this->controler_->ballistic_solver_.rune_ballistic_param_.level_second = param.as_double();
+            }
+            else if (param.get_name() == "level_third") {
+                this->controler_->ballistic_solver_.rune_ballistic_param_.level_third = param.as_double();
+            }
+            else if (param.get_name() == "level_fourth") {
+                this->controler_->ballistic_solver_.rune_ballistic_param_.level_fourth = param.as_double();
+            }
+            else if (param.get_name() == "height_first") {
+                this->controler_->ballistic_solver_.rune_ballistic_param_.height_first = param.as_int();
+            }
+            else if (param.get_name() == "height_second") {
+                this->controler_->ballistic_solver_.rune_ballistic_param_.height_second = param.as_int();
+            }           
+            else if (param.get_name() == "height_third") {
+                this->controler_->ballistic_solver_.rune_ballistic_param_.height_third = param.as_int();
+            }   
+            else if (param.get_name() == "g") {
+                this->controler_->ballistic_solver_.rune_ballistic_param_.g = param.as_double();
+            }
+            else if (param.get_name() == "debug") {
+                this->controler_->ballistic_solver_.rune_ballistic_param_.debug = param.as_int(); 
+            }
+            else {
+                RCLCPP_WARN(this->get_logger(), "Parameter %s not found", param.get_name().c_str());
+                result.successful = false;
+                result.reason = "Parameter not found";
+            }
+        }
+        return result;
+    }
+
 }
 
 #include <rclcpp_components/register_node_macro.hpp>

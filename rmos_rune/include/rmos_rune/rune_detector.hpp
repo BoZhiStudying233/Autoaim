@@ -21,6 +21,7 @@ namespace RuneDetector
         float red_brightness_thresh;
         float red_color_thresh;
         float blue_red_diff;   
+        bool show_bin;
         
         float circle_center_conf;                   // 能量机关圆心阈值
         float no_activate_conf;                     // 未激活扇叶阈值

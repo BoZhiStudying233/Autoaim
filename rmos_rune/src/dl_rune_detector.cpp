@@ -18,6 +18,7 @@ namespace RuneDetector
         this->param.red_color_thresh = params.red_color_thresh;
         this->param.blue_color_thresh = params.blue_color_thresh;
         this->param.blue_red_diff = params.blue_red_diff;
+        this->param.show_bin = params.show_bin;
 
         this->param.circle_center_conf = params.circle_center_conf;
         this->param.no_activate_conf = params.no_activate_conf;
@@ -451,7 +452,11 @@ namespace RuneDetector
                 }
             }
         }
-
+        if(this->param.show_bin)
+        {
+            cv::imshow("maskedImage", maskedImage);
+            waitKey(1);
+        }
         // area现在包含了多边形内部的像素数量
         if(this->param.tell_area)
             std::cout << "Area of the object: " << area << std::endl;

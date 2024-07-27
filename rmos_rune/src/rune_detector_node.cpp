@@ -84,7 +84,6 @@ namespace rmos_rune
                 bool can_draw = true;
                 for(int i = 0; i < 4; i++)
                 {
-                     
                     if(rune_next_pos[i].x < 0 || rune_next_pos[i].y < 0 || rune_next_pos[i].x > image.cols || rune_next_pos[i].y > image.rows)
                         can_draw = false;
                 }
@@ -100,12 +99,8 @@ namespace rmos_rune
                 cv::Mat tvec;
                 cv::Mat rvec;
                 
-                        if(true){
-            debug_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
-            debug_img_pub_.publish(*debug_image_msg_,camera_info_msg_);
-        }
+
                 bool is_solve;
-return ;
                 is_solve = this->pnp_solver_->solveRuneArmorPose(rune_next_pos,this->camera_matrix_,this->dist_coeffs_,tvec,rvec);
                 if(!is_solve)
                 {
@@ -196,6 +191,10 @@ return ;
         if(this->tell_cost_time)
             RCLCPP_INFO(this->get_logger(), "Cost %.4f ms", (time2-time1).seconds() * 1000);
         
+        if(true){
+            debug_image_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image).toImageMsg();
+            debug_img_pub_.publish(*debug_image_msg_,camera_info_msg_);
+        }
 
 
 
@@ -295,7 +294,8 @@ return ;
             .red_brightness_thresh = this->declare_parameter("image_params.red_brightness_thresh", 30),
             .red_color_thresh = this->declare_parameter("image_params.red_color_thresh", 50),
             .blue_red_diff = this->declare_parameter("image_params.blue_red_diff", 20),
-        
+            .show_bin = this->declare_parameter("image_params.show_bin", false),
+
             .circle_center_conf = this->declare_parameter("deep_learning_params.circle_center_conf", 0),
             .no_activate_conf = this->declare_parameter("deep_learning_params.no_activate_conf", 0.7),
             .activate_conf = this->declare_parameter("deep_learning_params.activate_conf", 0),
@@ -304,7 +304,7 @@ return ;
 
             .low_threshold = this->declare_parameter("image_params.low_threshold", 1000),
             .high_threshold = this->declare_parameter("image_params.high_threshold", 4000),
-            .tell_area = this->declare_parameter("image_params.tell_area", 0),
+            .tell_area = this->declare_parameter("image_params.tell_area", false),
     
             .delay_time = this->declare_parameter("fitting_params.delay_time", 0.45f),
             .save_txt = this->declare_parameter("fitting_params.save_txt", 0),
@@ -349,8 +349,10 @@ return ;
                 this->rune_detector_->param.red_color_thresh = param.as_int();
             } else if (param.get_name() == "image_params.blue_red_diff") {
                 this->rune_detector_->param.blue_red_diff = param.as_int();
+            } else if (param.get_name() == "image_params.show_bin") {
+                this->rune_detector_->param.show_bin = param.as_bool();
             } else if (param.get_name() == "image_params.tell_area") {
-                this->rune_detector_->param.tell_area = param.as_int();
+                this->rune_detector_->param.tell_area = param.as_bool();
             } else if (param.get_name() == "image_params.low_threshold") {
                 this->rune_detector_->param.low_threshold = param.as_int();
             } else if (param.get_name() == "image_params.high_threshold") {
