@@ -3,6 +3,7 @@
 namespace tool
 {
     BallisticSolver::BallisticSolver() {
+        this->bs_coeff_ = 0;
         return;
     }
 
@@ -34,8 +35,6 @@ namespace tool
         return cv::Point3f(pitch,yaw,t_actual);
     }
 
-
-
     bool BallisticSolver::setBulletSpeed(float bullet_speed)
     {
         this->bullet_speed_ = bullet_speed;
@@ -45,7 +44,24 @@ namespace tool
 
     void BallisticSolver::setBS_coeff(cv::Point3f position,bool is_rune)
     {
-        if(is_rune == true) // 打符模式下弹速系数的调节
+        if(is_rune == false) // 自瞄模式下的弹速系数调节
+        {
+            float distance = sqrt(position.x*position.x+
+                                position.y*position.y+
+                                position.z*position.z);
+            // std::cout<<"distance:"<<distance<<std::endl;
+            this->bs_coeff_ = normal_ballistic_param_.bs_coeff_first;
+            if(distance >= normal_ballistic_param_.distance_first)
+            {
+                this->bs_coeff_ = normal_ballistic_param_.bs_coeff_second;
+            }
+            if(distance >= normal_ballistic_param_.distance_second)
+            {
+                this->bs_coeff_ = normal_ballistic_param_.bs_coeff_third;
+            }
+            // std::cout<<"bs_coeff_:"<<this->bs_coeff_<<std::endl;
+        }
+        else if(is_rune == true) // 打符模式下弹速系数的调节
         {
                 bs_coeff_ = rune_ballistic_param_.level_first;
                 if (position.z >= rune_ballistic_param_.height_first && position.z < rune_ballistic_param_.height_second)
