@@ -55,7 +55,7 @@ private:
 
 
 
-    int DN = 2;                         // 逐差法测速度间距
+    int DN = 1;                         // 逐差法测速度间距
 
     double start_time;                  // 拟合数据集中的第一个时间戳
     bool is_Inited = false;             // 大符拟合是否初始化
