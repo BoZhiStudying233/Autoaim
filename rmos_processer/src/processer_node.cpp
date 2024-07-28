@@ -84,6 +84,9 @@ namespace rmos_processer {
             };
             
         this->tracker_sample_ = this->create_wall_timer(duration, timer_callback);
+
+        callback_handle_ = this->add_on_set_parameters_callback(
+                std::bind(&ProcesserNode::parametersCallback, this, std::placeholders::_1));
     }
 
     void ProcesserNode::armorsCallBack(const rmos_interfaces::msg::Armors::SharedPtr armors_msg)
@@ -431,6 +434,133 @@ namespace rmos_processer {
         };
         this->controler_->tracker_.initParams(tacker_params);
     }
+
+    rcl_interfaces::msg::SetParametersResult ProcesserNode::parametersCallback(
+        const std::vector<rclcpp::Parameter> &parameters)
+    {
+        rcl_interfaces::msg::SetParametersResult result;
+        result.successful = true;
+        result.reason = "success";
+        // Here update class attributes, do some actions, etc.
+
+        for (const auto &param: parameters)
+        {
+            RCLCPP_INFO(this->get_logger(), "%s", param.get_name().c_str());
+            RCLCPP_INFO(this->get_logger(), "%s", param.get_type_name().c_str());
+            RCLCPP_INFO(this->get_logger(), "%s", param.value_to_string().c_str());
+
+            if (param.get_name() == "debug")
+            {   
+                this->debug_ = param.as_int();  
+            }
+            else if (param.get_name() == "lost_time_thres")
+            {
+                this->controler_->lost_time_thres_ = param.as_double();
+            }
+            else if (param.get_name() == "s2qxyz")
+            {
+                this->controler_->s2qxyz_ = param.as_double();
+            }
+            else if (param.get_name() == "s2qyaw")
+            {
+                this->controler_->s2qyaw_ = param.as_double();
+            }
+            else if (param.get_name() == "s2qr")
+            {
+                this->controler_->s2qr_ = param.as_double();
+            }
+            else if (param.get_name() == "r_xyz_factor")
+            {   
+                this->controler_->r_xyz_factor = param.as_double();  
+            }
+            else if (param.get_name() == "r_yaw")
+            {       
+                this->controler_->r_yaw = param.as_double();  
+            }
+            else if (param.get_name() == "delay")
+            {
+                this->controler_->delay_ = param.as_double();
+            }
+            else if (param.get_name() == "true_x")
+            {
+                this->controler_->true_x_ = param.as_int();
+            }
+            else if (param.get_name() == "gun_pitch_offset")
+            {
+                this->controler_->gun_pitch_offset_ = param.as_double();
+            }
+            else if (param.get_name() == "gun_yaw_offset")
+            {
+                this->controler_->gun_yaw_offset_ = param.as_double();
+            }
+            else if (param.get_name() == "rune_gun_pitch_offset")
+            {
+                this->controler_->rune_gun_pitch_offset_ = param.as_double();
+            }
+            else if (param.get_name() == "rune_gun_yaw_offset")
+            {
+                this->controler_->rune_gun_yaw_offset_ = param.as_double();
+            }
+            else if (param.get_name() == "bs_fly_time")
+            {   
+                this->controler_->bs_fly_time_ = param.as_double();  
+            }
+            else if (param.get_name() == "ready_time")
+            {  
+                this->controler_->ready_time_ = param.as_double();  
+            }
+            else if (param.get_name() == "bs_coeff_first")
+            {
+                this->controler_->ballistic_solver_.normal_ballistic_param_.bs_coeff_first = param.as_double();
+            }
+            else if (param.get_name() == "bs_coeff_second")
+            {
+                this->controler_->ballistic_solver_.normal_ballistic_param_.bs_coeff_second = param.as_double();
+            }
+            else if (param.get_name() == "bs_coeff_third")
+            {
+                this->controler_->ballistic_solver_.normal_ballistic_param_.bs_coeff_third = param.as_double();
+            }
+            else if (param.get_name() == "bs_coeff_fourth")
+            {
+                this->controler_->ballistic_solver_.normal_ballistic_param_.bs_coeff_fourth = param.as_double();
+            }
+            else if (param.get_name() == "distance_first")
+            {
+                this->controler_->ballistic_solver_.normal_ballistic_param_.distance_first = param.as_int();
+            }  
+            else if (param.get_name() == "distance_second")
+            {
+                this->controler_->ballistic_solver_.normal_ballistic_param_.distance_second = param.as_int();
+            }   
+            else if (param.get_name() == "distance_third")   
+            {
+                this->controler_->ballistic_solver_.normal_ballistic_param_.distance_third = param.as_int();
+            }
+            else if (param.get_name() == "k")
+            {
+                this->controler_->ballistic_solver_.normal_ballistic_param_.k = param.as_double();
+
+            }
+            else if (param.get_name() == "g")
+            {
+                this->controler_->ballistic_solver_.normal_ballistic_param_.g = param.as_double();
+            }
+            else if (param.get_name() == "bullet_speed")
+            {
+                this->controler_->ballistic_solver_.bullet_speed_ = param.as_double();
+            }
+            else
+            {
+                RCLCPP_WARN(this->get_logger(), "Unknown parameter of processer node: %s", param.get_name().c_str());
+                result.successful = false;
+                result.reason = "unknown parameter";
+            }
+        }
+
+        return result;
+    }
+
 }
 
 #include <rclcpp_components/register_node_macro.hpp>
