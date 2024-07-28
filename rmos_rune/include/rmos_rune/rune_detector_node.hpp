@@ -183,7 +183,7 @@ namespace rmos_rune
             this->tf_publisher_->sendTransform(t) ;
 
             callback_handle_ = this->add_on_set_parameters_callback(
-            std::bind(&RuneDetectorNode::parametersCallback, this, std::placeholders::_1));
+                std::bind(&RuneDetectorNode::parametersCallback, this, std::placeholders::_1));
         }
         rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter> &parameters);
 
