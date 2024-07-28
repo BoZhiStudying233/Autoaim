@@ -70,7 +70,6 @@ namespace tool
                     bs_coeff_ = rune_ballistic_param_.level_third;
                 else if (position.z >= rune_ballistic_param_.height_third)
                     bs_coeff_ = rune_ballistic_param_.level_fourth;
-            std::cout<<"rune_ballistic_param_.debug"<<rune_ballistic_param_.debug<<std::endl;
             if(rune_ballistic_param_.debug)
             {
                 std::cout<<"bs_coeff_:"<<this->bs_coeff_<<std::endl;
