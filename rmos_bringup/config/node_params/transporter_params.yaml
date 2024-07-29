@@ -1,6 +1,6 @@
 /**:
   ros__parameters:
-    debug: 0
+    debug: false
 
     interface_usb_vid: 0x0483
     interface_usb_pid: 0x5740
@@ -10,4 +10,4 @@
     interface_usb_write_timeout: 1
 
     force_mode: -1 # -1--disable  0--自瞄 1--小符 2--大符
-    tell_mode: 0
+    tell_mode: false

@@ -42,6 +42,8 @@
 // #include "../../Algorithm/include/Debug/debug.hpp"
 
 
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
+
 namespace rmos_processer
 {
     using tf2_filter = tf2_ros::MessageFilter<rmos_interfaces::msg::Armors>;
@@ -52,7 +54,12 @@ namespace rmos_processer
 
         ~ProcesserNode() = default;
 
+        rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter> &parameters);
+
     protected:
+
+        OnSetParametersCallbackHandle::SharedPtr callback_handle_;
+
         /**
          *  @brief  amrors_sub_的回调函数,对识别装甲板进行后处理，发布target目标
          *  @param[in]  armors_msg detector_node发送的所有已识别装甲板

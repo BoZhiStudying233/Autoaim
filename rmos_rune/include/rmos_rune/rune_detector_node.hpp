@@ -44,6 +44,9 @@
 // #include "../../Algorithm/include/Debug/debug.hpp"
 // #include "../../Algorithm/include/Dectector/detector/mix_detector/mix_detector.hpp"
 
+
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
+
 namespace rmos_rune
 {
     class BaseDetectorNode : public rclcpp::Node
@@ -136,6 +139,7 @@ namespace rmos_rune
             debug_bin_img_pub_ = image_transport::create_camera_publisher(this, "/debug_bin_image", rmw_qos_profile_default);
 
 
+
             //cj_detector_ = std::make_shared<detector::CjDetector>();
             // detector_ = std::make_shared<detector::Detector>();            
             fitting_ = std::make_shared<RuneDetector::Fitting>();
@@ -147,7 +151,7 @@ namespace rmos_rune
             /*publish static TF*/
             this->tf_publisher_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
             this->rune_detector_ = initDetector();
-            
+
 
 
             //发布相机到陀螺仪的静态tf
@@ -177,11 +181,17 @@ namespace rmos_rune
             t.transform.translation.y = this->declare_parameter("camera2imu_offset_y", 0.0);
             t.transform.translation.z = this->declare_parameter("camera2imu_offset_z", 0.0);
             this->tf_publisher_->sendTransform(t) ;
+
+            callback_handle_ = this->add_on_set_parameters_callback(
+                std::bind(&RuneDetectorNode::parametersCallback, this, std::placeholders::_1));
         }
+        rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter> &parameters);
 
     protected:
-        void imageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr &image_msg);
 
+        OnSetParametersCallbackHandle::SharedPtr callback_handle_;
+        void imageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr &image_msg);
+        std::string my_str_;
         /*mode*/
         void setMode(int mode);
         base::Mode mode_ = base::Mode::NORMAL;
@@ -217,6 +227,9 @@ namespace rmos_rune
 
         //std::shared_ptr<detector::CjDetector> cj_detector_;
         // std::shared_ptr<detector::Detector> detector_;
+
+
+
         std::unique_ptr<RuneDetector::DlRuneDetector> initDetector();
         std::shared_ptr<RuneDetector::DlRuneDetector> rune_detector_;
 

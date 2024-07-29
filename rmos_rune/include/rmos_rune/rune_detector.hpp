@@ -13,7 +13,7 @@ namespace RuneDetector
     typedef struct RuneParam
     {
     public:
-        int show_R;
+        bool show_R;
  
         //图像参数
         float blue_brightness_thresh;
@@ -21,6 +21,7 @@ namespace RuneDetector
         float red_brightness_thresh;
         float red_color_thresh;
         float blue_red_diff;   
+        bool show_bin;
         
         float circle_center_conf;                   // 能量机关圆心阈值
         float no_activate_conf;                     // 未激活扇叶阈值
@@ -61,7 +62,7 @@ namespace RuneDetector
 
         int id = 0;                                     // 扇叶识别次序
         RuneParam param;
-        base::Color enemy_color_{base::BLUE};
+        base::Color enemy_color_{base::RED};
 
         /**
          *  @brief  构造函数,初始化yolov7模型与RuneParam内的参数

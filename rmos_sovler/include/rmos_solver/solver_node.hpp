@@ -51,6 +51,7 @@ namespace rmos_solver
         RuneSolverNode(const rclcpp::NodeOptions &options);
 
         ~RuneSolverNode() = default;
+        rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter> &parameters);
 
     protected:
         /**
@@ -84,6 +85,7 @@ namespace rmos_solver
         base::Mode mode_ = base::Mode::NORMAL;
         base::Mode last_mode_ = base::Mode::NORMAL; 
 
+        OnSetParametersCallbackHandle::SharedPtr callback_handle_;
 
         
 

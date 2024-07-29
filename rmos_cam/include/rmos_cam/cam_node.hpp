@@ -28,6 +28,9 @@
 #include "rmos_utils/const.hpp"
 #include "virtual_cam.hpp"
 
+
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
+
 // #include "rmos_interfaces/msg/mode.hpp"
 // #include "rmos_interfaces/msg/exp.hpp"
 namespace rmos_cam
@@ -59,6 +62,9 @@ namespace rmos_cam
     public:
         DahengCamNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
         ~DahengCamNode();
+
+        rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter> &parameters);
+
     protected:
         /**
         *  @brief  设置模式
@@ -95,6 +101,8 @@ namespace rmos_cam
         rclcpp::Subscription<std_msgs::msg::Int8>::SharedPtr mode_sub_;
         std::shared_ptr<camera::DahengCam> cam_dev_;
         std::thread capture_thread_;                    // 采图线程
+
+        OnSetParametersCallbackHandle::SharedPtr callback_handle_;
     };
 
     class VirtualCamNode : public virtual CamNode

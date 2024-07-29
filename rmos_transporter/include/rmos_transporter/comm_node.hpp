@@ -25,6 +25,7 @@
 
 #include "usb.hpp"
 
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
 namespace rmos_transporter
 {
     class CommNode : public rclcpp::Node{
@@ -40,6 +41,8 @@ namespace rmos_transporter
             this->mode_pub_ = this->create_publisher<std_msgs::msg::Int8>("/mode_info", rclcpp::SensorDataQoS());
             this->autoaim_state_pub_ = this->create_publisher<rmos_interfaces::msg::AutoaimState>("/autoaim_state", rclcpp::SensorDataQoS());
             this->interval_pub_ = this->create_publisher<std_msgs::msg::Float64>("/fire_interval", rclcpp::SensorDataQoS());
+
+            
         }
 
     protected:
@@ -61,7 +64,11 @@ namespace rmos_transporter
     public:
         UsbCommNode(const rclcpp::NodeOptions & options);
         ~UsbCommNode();
+        rcl_interfaces::msg::SetParametersResult parametersCallback(const std::vector<rclcpp::Parameter> &parameters);
+
     protected:
+        OnSetParametersCallbackHandle::SharedPtr callback_handle_;
+
         /**
          *  @brief  target_sub_的回调函数，将msg转换后通过usb发送
          */

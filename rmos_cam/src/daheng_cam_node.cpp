@@ -114,6 +114,9 @@ namespace rmos_cam
                                               }
                                           }
                                       }};
+        callback_handle_ = this->add_on_set_parameters_callback(
+        std::bind(&DahengCamNode::parametersCallback, this, std::placeholders::_1));
+
             
     }
     void DahengCamNode::setMode(int mode)
@@ -175,6 +178,40 @@ namespace rmos_cam
         }
         cam_dev_->close();
         RCLCPP_INFO(this->get_logger(), "Camera node destroyed!");
+    }
+
+    rcl_interfaces::msg::SetParametersResult DahengCamNode::parametersCallback(
+        const std::vector<rclcpp::Parameter> &parameters)
+    {
+        rcl_interfaces::msg::SetParametersResult result;
+        result.successful = true;
+        result.reason = "success";
+        // Here update class attributes, do some actions, etc.
+
+        for (const auto &param: parameters)
+        {
+            RCLCPP_INFO(this->get_logger(), "%s", param.get_name().c_str());
+            RCLCPP_INFO(this->get_logger(), "%s", param.get_type_name().c_str());
+            RCLCPP_INFO(this->get_logger(), "%s", param.value_to_string().c_str());
+
+            if (param.get_name() == "exposure") {
+                if(this->mode_ == base::Mode::NORMAL){
+                    this->normal_Exposure = param.as_int();
+                    cam_dev_->changeExp(this->normal_Exposure);
+                }
+            }  else if (param.get_name() == "time_offset") {
+                this->time_offset = param.as_int();
+            } else if (param.get_name() == "rune_exposure") {
+                if(this->mode_ == base::Mode::RUNE || this->mode_ == base::Mode::NORMAL_RUNE){
+                    this->rune_Exposure = param.as_int();
+                    cam_dev_->changeExp(this->rune_Exposure);
+                }
+            } else {
+                RCLCPP_WARN(this->get_logger(), "我没在相机节点写这个参数... %s", param.get_name().c_str());
+            }
+
+        }
+        return result;
     }
 } // namespace rmos_cam
 

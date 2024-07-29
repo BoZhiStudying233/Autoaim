@@ -1,14 +1,14 @@
 /**:
   ros__parameters:
-    rune_gun_pitch_offset: -0.8
+    rune_gun_pitch_offset: -1.2
     rune_gun_yaw_offset: 0.2
 
     bs_fly_time: 1380.0     
     ready_time: 0.0
-    bullet_speed: 27
+    bullet_speed: 27.2
 
 
-    debug: 1
+    debug: 0
     level_first: 1.28
     level_second: 1.24  # 0.8
     level_third: 1.18   # 0.8

@@ -37,9 +37,9 @@ namespace rmos_transporter
         interface_usb_write_timeout_ = this->declare_parameter("interface_usb_write_timeout", 1);
         
         force_mode = this->declare_parameter("force_mode", -1);
-        tell_mode = this->declare_parameter("tell_mode", 0);
+        tell_mode = this->declare_parameter("tell_mode", false);
         
-        this->debug = this->declare_parameter("debug", 0);
+        this->debug = this->declare_parameter("debug", false);
         RCLCPP_INFO(this->get_logger(), "Init Transporter");
         transporter_ = std::make_shared<transporter_sdk::UsbcdcTransporter>(
             interface_usb_vid_, 
@@ -59,6 +59,9 @@ namespace rmos_transporter
             // exit(1);
         }
         RCLCPP_INFO(this->get_logger(), "Finish Init");
+
+        callback_handle_ = this->add_on_set_parameters_callback(
+                std::bind(&UsbCommNode::parametersCallback, this, std::placeholders::_1));
     }
 
     UsbCommNode::~UsbCommNode()
@@ -220,12 +223,16 @@ namespace rmos_transporter
                 if (package.mode & (0x02)){
                     mode_msg_.data = (int) base::Mode::NORMAL;
                 }
-                if (package.mode & (0x04)){
+                else if (package.mode & (0x04)){
                     mode_msg_.data = (int) base::Mode::RUNE;
                 }
-                if (package.mode & (0x08)){
+                else if (package.mode & (0x08)){
                     mode_msg_.data = (int) base::Mode::NORMAL_RUNE;
                 }
+                else{
+                    mode_msg_.data = (int) base::Mode::NORMAL;
+                }
+
                 ForceSetMode(mode_msg_); 
                 if(this->tell_mode)
                     tellMode(mode_msg_);
@@ -306,7 +313,34 @@ namespace rmos_transporter
             std::cout<<"NORMAL_RUNE"<<std::endl;
         }
     }
+    rcl_interfaces::msg::SetParametersResult UsbCommNode::parametersCallback(
+        const std::vector<rclcpp::Parameter> &parameters)
+    {
+        rcl_interfaces::msg::SetParametersResult result;
+        result.successful = true;
+        result.reason = "success";
+        // Here update class attributes, do some actions, etc.
 
+        for (const auto &param: parameters)
+        {
+            RCLCPP_INFO(this->get_logger(), "%s", param.get_name().c_str());
+            RCLCPP_INFO(this->get_logger(), "%s", param.get_type_name().c_str());
+            RCLCPP_INFO(this->get_logger(), "%s", param.value_to_string().c_str());
+
+            if (param.get_name() == "debug") {
+                this->debug = param.as_bool();
+            } else if (param.get_name() == "force_mode") {
+                this->force_mode = param.as_int();
+
+            } else if (param.get_name() == "tell_mode") {
+                this->tell_mode = param.as_bool();
+            } else {
+                RCLCPP_WARN(this->get_logger(), "unknown parameter %s", param.get_name().c_str());
+            }
+
+        }
+        return result;
+    }
 } // namespace rmos_comm
 #include <rclcpp_components/register_node_macro.hpp>
 

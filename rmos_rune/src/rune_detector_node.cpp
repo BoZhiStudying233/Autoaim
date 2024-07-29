@@ -83,7 +83,6 @@ namespace rmos_rune
                 bool can_draw = true;
                 for(int i = 0; i < 4; i++)
                 {
-                     
                     if(rune_next_pos[i].x < 0 || rune_next_pos[i].y < 0 || rune_next_pos[i].x > image.cols || rune_next_pos[i].y > image.rows)
                         can_draw = false;
                 }
@@ -99,8 +98,8 @@ namespace rmos_rune
                 cv::Mat tvec;
                 cv::Mat rvec;
                 
-                bool is_solve;
 
+                bool is_solve;
                 is_solve = this->pnp_solver_->solveRuneArmorPose(rune_next_pos,this->camera_matrix_,this->dist_coeffs_,tvec,rvec);
                 if(!is_solve)
                 {
@@ -197,6 +196,7 @@ namespace rmos_rune
         }
 
 
+
        
         if(armors_msg.armors.size()!=0){
             armors_pub_->publish(armors_msg); 
@@ -287,16 +287,14 @@ namespace rmos_rune
     std::unique_ptr<RuneDetector::DlRuneDetector> RuneDetectorNode::initDetector()
     {
         RuneDetector::RuneParam params = {
-            .show_R = this->declare_parameter("image_params.show_R", 0),
-
+            .show_R = this->declare_parameter("image_params.show_R", true),
             .blue_brightness_thresh = this->declare_parameter("image_params.blue_brightness_thresh", 30),
             .blue_color_thresh = this->declare_parameter("image_params.blue_color_thresh", 50),
             .red_brightness_thresh = this->declare_parameter("image_params.red_brightness_thresh", 30),
             .red_color_thresh = this->declare_parameter("image_params.red_color_thresh", 50),
             .blue_red_diff = this->declare_parameter("image_params.blue_red_diff", 20),
+            .show_bin = this->declare_parameter("image_params.show_bin", false),
 
- 
-            
             .circle_center_conf = this->declare_parameter("deep_learning_params.circle_center_conf", 0),
             .no_activate_conf = this->declare_parameter("deep_learning_params.no_activate_conf", 0.7),
             .activate_conf = this->declare_parameter("deep_learning_params.activate_conf", 0),
@@ -305,13 +303,12 @@ namespace rmos_rune
 
             .low_threshold = this->declare_parameter("image_params.low_threshold", 1000),
             .high_threshold = this->declare_parameter("image_params.high_threshold", 4000),
-            .tell_area = this->declare_parameter("image_params.tell_area", 0),
+            .tell_area = this->declare_parameter("image_params.tell_area", false),
     
             .delay_time = this->declare_parameter("fitting_params.delay_time", 0.45f),
             .save_txt = this->declare_parameter("fitting_params.save_txt", 0),
             .print_result = this->declare_parameter("fitting_params.print_result", 1), // 添加了 print_result 参数声明    
         };
-        std::cout<<"low_threshold:"<<params.low_threshold<<std::endl;
         this->save_image = this->declare_parameter("debug_params.save_image", 0);
         this->save_draw_image = this->declare_parameter("debug_params.save_draw_image", 0);
         this->tell_cost_time = this->declare_parameter("debug_params.tell_cost_time", 0);
@@ -324,6 +321,71 @@ namespace rmos_rune
         auto rune_detector = std::make_unique<RuneDetector::DlRuneDetector>(params);
 
         return rune_detector;
+    }
+    rcl_interfaces::msg::SetParametersResult RuneDetectorNode::parametersCallback(
+        const std::vector<rclcpp::Parameter> &parameters)
+    {
+        rcl_interfaces::msg::SetParametersResult result;
+        result.successful = true;
+        result.reason = "success";
+        // Here update class attributes, do some actions, etc.
+
+        for (const auto &param: parameters)
+        {
+            RCLCPP_INFO(this->get_logger(), "%s", param.get_name().c_str());
+            RCLCPP_INFO(this->get_logger(), "%s", param.get_type_name().c_str());
+            RCLCPP_INFO(this->get_logger(), "%s", param.value_to_string().c_str());
+
+            if (param.get_name() == "image_params.show_R") {
+                this->rune_detector_->param.show_R = param.as_bool();
+            } else if (param.get_name() == "image_params.blue_brightness_thresh") {
+                this->rune_detector_->param.blue_brightness_thresh = param.as_int();
+            } else if (param.get_name() == "image_params.blue_color_thresh") {
+                this->rune_detector_->param.blue_color_thresh = param.as_int();
+            } else if (param.get_name() == "image_params.red_brightness_thresh") {
+                this->rune_detector_->param.red_brightness_thresh = param.as_int();
+            } else if (param.get_name() == "image_params.red_color_thresh") {
+                this->rune_detector_->param.red_color_thresh = param.as_int();
+            } else if (param.get_name() == "image_params.blue_red_diff") {
+                this->rune_detector_->param.blue_red_diff = param.as_int();
+            } else if (param.get_name() == "image_params.show_bin") {
+                this->rune_detector_->param.show_bin = param.as_bool();
+            } else if (param.get_name() == "image_params.tell_area") {
+                this->rune_detector_->param.tell_area = param.as_bool();
+            } else if (param.get_name() == "image_params.low_threshold") {
+                this->rune_detector_->param.low_threshold = param.as_int();
+            } else if (param.get_name() == "image_params.high_threshold") {
+                this->rune_detector_->param.high_threshold = param.as_int();
+            } else if (param.get_name() == "deep_learning_params.circle_center_conf") {
+                this->rune_detector_->param.circle_center_conf = param.as_double();
+            } else if (param.get_name() == "deep_learning_params.no_activate_conf") {
+                this->rune_detector_->param.no_activate_conf = param.as_double();
+            } else if (param.get_name() == "deep_learning_params.activate_conf") {
+                this->rune_detector_->param.activate_conf = param.as_double();
+            } else if (param.get_name() == "deep_learning_params.circle_center_roi_width") {
+                this->rune_detector_->param.circle_center_roi_width = param.as_int();
+            } else if (param.get_name() == "deep_learning_params.max_diff_distance_ratio") {
+                this->rune_detector_->param.max_diff_distance_ratio = param.as_double();
+            } else if (param.get_name() == "fitting_params.points_num") {
+                this->fitting_->Points_num = param.as_int();
+            } else if (param.get_name() == "fitting_params.delay_time") {
+                this->fitting_->fit.delay_time = param.as_double();
+            } else if (param.get_name() == "fitting_params.save_txt") {
+                this->fitting_->fit.save_txt = param.as_int();
+            } else if (param.get_name() == "fitting_params.print_result") {
+                this->fitting_->fit.print_result = param.as_int();
+            } else if (param.get_name() == "debug_params.save_image") {
+                this->save_image = param.as_int();
+            } else if (param.get_name() == "debug_params.save_draw_image") {
+                this->save_draw_image = param.as_int();
+            } else if (param.get_name() == "debug_params.tell_cost_time") {
+                this->tell_cost_time = param.as_int();
+            } else {
+                RCLCPP_WARN(this->get_logger(), "unknown parameter %s", param.get_name().c_str());
+            }
+
+        }
+        return result;
     }
 
 }
