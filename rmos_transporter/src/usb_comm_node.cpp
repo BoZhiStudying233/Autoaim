@@ -223,12 +223,16 @@ namespace rmos_transporter
                 if (package.mode & (0x02)){
                     mode_msg_.data = (int) base::Mode::NORMAL;
                 }
-                if (package.mode & (0x04)){
+                else if (package.mode & (0x04)){
                     mode_msg_.data = (int) base::Mode::RUNE;
                 }
-                if (package.mode & (0x08)){
+                else if (package.mode & (0x08)){
                     mode_msg_.data = (int) base::Mode::NORMAL_RUNE;
                 }
+                else{
+                    mode_msg_.data = (int) base::Mode::NORMAL;
+                }
+
                 ForceSetMode(mode_msg_); 
                 if(this->tell_mode)
                     tellMode(mode_msg_);
