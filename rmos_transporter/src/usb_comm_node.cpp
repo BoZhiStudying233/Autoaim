@@ -37,9 +37,9 @@ namespace rmos_transporter
         interface_usb_write_timeout_ = this->declare_parameter("interface_usb_write_timeout", 1);
         
         force_mode = this->declare_parameter("force_mode", -1);
-        tell_mode = this->declare_parameter("tell_mode", 0);
+        tell_mode = this->declare_parameter("tell_mode", false);
         
-        this->debug = this->declare_parameter("debug", 0);
+        this->debug = this->declare_parameter("debug", false);
         RCLCPP_INFO(this->get_logger(), "Init Transporter");
         transporter_ = std::make_shared<transporter_sdk::UsbcdcTransporter>(
             interface_usb_vid_, 
@@ -326,7 +326,7 @@ namespace rmos_transporter
             if (param.get_name() == "debug") {
                 this->debug = param.as_bool();
             } else if (param.get_name() == "force_mode") {
-                this->force_mode = param.as_int();\
+                this->force_mode = param.as_int();
 
             } else if (param.get_name() == "tell_mode") {
                 this->tell_mode = param.as_bool();

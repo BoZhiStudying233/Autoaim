@@ -26,4 +26,4 @@
     debug_params:
       save_image: 0
       save_draw_image: 0
-      tell_cost_time: 1
+      tell_cost_time: 0
